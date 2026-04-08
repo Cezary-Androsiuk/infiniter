@@ -40,11 +40,21 @@ const cell *InfiniterCorePrivate::getData() const
     return m_sbo_active ? m_data.stack : m_data.heap.memory;
 }
 
+const uint_64 &getSize() const
+{
+    return m_size;
+}
+
+const uint_64 &getCapacity() const
+{
+    return m_sbo_active ? STACK_CAPACITY : m_data.heap.capacity;
+}
+
 void InfiniterCorePrivate::reserve(uint_64 new_size)
 {
     if(m_sbo_active)
     {
-        if(new_size <= STACK_CAPACITY) return;
+        if(new_size <= STACK_CAPACITY) return; // handle m_size
 
         // allocate heap (to tmp variable because of union)
         cell* new_heap = new cell[new_size];
@@ -71,7 +81,6 @@ void InfiniterCorePrivate::reserve(uint_64 new_size)
         m_data.heap.memory = new_heap;
         m_size = new_size;
     }
-
 }
 
 void InfiniterCorePrivate::dbgPrint() // temporary

@@ -16,8 +16,12 @@ public:
 
     cell *getData();
     const cell *getData() const;
+    const uint_64 &getSize() const;
+    const uint_64 &getCapacity() const;
 
     void reserve(uint_64 size);
+    void optimize();
+    void optimize_memory();
 
     void dbgPrint(); // temporary
 
