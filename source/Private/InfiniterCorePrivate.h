@@ -1,10 +1,10 @@
 #ifndef INFINITERCOREPRIVATE_H
 #define INFINITERCOREPRIVATE_H
 
-#define STACK_CELLS_SIZE 2
+#define STACK_CAPACITY 2
 
 typedef unsigned long long cell;
-typedef unsigned long long size_t;
+typedef unsigned long long uint_64;
 
 class InfiniterCorePrivate
 {
@@ -12,26 +12,30 @@ public:
     InfiniterCorePrivate();
 
     void clear();
+    void reset();
 
     cell *getData();
     const cell *getData() const;
 
-    void dbgPrint();
+    void reserve(uint_64 size);
+
+    void dbgPrint(); // temporary
 
 
 private:
 
 
 private:
-    size_t m_length;
-    bool m_sboActive;
+    bool m_sbo_active; // small buffer optimization
 
+    uint_64 m_size;
+    
     union{
-        cell stack[STACK_CELLS_SIZE];
+        cell stack[STACK_CAPACITY];
 
         struct{
             cell *memory;
-            size_t heapMemReserved;
+            uint_64 capacity;
         } heap;
     } m_data;
 };
