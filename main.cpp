@@ -1,7 +1,14 @@
-#include "source/Private/InfiniterCorePrivate.h"
-
+#include "source/InfiniterCore.h"
+#include <cstdio>
 int main(int argc, char *argv[])
 {
-    InfiniterCorePrivate icp;
+
+    printf("1\n");
+    InfiniterCore icp;
+
+    printf("2\n");
     icp.dbgPrint();
+
+
+
 }

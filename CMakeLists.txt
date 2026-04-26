@@ -15,7 +15,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 add_executable(Infiniter
   main.cpp
   source/Infiniter.h source/Infiniter.cpp
-  source/Private/InfiniterCorePrivate.h source/Private/InfiniterCorePrivate.cpp
+  source/InfiniterCore.h source/InfiniterCore.cpp
 )
 target_link_libraries(Infiniter Qt${QT_VERSION_MAJOR}::Core)
 

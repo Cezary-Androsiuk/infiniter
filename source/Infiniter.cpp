@@ -1,3 +1,5 @@
 #include "Infiniter.h"
 
-Infiniter::Infiniter() {}
+Infiniter::Infiniter()
+    : InfiniterCore()
+{}
