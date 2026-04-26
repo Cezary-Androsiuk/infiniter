@@ -25,6 +25,8 @@ public:
     uint64_t getSize() const;
     uint64_t getCapacity() const;
 
+    uint8_t getSign() const;
+
     void reserve(uint64_t size);
     void optimize();
     void optimize_memory();

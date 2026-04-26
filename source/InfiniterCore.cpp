@@ -59,6 +59,11 @@ uint64_t InfiniterCore::getCapacity() const
     return GET_BIT(m_bit_state, SBO_BIT) ? STACK_CAPACITY : m_data.heap.capacity;
 }
 
+uint8_t InfiniterCore::getSign() const
+{
+    return GET_BIT( m_bit_state, SIGN_BIT );
+}
+
 void InfiniterCore::reserve(uint64_t new_size)
 {
     if(GET_BIT(m_bit_state, SBO_BIT))
@@ -70,6 +75,8 @@ void InfiniterCore::reserve(uint64_t new_size)
 
         // move existing data
         std::copy(m_data.stack, m_data.stack + m_size, new_heap);
+        // fill new cells with mask000
+        std::fill(new_heap + m_size, new_heap + new_size, 0);
 
         // add new heap to member variables
         m_data.heap.memory = new_heap;
@@ -85,6 +92,8 @@ void InfiniterCore::reserve(uint64_t new_size)
 
         // move existing data
         std::copy(m_data.heap.memory, m_data.heap.memory + m_size, new_heap);
+        // fill new cells with mask000
+        std::fill(new_heap + m_size, new_heap + new_size, 0);
 
         // delete old heap and add new heap to member variables
         delete[] m_data.heap.memory;

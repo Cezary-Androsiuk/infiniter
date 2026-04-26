@@ -16,6 +16,7 @@ add_executable(Infiniter
   main.cpp
   source/Infiniter.h source/Infiniter.cpp
   source/InfiniterCore.h source/InfiniterCore.cpp
+  source/InfiniterLow.h source/InfiniterLow.cpp
 )
 target_link_libraries(Infiniter Qt${QT_VERSION_MAJOR}::Core)
 

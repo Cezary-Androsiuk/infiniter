@@ -1,7 +1,7 @@
 #ifndef INFINITER_H
 #define INFINITER_H
 
-#include "InfiniterCore.h"
+#include "InfiniterLow.h"
 
 #define mask000 (0b0000000000000000000000000000000000000000000000000000000000000000)
 #define mask001 (0b0000000000000000000000000000000000000000000000000000000000000001)
@@ -13,7 +13,7 @@
 #define mask111 (0b1111111111111111111111111111111111111111111111111111111111111111)
 
 
-class Infiniter : public InfiniterCore
+class Infiniter : public InfiniterLow
 {
 public:
     Infiniter();

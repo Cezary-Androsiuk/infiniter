@@ -2,12 +2,26 @@
 #include <cstdio>
 int main(int argc, char *argv[])
 {
-
-    printf("1\n");
     InfiniterCore icp;
+    icp.dbgPrint(); printf("\n");
 
-    printf("2\n");
-    icp.dbgPrint();
+    icp.reserve(0);
+    icp.dbgPrint(); printf("\n");
+
+    icp.reserve(1);
+    icp.dbgPrint(); printf("\n");
+
+    icp.reserve(2);
+    icp.dbgPrint(); printf("\n");
+
+    icp.reserve(3);
+    icp.dbgPrint(); printf("\n");
+
+    icp.reserve(4);
+    icp.dbgPrint(); printf("\n");
+
+    icp.reserve(3);
+    icp.dbgPrint(); printf("\n");
 
 
 
