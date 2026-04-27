@@ -14,6 +14,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 add_executable(Infiniter
   main.cpp
+  source/InfiniterCommon.hpp
   source/Infiniter.h source/Infiniter.cpp
   source/InfiniterCore.h source/InfiniterCore.cpp
   source/InfiniterLow.h source/InfiniterLow.cpp

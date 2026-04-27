@@ -1,6 +1,8 @@
 #ifndef INFINITER_H
 #define INFINITER_H
 
+#include <cstdint>
+
 #include "InfiniterLow.h"
 
 #define mask000 (0b0000000000000000000000000000000000000000000000000000000000000000)
@@ -17,6 +19,7 @@ class Infiniter : public InfiniterLow
 {
 public:
     Infiniter();
+
 };
 
 #endif // INFINITER_H

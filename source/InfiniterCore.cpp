@@ -15,9 +15,9 @@ void InfiniterCore::clear()
     m_bit_state = 0;
 
     printf("%d\n", m_bit_state);
-    SET_BIT_1( m_bit_state, SIGN_BIT );
+    SET_BIT( m_bit_state, SIGN_BIT );
     printf("%d\n", m_bit_state);
-    SET_BIT_1( m_bit_state, SBO_BIT );
+    SET_BIT( m_bit_state, SBO_BIT );
 
     printf("%d\n", m_bit_state);
 
@@ -81,7 +81,7 @@ void InfiniterCore::reserve(uint64_t new_size)
         // add new heap to member variables
         m_data.heap.memory = new_heap;
         m_size = new_size;
-        SET_BIT_0( m_bit_state, SBO_BIT );
+        CLEAR_BIT( m_bit_state, SBO_BIT );
     }
     else
     {

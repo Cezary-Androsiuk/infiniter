@@ -5,8 +5,8 @@
 
 #define STACK_CAPACITY 2
 
-#define SET_BIT_1(var, bit)     ( (var) |=  (bit) )
-#define SET_BIT_0(var, bit)     ( (var) &= ~(bit) )
+#define SET_BIT(var, bit)       ( (var) |=  (bit) )
+#define CLEAR_BIT(var, bit)     ( (var) &= ~(bit) )
 #define SWITCH_BIT(var, bit)    ( (var) ^=  (bit) )
 #define GET_BIT(var, bit)       ( (var) &   (bit) )
 
@@ -38,8 +38,8 @@ private:
 
 
 private:
-    static constexpr uint8_t SIGN_BIT   = 1 << 0; // 00000001 (1)
-    static constexpr uint8_t SBO_BIT    = 1 << 1; // 00000010 (2) // small buffer optimization
+    static constexpr uint8_t SIGN_BIT   = UINT8(1) << 0; // 00000001 (1)
+    static constexpr uint8_t SBO_BIT    = UINT8(1) << 1; // 00000010 (2) // small buffer optimization
     uint8_t m_bit_state;
 
     uint64_t m_size;
