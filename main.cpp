@@ -1,5 +1,14 @@
 #include "source/InfiniterCore.h"
 #include <cstdio>
+
+/*
+ * Infiniter
+ * InfiniterMath
+ * InfiniterBit (InfiniterLow)
+ * InfiniterIO
+ * InfiniterCore
+ */
+
 int main(int argc, char *argv[])
 {
     InfiniterCore icp;

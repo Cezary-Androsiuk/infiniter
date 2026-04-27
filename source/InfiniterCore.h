@@ -38,8 +38,8 @@ private:
 
 
 private:
-    static constexpr uint8_t SIGN_BIT   = UINT8(1) << 0; // 00000001 (1)
-    static constexpr uint8_t SBO_BIT    = UINT8(1) << 1; // 00000010 (2) // small buffer optimization
+    static constexpr uint8_t SIGN_BIT   = UINT8_C(1) << 0; // 00000001 (1)
+    static constexpr uint8_t SBO_BIT    = UINT8_C(1) << 1; // 00000010 (2) // small buffer optimization
     uint8_t m_bit_state;
 
     uint64_t m_size;

@@ -1,11 +1,9 @@
 #ifndef INFINITER_H
 #define INFINITER_H
 
-#include <cstdint>
+#include "InfiniterMath.h"
 
-#include "InfiniterLow.h"
-
-class Infiniter : public InfiniterLow
+class Infiniter : public InfiniterMath
 {
 public:
     Infiniter();
