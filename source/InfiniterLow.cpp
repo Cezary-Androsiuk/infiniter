@@ -33,7 +33,7 @@ void InfiniterLow::clearBit(uint64_t cell_id, uint8_t pos)
     this->getData()[cell_id] &= ~(UINT64(1) << pos);
 }
 
-void toggleBit(uint64_t cell_id, uint8_t pos)
+void InfiniterLow::toggleBit(uint64_t cell_id, uint8_t pos)
 {
     this->checkCellPos(cell_id, pos);
 
@@ -55,7 +55,7 @@ void InfiniterLow::clearBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept
     this->getData()[cell_id] &= ~(UINT64(1) << pos);
 }
 
-void toggleBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept
+void InfiniterLow::toggleBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept
 {
     this->getData()[cell_id] ^= (UINT64(1) << pos);
 }

@@ -8,8 +8,6 @@ class InfiniterLow : public InfiniterCore
 public:
     InfiniterLow();
 
-    // bool setBit(uint64_t cell_id, uint8_t pos, uint8_t bit_value);
-
     void checkCellPos(uint64_t cell_id, uint8_t pos);
 
     uint8_t getBit(uint64_t cell_id, uint8_t pos);
@@ -22,6 +20,8 @@ public:
     void setBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept;
     void clearBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept;
     void toggleBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept;
+    
+
     
 
 };
