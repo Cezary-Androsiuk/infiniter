@@ -79,7 +79,7 @@ void InfiniterBit::shiftLSB(uint64_t lsb)
     cell *data = this->getData();
     uint64_t nextLSB;
 
-    for(int i=0; i<this->getSize(); i++)
+    for(uint64_t i=0; i<this->getSize(); i++)
     {
         nextLSB = !!(data[i] & mask100);
         data[i] = (data[i] << 1) | lsb; // shift left and set lsb
@@ -100,10 +100,10 @@ void InfiniterBit::shiftMSB(uint64_t msb)
     cell *data = this->getData();
     uint64_t nextMSB;
 
-    for(int i=this->getSize()-1; i>=0; i--)
+    for(uint64_t i=this->getSize(); i>0; i--)
     {
-        nextMSB = (data[i] & mask001) << 63;
-        data[i] = (data[i] >> 1) | msb; // shift right and set msb
+        nextMSB = (data[i-1] & mask001) << 63;
+        data[i-1] = (data[i-1] >> 1) | msb; // shift right and set msb
         msb = nextMSB;
     }
 

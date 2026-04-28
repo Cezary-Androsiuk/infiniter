@@ -14,5 +14,9 @@
 
 typedef uint8_t bit;
 
+#define CELL_TYPE unsigned long long
+#define BITS_PER_BYTE 8
+#define BYTES_PER_VAR 8
+#define BITS_PER_VAR 64
 
 #endif // INFINITERCOMMON_HPP

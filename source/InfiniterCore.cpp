@@ -14,12 +14,9 @@ void InfiniterCore::clear()
     m_size = STACK_CAPACITY;
     m_bit_state = 0;
 
-    printf("%d\n", m_bit_state);
     SET_BIT( m_bit_state, SIGN_BIT );
-    printf("%d\n", m_bit_state);
     SET_BIT( m_bit_state, SBO_BIT );
 
-    printf("%d\n", m_bit_state);
 
     #pragma GCC unroll STACK_CAPACITY
     for(int i=0; i<STACK_CAPACITY; i++)
@@ -66,6 +63,10 @@ uint8_t InfiniterCore::getSign() const
 
 void InfiniterCore::reserve(uint64_t new_size)
 {
+    // keep highest value as technical buffer (for loops)
+    if(new_size == ~UINT64_C(0))
+        new_size = ~UINT64_C(0)-1;
+
     if(GET_BIT(m_bit_state, SBO_BIT))
     {
         if(new_size <= STACK_CAPACITY) return; // handle m_size
@@ -112,7 +113,12 @@ void InfiniterCore::dbgPrint() // temporary
             auto value = m_data.stack[m_size -i -1];
             for (int i = 63; i >= 0; --i)
             {
-                printf("%d", (int)((value >> i) & 1));
+                int bit = (int)((value >> i) & 1);
+                if(bit)
+                    printf("1");
+                else
+                    printf("_");
+                // printf("%d", (int)((value >> i) & 1));
             }
             printf(" ");
         }
@@ -125,7 +131,12 @@ void InfiniterCore::dbgPrint() // temporary
             auto value = m_data.heap.memory[m_size -i -1];
             for (int i = 63; i >= 0; --i)
             {
-                printf("%d", (int)((value >> i) & 1));
+                int bit = (int)((value >> i) & 1);
+                if(bit)
+                    printf("1");
+                else
+                    printf("_");
+                // printf("%d", (int)((value >> i) & 1));
             }
             printf(" ");
         }
