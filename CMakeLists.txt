@@ -20,6 +20,7 @@ add_executable(Infiniter
   source/InfiniterBit.h source/InfiniterBit.cpp
   source/InfiniterIO.h source/InfiniterIO.cpp
   source/InfiniterMath.h source/InfiniterMath.cpp
+  source/InfiniterMemory.h source/InfiniterMemory.cpp
 )
 target_link_libraries(Infiniter Qt${QT_VERSION_MAJOR}::Core)
 

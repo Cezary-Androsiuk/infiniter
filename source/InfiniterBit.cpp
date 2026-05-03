@@ -81,7 +81,7 @@ void InfiniterBit::shiftLSB(uint64_t lsb)
 
     for(uint64_t i=0; i<this->getSize(); i++)
     {
-        nextLSB = !!(data[i] & mask100);
+        nextLSB = !!(data[i] & M100);
         data[i] = (data[i] << 1) | lsb; // shift left and set lsb
         lsb = nextLSB;
     }
@@ -102,7 +102,7 @@ void InfiniterBit::shiftMSB(uint64_t msb)
 
     for(uint64_t i=this->getSize(); i>0; i--)
     {
-        nextMSB = (data[i-1] & mask001) << 63;
+        nextMSB = (data[i-1] & M001) << 63;
         data[i-1] = (data[i-1] >> 1) | msb; // shift right and set msb
         msb = nextMSB;
     }
@@ -123,7 +123,7 @@ void InfiniterBit::shiftRight()
 void InfiniterBit::pushLSB(uint64_t lsb)
 {
     /// check for possible overflow before shifting left
-    if(this->getData()[this->getSize()-1] & mask100)
+    if(this->getData()[this->getSize()-1] & M100)
     {
         // MSB is 1 and memory need to be expanded
 
