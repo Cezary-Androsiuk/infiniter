@@ -14,10 +14,13 @@ InfiniterMemory::InfiniterMemory() noexcept
 #if CLEAR_ALLOCATED_MEMORY
     , m_sbo_buffer()
 #endif
-{ }
+{
+    printf("default C\n");
+}
 
 InfiniterMemory::InfiniterMemory(uint64_t p_capacity)
 {
+    printf("parameter C\n");
     /// often when this constructor will be called, user wants more that SBO size
     if(LIKELY( p_capacity > SBO_CAPACITY ))
     {
@@ -50,6 +53,7 @@ InfiniterMemory::InfiniterMemory(const InfiniterMemory &p_source)
     : m_sbo_active( p_source.m_sbo_active )
     , m_capacity( p_source.m_capacity )
 {
+    printf("copy C\n");
     /// set stack or heap
     m_memory = m_sbo_active ? m_sbo_buffer : new cell_t[m_capacity];
     /// if operator new thows here std::bad_alloc() object will be hardly corrupted
@@ -57,26 +61,30 @@ InfiniterMemory::InfiniterMemory(const InfiniterMemory &p_source)
 
     /// copy old data
     // std::memcpy(m_memory, p_source.m_memory, m_capacity);
-    std::copy_n(m_memory, m_capacity, p_source.m_memory);
+    std::copy_n(p_source.m_memory, m_capacity, m_memory);
 }
 
 InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source)
     : m_sbo_active( p_source.m_sbo_active )
     , m_capacity( p_source.m_capacity )
 {
+    printf("move C\n");
     if(UNLIKELY( m_sbo_active )) /// ensure speed up moving heap memory, stack here is already slow
     {
         m_memory = m_sbo_buffer;
 
         /// copy stack memory
-        std::memcpy(m_memory, p_source.m_memory, m_capacity);
+        // std::memcpy(m_memory, p_source.m_memory, m_capacity);
+        std::copy_n(p_source.m_memory, m_capacity, m_memory);
     }
     else
     {
         /// move already allocated memory from source here
         m_memory = p_source.m_memory;
+        p_source.m_memory = nullptr;
     }
 
+#if ENSURE_NEW_OBJECT_AFTER_MOVE
     /// reset source by hand (to prevent memory deallocation)
     p_source.m_memory = p_source.m_sbo_buffer;
     p_source.m_capacity = SBO_CAPACITY;
@@ -85,6 +93,7 @@ InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source)
 #if CLEAR_ALLOCATED_MEMORY
     // std::memset(p_source.m_sbo_buffer, 0, SBO_CAPACITY);
     std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, 0);
+#endif
 #endif
 }
 
@@ -123,4 +132,5 @@ void InfiniterMemory::print() const
         // }
         printf("%016llx ", m_memory[m_capacity-1-i]);
     }
+    printf("\n");
 }

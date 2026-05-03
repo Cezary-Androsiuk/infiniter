@@ -35,6 +35,8 @@ typedef uint8_t     bit_t;
 /// Infiniter variable should be set to 0 after allocation? or leave it without overwriting old data
 #define CLEAR_ALLOCATED_MEMORY true
 
+#define ENSURE_NEW_OBJECT_AFTER_MOVE true
+
 #define LIKELY(x)       __builtin_expect(!!(x), 1)
 #define UNLIKELY(x)     __builtin_expect(!!(x), 0)
 

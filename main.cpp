@@ -59,7 +59,21 @@ int main(int argc, char *argv[])
     // io.dbgPrint();
     // printf("\n");
 
-    InfiniterMemory im;
-
+    InfiniterMemory im(30);
     im.print();
+
+    printf("\n");
+
+    InfiniterMemory im2(im);
+    im2.print();
+
+    printf("\n");
+
+    InfiniterMemory im3(std::move(im));
+    im3.print();
+    im.print();
+    im2.print();
+
+
+
 }
