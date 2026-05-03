@@ -14,11 +14,11 @@ protected: public:
 
     /// Copy Constructor
     InfiniterMemory(const InfiniterMemory &p_source);
-    InfiniterMemory& operator =(const InfiniterMemory &) = delete;
+    InfiniterMemory &operator =(const InfiniterMemory &p_source);
 
     /// Move Constructor
     InfiniterMemory(InfiniterMemory &&p_source);
-    InfiniterMemory& operator =(InfiniterMemory &&) = delete;
+    InfiniterMemory &operator =(InfiniterMemory &&p_source);
 
     ~InfiniterMemory();
 

@@ -64,6 +64,11 @@ InfiniterMemory::InfiniterMemory(const InfiniterMemory &p_source)
     std::copy_n(p_source.m_memory, m_capacity, m_memory);
 }
 
+InfiniterMemory &InfiniterMemory::operator =(const InfiniterMemory &p_source)
+{
+
+}
+
 InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source)
     : m_sbo_active( p_source.m_sbo_active )
     , m_capacity( p_source.m_capacity )
@@ -95,6 +100,11 @@ InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source)
     std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, 0);
 #endif
 #endif
+}
+
+InfiniterMemory &InfiniterMemory::operator =(InfiniterMemory &&p_source)
+{
+
 }
 
 InfiniterMemory::~InfiniterMemory()
