@@ -9,15 +9,15 @@ class InfiniterMemory
 {
 protected: public:
     /// Constructor
-    InfiniterMemory() noexcept;
-    InfiniterMemory(uint64_t p_capacity); /// throws bad_alloc
+    explicit InfiniterMemory() noexcept;
+    explicit InfiniterMemory(uint64_t p_capacity); /// throws bad_alloc
 
     /// Copy Constructor
-    InfiniterMemory(const InfiniterMemory &p_source);
+    explicit InfiniterMemory(const InfiniterMemory &p_source);
     InfiniterMemory &operator =(const InfiniterMemory &p_source);
 
     /// Move Constructor
-    InfiniterMemory(InfiniterMemory &&p_source);
+    explicit InfiniterMemory(InfiniterMemory &&p_source);
     InfiniterMemory &operator =(InfiniterMemory &&p_source);
 
     ~InfiniterMemory();
