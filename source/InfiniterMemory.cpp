@@ -15,12 +15,13 @@ InfiniterMemory::InfiniterMemory() noexcept
     , m_sbo_buffer()
 #endif
 {
-    printf("default C\n");
+    printf("default constructor\n");
 }
 
 InfiniterMemory::InfiniterMemory(uint64_t p_capacity)
 {
-    printf("parameter C\n");
+    printf("parameter constructor\n");
+
     /// often when this constructor will be called, user wants more that SBO size
     if(LIKELY( p_capacity > SBO_CAPACITY ))
     {
@@ -49,15 +50,31 @@ InfiniterMemory::InfiniterMemory(uint64_t p_capacity)
     }
 }
 
+// InfiniterMemory::InfiniterMemory(const InfiniterMemory &p_source)
+//     : m_sbo_active( p_source.m_sbo_active )
+//     , m_capacity( p_source.m_capacity )
+// {
+//     printf("copy constructor\n");
+//     /// set stack or heap
+//     m_memory = m_sbo_active ? m_sbo_buffer : new cell_t[m_capacity];
+//     /// if operator new thows here std::bad_alloc() object will be hardly corrupted
+//     /// because capacity and sbo flag are already set
+
+//     /// copy old data
+//     // std::memcpy(m_memory, p_source.m_memory, m_capacity);
+//     std::copy_n(p_source.m_memory, m_capacity, m_memory);
+// }
+
 InfiniterMemory::InfiniterMemory(const InfiniterMemory &p_source)
-    : m_sbo_active( p_source.m_sbo_active )
-    , m_capacity( p_source.m_capacity )
 {
-    printf("copy C\n");
+    printf("copy constructor\n");
+
     /// set stack or heap
-    m_memory = m_sbo_active ? m_sbo_buffer : new cell_t[m_capacity];
-    /// if operator new thows here std::bad_alloc() object will be hardly corrupted
-    /// because capacity and sbo flag are already set
+    m_memory = p_source.m_sbo_active ? m_sbo_buffer : new cell_t[p_source.m_capacity];
+    /// if operator new thows here std::bad_alloc(), object instance won't be corrupted here
+
+    m_sbo_active = p_source.m_sbo_active;
+    m_capacity = p_source.m_capacity;
 
     /// copy old data
     // std::memcpy(m_memory, p_source.m_memory, m_capacity);
@@ -66,15 +83,39 @@ InfiniterMemory::InfiniterMemory(const InfiniterMemory &p_source)
 
 InfiniterMemory &InfiniterMemory::operator =(const InfiniterMemory &p_source)
 {
+    printf("copy operator\n");
 
+    if( &p_source != this )
+    {
+        cell_t tmp_memory = p_source.m_sbo_active ? m_sbo_buffer : new cell_t[p_source.m_capacity];
+        /// will throw if allocation failed, but object instanc, won't be corrupted
+
+        /// dealocate old memory if allocated
+        if(!m_sbo_active)
+        {
+            delete [] m_memory;
+        }
+
+        m_memory = tmp_memory;
+        m_sbo_active = p_source.m_sbo_active;
+        m_capacity = p_source.m_capacity;
+
+        /// copy old data
+        // std::memcpy(m_memory, p_source.m_memory, m_capacity);
+        std::copy_n(p_source.m_memory, m_capacity, m_memory);
+    }
+
+    return *this;
 }
 
 InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source)
     : m_sbo_active( p_source.m_sbo_active )
     , m_capacity( p_source.m_capacity )
 {
-    printf("move C\n");
-    if(UNLIKELY( m_sbo_active )) /// ensure speed up moving heap memory, stack here is already slow
+    printf("move constructor\n");
+
+    /// ensure speed up for moving heap memory, stack here is already slow
+    if(UNLIKELY( m_sbo_active ))
     {
         m_memory = m_sbo_buffer;
 
@@ -104,7 +145,43 @@ InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source)
 
 InfiniterMemory &InfiniterMemory::operator =(InfiniterMemory &&p_source)
 {
+    printf("move operator\n");
 
+    if( &p_source != this )
+    {
+        m_sbo_active = p_source.m_sbo_active;
+        m_capacity = p_source.m_capacity;
+
+        /// ensure speed up for moving heap memory, stack here is already slow
+        if(UNLIKELY( m_sbo_active ))
+        {
+            m_memory = m_sbo_buffer;
+
+            /// copy stack memory
+            // std::memcpy(m_memory, p_source.m_memory, m_capacity);
+            std::copy_n(p_source.m_memory, m_capacity, m_memory);
+        }
+        else
+        {
+            /// move already allocated memory from source here
+            m_memory = p_source.m_memory;
+            p_source.m_memory = nullptr;
+        }
+
+#if ENSURE_NEW_OBJECT_AFTER_MOVE
+        /// reset source by hand (to prevent memory deallocation)
+        p_source.m_memory = p_source.m_sbo_buffer;
+        p_source.m_capacity = SBO_CAPACITY;
+        p_source.m_sbo_active = true;
+
+#if CLEAR_ALLOCATED_MEMORY
+        // std::memset(p_source.m_sbo_buffer, 0, SBO_CAPACITY);
+        std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, 0);
+#endif
+#endif
+    }
+
+    return *this;
 }
 
 InfiniterMemory::~InfiniterMemory()

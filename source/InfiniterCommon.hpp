@@ -32,10 +32,17 @@ typedef uint8_t     bit_t;
 #define REALLOC_PADDING_SIZE( ___ ) _REALLOC_CONSTANT
 #endif
 
+// ####################### INFINITER MEMORY #######################
+
 /// Infiniter variable should be set to 0 after allocation? or leave it without overwriting old data
+/// after allocation memory will be set to 0 if enabled, if disabled memory can have trash in in
 #define CLEAR_ALLOCATED_MEMORY true
 
 #define ENSURE_NEW_OBJECT_AFTER_MOVE true
+/// if not ensured, object after std::move will be corrupted and need to be deleted, but it is few operation faster
+
+// ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER MEMORY ^^^^^^^^^^^^^^^^^^^^^^^
+
 
 #define LIKELY(x)       __builtin_expect(!!(x), 1)
 #define UNLIKELY(x)     __builtin_expect(!!(x), 0)
