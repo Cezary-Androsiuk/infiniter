@@ -37,11 +37,14 @@ protected: public:
 
     void dbg_print() const;
 
+    /// Getters
+    bool isSBOActive() const;
 
+    /// Operators
     InfiniterMemory &operator =(const InfiniterMemory &p_source);
     InfiniterMemory &operator =(InfiniterMemory &&p_source);
 
-protected:
+protected: public:
     cell_t *m_memory;
     uint64_t m_capacity;
 

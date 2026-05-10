@@ -22,6 +22,33 @@ void print_array(uint64_t *array, uint64_t size)
     printf("\n");
 }
 
+void test_reasigning_data_to_new_array()
+{
+
+    printf("\n");
+    printf("\n");
+    printf("\n");
+    printf("\n");
+
+    /// testing copying and filling what left
+
+    cell_t m_memory[8];
+    for(int i=0; i<8; i++) m_memory[i] = i+1;
+    print_array(m_memory, 8);
+
+
+    cell_t *tmp_memory = new cell_t[10];
+    for(int i=0; i<10; i++) tmp_memory[i] = UINT64_C(-1);
+    print_array(tmp_memory, 10);
+
+    std::copy_n(m_memory, 8, tmp_memory);
+    print_array(tmp_memory, 10);
+
+    uint64_t addition = 10-8; // p_new_capacity-m_capacity
+    std::fill_n(tmp_memory+8, addition, 0xaaaaaaaaaaaaaaaa);
+    print_array(tmp_memory, 10);
+}
+
 
 void infiniterMemoryTests()
 {
@@ -53,31 +80,59 @@ void infiniterMemoryTests()
     im.dbg_print();
     im0.dbg_print();
 
+
+    printf("\n");
+    printf("\n");
+
+
+    // InfiniterMemory im10;
+    // im10.reserve(SBO_CAPACITY+5);
+    // im10.m_memory[im10.m_capacity-1-2] = -1;
+    // im10.dbg_print();
+    // im10.shrink();
+    // im10.dbg_print();
+
+    {
+        InfiniterMemory _im(SBO_CAPACITY +5);
+        _im.m_memory[SBO_CAPACITY +1] = -1;
+        _im.dbg_print();
+        _im.shrink();
+        _im.dbg_print();
+        printf("\n");
+    }
+
+    {
+        InfiniterMemory _im(SBO_CAPACITY +5);
+        _im.m_memory[SBO_CAPACITY] = -1;
+        _im.dbg_print();
+        _im.shrink();
+        _im.dbg_print();
+        printf("\n");
+    }
+
+    {
+        InfiniterMemory _im(SBO_CAPACITY +5);
+        _im.m_memory[SBO_CAPACITY -1] = -1;
+        _im.dbg_print();
+        _im.shrink();
+        _im.dbg_print();
+        printf("\n");
+    }
+
+    {
+        InfiniterMemory _im(SBO_CAPACITY +5);
+        _im.m_memory[SBO_CAPACITY -2] = -1;
+        _im.dbg_print();
+        _im.shrink();
+        _im.dbg_print();
+        printf("\n");
+    }
+
+
+
     /// r-value (move) / l-value
 
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printf("\n");
-
-    /// testing copying and filling what left
-
-    cell_t m_memory[8];
-    for(int i=0; i<8; i++) m_memory[i] = i+1;
-    print_array(m_memory, 8);
-
-
-    cell_t *tmp_memory = new cell_t[10];
-    for(int i=0; i<10; i++) tmp_memory[i] = UINT64_C(-1);
-    print_array(tmp_memory, 10);
-
-    std::copy_n(m_memory, 8, tmp_memory);
-    print_array(tmp_memory, 10);
-
-    uint64_t addition = 10-8; // p_new_capacity-m_capacity
-    std::fill_n(tmp_memory+8, addition, 0xaaaaaaaaaaaaaaaa);
-    print_array(tmp_memory, 10);
-
+    // test_reasigning_data_to_new_array();
 
     printf("\n");
     printf("\n");

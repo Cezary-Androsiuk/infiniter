@@ -20,7 +20,7 @@ typedef uint8_t     bit_t;
 #define BYTES_PER_CELL  8
 #define BITS_PER_CELL   64
 
-#define SBO_CAPACITY 20
+#define SBO_CAPACITY 3
 
 #define USE_DYNAMIC_PADDING_SIZE true
 

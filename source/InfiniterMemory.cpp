@@ -140,49 +140,25 @@ void InfiniterMemory::reserve(uint64_t p_new_capacity)
 
     /// m_capacity < p_new_capacity at this point
 
+    cell_t *tmp_memory = new cell_t[p_new_capacity];
+    /// will throw if allocation failed, but object instance, won't be corrupted
 
+    /// copy old data
+    std::copy_n(m_memory, m_capacity, tmp_memory);
 
-    cell_t m_memory[8];
-    for(int i=0; i<8; i++) m_memory[i] = i+1;
-    // print_array(m_memory, 8);
+    /// set new cells to 0
+    uint64_t cells_added = p_new_capacity - m_capacity;
+    std::fill_n(tmp_memory + m_capacity, cells_added, 0);
 
+    /// dealocate old memory if allocated
+    if(!m_sbo_active)
+    {
+        delete [] m_memory;
+    }
 
-    cell_t *tmp_memory = new cell_t[10];
-    for(int i=0; i<10; i++) tmp_memory[i] = UINT64_C(-1);
-    // print_array(tmp_memory, 10);
-
-    std::copy_n(m_memory, 8, tmp_memory);
-    // print_array(tmp_memory, 10);
-
-    uint64_t addition = 10-8; // p_new_capacity-m_capacity
-    std::fill_n(tmp_memory+8, addition, 0xaaaaaaaaaaaaaaaa);
-    // print_array(tmp_memory, 10);
-
-
-
-
-
-    // cell_t *tmp_memory = new cell_t[p_new_capacity]();
-    // /// will throw if allocation failed, but object instance, won't be corrupted
-
-    // /// copy old data
-    // std::copy_n(m_memory, m_capacity, tmp_memory);
-    // /// fill other with 0, keeping
-    // std::fill_n(tmp_memory+m_capacity, p_new_capacity-m_capacity, 0);
-
-    // /// dealocate old memory if allocated
-    // if(!m_sbo_active)
-    // {
-    //     delete [] m_memory;
-    // }
-
-    // m_memory = tmp_memory;
-    // m_sbo_active = p_source.m_sbo_active;
-    // m_capacity = p_source.m_capacity;
-
-    // /// copy old data
-    // // std::memcpy(m_memory, p_source.m_memory, m_capacity);
-    // std::copy_n(p_source.m_memory, m_capacity, m_memory);
+    m_memory = tmp_memory;
+    m_sbo_active = false;
+    m_capacity = p_new_capacity;
 
 }
 
@@ -202,6 +178,55 @@ void InfiniterMemory::shrink()
     /// for example:
     /// INPUT:  000 000 000 100 000 000 101 101 000
     /// OUTPUT:             100 000 000 101 101 000
+
+    /// might require m_size update in InfiniterCore
+
+    /// SBO is smallest possible size, so if active then skip it
+    /// propably not often someone want to shrink SBO more
+    if(UNLIKELY(m_sbo_active))
+        return;
+
+    /// find first non zero cell going from the left (from MSB)
+    /// if msb_index is smaller than SBO_CAPACITY just enable SBO
+    uint64_t msb_index = m_capacity;
+    while( !(m_memory[--msb_index]) && msb_index>=SBO_CAPACITY )
+        ;
+
+
+    if(msb_index+1 == SBO_CAPACITY)
+    {
+        /// shrink to match SBO
+
+        /// copy old data
+        std::copy_n(m_memory, SBO_CAPACITY, m_sbo_buffer);
+
+        /// dealocate old memory
+        delete [] m_memory;
+
+        m_memory = m_sbo_buffer;
+        m_sbo_active = true;
+        m_capacity = SBO_CAPACITY;
+    }
+    else
+    {
+        /// shrink heap
+
+        uint64_t new_capacity = msb_index +1;
+
+        cell_t *tmp_memory = new cell_t[new_capacity];
+        /// will throw if allocation failed, but object instance, won't be corrupted
+
+        /// copy old data
+        std::copy_n(m_memory, new_capacity, tmp_memory);
+
+        /// dealocate old memory
+        delete [] m_memory;
+
+        m_memory = tmp_memory;
+        m_sbo_active = false;
+        m_capacity = new_capacity;
+    }
+
 }
 
 void InfiniterMemory::shrink(uint64_t p_target_capacity)
@@ -213,6 +238,49 @@ void InfiniterMemory::shrink(uint64_t p_target_capacity)
     /// for example when target capacity is 7:
     /// INPUT:  000 000 000 100 000 000 101 101 000
     /// OUTPUT:         000 100 000 000 101 101 000
+
+    /// should be used only by InfiniterCore after changing m_size
+
+    /// SBO is smallest possible size, so if active then skip it
+    /// propably not often someone want to shrink SBO more
+    if(UNLIKELY(m_sbo_active))
+        return;
+
+    /// shrinking to larger capacity? must be nice
+    if(UNLIKELY( p_target_capacity >= m_capacity ))
+        return;
+
+    if(p_target_capacity == SBO_CAPACITY)
+    {
+        /// shrink to match SBO
+
+        /// copy old data
+        std::copy_n(m_memory, SBO_CAPACITY, m_sbo_buffer);
+
+        /// dealocate old memory
+        delete [] m_memory;
+
+        m_memory = m_sbo_buffer;
+        m_sbo_active = true;
+        m_capacity = SBO_CAPACITY;
+    }
+    else
+    {
+        /// shrink heap
+
+        cell_t *tmp_memory = new cell_t[p_target_capacity];
+        /// will throw if allocation failed, but object instance, won't be corrupted
+
+        /// copy old data
+        std::copy_n(m_memory, p_target_capacity, tmp_memory);
+
+        /// dealocate old memory
+        delete [] m_memory;
+
+        m_memory = tmp_memory;
+        m_sbo_active = false;
+        m_capacity = p_target_capacity;
+    }
 }
 
 void InfiniterMemory::reset() noexcept
@@ -234,11 +302,16 @@ void InfiniterMemory::reset() noexcept
 void InfiniterMemory::dbg_print() const
 {
     printf("obj: %p, size: %llu\n", this, m_capacity);
-    for(int i=0; i<m_capacity; i++)
+    for(uint64_t i=0; i<m_capacity; i++)
     {
         printf("%016llx ", m_memory[m_capacity-1-i]);
     }
     printf("\n");
+}
+
+bool InfiniterMemory::isSBOActive() const
+{
+    return m_sbo_active;
 }
 
 InfiniterMemory &InfiniterMemory::operator =(const InfiniterMemory &p_source)
