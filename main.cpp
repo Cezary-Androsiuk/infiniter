@@ -11,6 +11,81 @@
  * InfiniterCore
  */
 
+void print_array(uint64_t *array, uint64_t size)
+{
+
+    printf("size: %llu\n", size);
+    for(int i=0; i<size; i++)
+    {
+        printf("%016llx ", array[size-1-i]);
+    }
+    printf("\n");
+}
+
+
+void infiniterMemoryTests()
+{
+    InfiniterMemory im0;
+    im0.dbg_print();
+
+    InfiniterMemory im(30);
+    im.dbg_print();
+
+    printf("\n");
+
+    InfiniterMemory im2(im);
+    im2.dbg_print();
+
+    printf("\n");
+
+    InfiniterMemory im3(std::move(im));
+    im3.dbg_print();
+    im.dbg_print();
+    im2.dbg_print();
+
+    printf("\n");
+
+    im = im0;
+    im.dbg_print();
+    im = im2;
+    im.dbg_print();
+    im = std::move(im0);
+    im.dbg_print();
+    im0.dbg_print();
+
+    /// r-value (move) / l-value
+
+    printf("\n");
+    printf("\n");
+    printf("\n");
+    printf("\n");
+
+    /// testing copying and filling what left
+
+    cell_t m_memory[8];
+    for(int i=0; i<8; i++) m_memory[i] = i+1;
+    print_array(m_memory, 8);
+
+
+    cell_t *tmp_memory = new cell_t[10];
+    for(int i=0; i<10; i++) tmp_memory[i] = UINT64_C(-1);
+    print_array(tmp_memory, 10);
+
+    std::copy_n(m_memory, 8, tmp_memory);
+    print_array(tmp_memory, 10);
+
+    uint64_t addition = 10-8; // p_new_capacity-m_capacity
+    std::fill_n(tmp_memory+8, addition, 0xaaaaaaaaaaaaaaaa);
+    print_array(tmp_memory, 10);
+
+
+    printf("\n");
+    printf("\n");
+    printf("\n");
+    printf("\n");
+
+}
+
 int main(int argc, char *argv[])
 {
     // InfiniterIO icp;
@@ -59,21 +134,7 @@ int main(int argc, char *argv[])
     // io.dbgPrint();
     // printf("\n");
 
-    InfiniterMemory im(30);
-    im.print();
-
-    printf("\n");
-
-    InfiniterMemory im2(im);
-    im2.print();
-
-    printf("\n");
-
-    InfiniterMemory im3(std::move(im));
-    im3.print();
-    im.print();
-    im2.print();
-
+    infiniterMemoryTests();
 
 
 }

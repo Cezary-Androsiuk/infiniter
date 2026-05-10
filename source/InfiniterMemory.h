@@ -5,6 +5,10 @@
 
 #include "InfiniterCommon.hpp"
 
+/// prints what is happening - what methods are executed
+#define INFINITER_MEMORY_DEBUG_PRINT true
+
+// template <uint64_t SBO_CAPACITY = DEFAULT_SBO_CAPACITY> // possible but another leayer of complexity and makes code hard to implement/read
 class InfiniterMemory
 {
 protected: public:
@@ -13,18 +17,29 @@ protected: public:
     explicit InfiniterMemory(uint64_t p_capacity); /// throws bad_alloc
 
     /// Copy Constructor
-    explicit InfiniterMemory(const InfiniterMemory &p_source);
-    InfiniterMemory &operator =(const InfiniterMemory &p_source);
+    explicit InfiniterMemory(const InfiniterMemory &p_source); /// throws bad_alloc
 
     /// Move Constructor
-    explicit InfiniterMemory(InfiniterMemory &&p_source);
-    InfiniterMemory &operator =(InfiniterMemory &&p_source);
+    explicit InfiniterMemory(InfiniterMemory &&p_source) noexcept;
 
     ~InfiniterMemory();
 
-    void reset();
 
-    void print() const;
+    void reserve(uint64_t p_new_capacity); /// throws bad_alloc // in upper classes operator uint64_t() will be implemented, then Infiniter can be converted to scalars
+    void reserve(const InfiniterMemory &p_source); /// throws bad_alloc
+    void extend(uint64_t p_additional_capacity); /// throws bad_alloc
+
+    /// might require m_size update in InfiniterCore
+    void shrink(); /// throws bad_alloc
+    void shrink(uint64_t p_target_capacity); /// throws bad_alloc
+
+    void reset() noexcept;
+
+    void dbg_print() const;
+
+
+    InfiniterMemory &operator =(const InfiniterMemory &p_source);
+    InfiniterMemory &operator =(InfiniterMemory &&p_source);
 
 protected:
     cell_t *m_memory;
