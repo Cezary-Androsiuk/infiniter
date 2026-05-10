@@ -63,7 +63,6 @@ InfiniterMemory::InfiniterMemory(uint64_t p_capacity)
         m_sbo_active = true;
 
 #if CLEAR_ALLOCATED_MEMORY
-        // std::memset(m_sbo_buffer, 0, SBO_CAPACITY);
         std::fill_n(m_sbo_buffer, SBO_CAPACITY, 0);
 #endif
     }
@@ -84,7 +83,6 @@ InfiniterMemory::InfiniterMemory(const InfiniterMemory &p_source)
     m_capacity = p_source.m_capacity;
 
     /// copy old data
-    // std::memcpy(m_memory, p_source.m_memory, m_capacity);
     std::copy_n(p_source.m_memory, m_capacity, m_memory);
 }
 
@@ -100,7 +98,6 @@ InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source) noexcept
         m_memory = m_sbo_buffer;
 
         /// copy stack memory
-        // std::memcpy(m_memory, p_source.m_memory, m_capacity);
         std::copy_n(p_source.m_memory, m_capacity, m_memory);
     }
     else
@@ -117,7 +114,6 @@ InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source) noexcept
     p_source.m_sbo_active = true;
 
 #if CLEAR_ALLOCATED_MEMORY
-    // std::memset(p_source.m_sbo_buffer, 0, SBO_CAPACITY);
     std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, 0);
 #endif
 #endif
@@ -231,7 +227,6 @@ void InfiniterMemory::reset() noexcept
     m_sbo_active = true;
 
 #if CLEAR_ALLOCATED_MEMORY
-    // std::memset(m_sbo_buffer, 0, SBO_CAPACITY);
     std::fill_n(m_sbo_buffer, SBO_CAPACITY, 0);
 #endif
 }
@@ -266,7 +261,6 @@ InfiniterMemory &InfiniterMemory::operator =(const InfiniterMemory &p_source)
         m_capacity = p_source.m_capacity;
 
         /// copy old data
-        // std::memcpy(m_memory, p_source.m_memory, m_capacity);
         std::copy_n(p_source.m_memory, m_capacity, m_memory);
     }
 
@@ -288,7 +282,6 @@ InfiniterMemory &InfiniterMemory::operator =(InfiniterMemory &&p_source)
             m_memory = m_sbo_buffer;
 
             /// copy stack memory
-            // std::memcpy(m_memory, p_source.m_memory, m_capacity);
             std::copy_n(p_source.m_memory, m_capacity, m_memory);
         }
         else
@@ -305,7 +298,6 @@ InfiniterMemory &InfiniterMemory::operator =(InfiniterMemory &&p_source)
         p_source.m_sbo_active = true;
 
 #if CLEAR_ALLOCATED_MEMORY
-        // std::memset(p_source.m_sbo_buffer, 0, SBO_CAPACITY);
         std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, 0);
 #endif
 #endif
