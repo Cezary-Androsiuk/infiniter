@@ -8,10 +8,10 @@
 /// prints what is happening - what methods are executed
 #define INFINITER_MEMORY_DEBUG_PRINT true
 
-// template <uint64_t SBO_CAPACITY = DEFAULT_SBO_CAPACITY> // possible but another leayer of complexity and makes code hard to implement/read
+
 class InfiniterMemory
 {
-protected: public:
+protected:
     /// Constructor
     explicit InfiniterMemory() noexcept;
     explicit InfiniterMemory(uint64_t p_capacity); /// throws bad_alloc
@@ -44,7 +44,7 @@ protected: public:
     InfiniterMemory &operator =(const InfiniterMemory &p_source);
     InfiniterMemory &operator =(InfiniterMemory &&p_source);
 
-protected: public:
+protected:
     cell_t *m_memory;
     uint64_t m_capacity;
 
@@ -53,6 +53,8 @@ private:
     bool m_sbo_active;
 
     // heap memory allocated directly on m_memory
+
+    friend void infiniterMemoryTests();
 };
 
 #endif // INFINITERMEMORY_H
