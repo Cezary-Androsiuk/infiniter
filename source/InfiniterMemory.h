@@ -52,7 +52,7 @@ private:
     cell_t m_sbo_buffer[SBO_CAPACITY];
     bool m_sbo_active;
 
-    // heap memory allocated directly on m_memory
+    // heap memory is allocated directly on m_memory
 
     friend void infiniterMemoryTests();
 };

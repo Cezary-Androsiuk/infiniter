@@ -3,56 +3,30 @@
 
 #include <cstdint>
 
-#define STACK_CAPACITY 2
+#include "InfiniterCommon.hpp"
+#include "InfiniterMemory.h"
 
-#define SET_BIT(var, bit)       ( (var) |=  (bit) )
-#define CLEAR_BIT(var, bit)     ( (var) &= ~(bit) )
-#define SWITCH_BIT(var, bit)    ( (var) ^=  (bit) )
-#define GET_BIT(var, bit)       ( (var) &   (bit) )
-
-typedef uint64_t cell;
-
-class InfiniterCore
+class InfiniterCore : private InfiniterMemory
 {
 public:
-    InfiniterCore();
+    /// Constructor
+    explicit InfiniterCore() noexcept;
 
-    void clear();
-    void reset();
+    InfiniterCore(uint64_t p_capacity); /// throws bad_alloc
 
-    cell *getData();
-    const cell *getData() const;
-    uint64_t getSize() const;
-    uint64_t getCapacity() const;
+    /// value only covers first cell, purpose of this is to initialize instance with 1 or something like that
+    InfiniterCore(uint64_t p_capacity, uint64_t p_value, bool p_positive_value=true); /// throws bad_alloc
+    // czy opłaca się oznaczać konstruktory z uint64_t jako explicit?
+    // tak samo w IM
 
-    uint8_t getSign() const;
+    /// Copy Constructor
+    explicit InfiniterCore(const InfiniterCore &p_source); /// throws bad_alloc
 
-    void reserve(uint64_t size);
-    void optimize();
-    void optimize_memory();
-
-    void dbgPrint(); // temporary
+    /// Move Constructor
+    explicit InfiniterCore(InfiniterMemory &&p_source) noexcept;
 
 
 private:
-
-
-private:
-    static constexpr uint8_t SIGN_BIT   = UINT8_C(1) << 0; // 00000001 (1)
-    static constexpr uint8_t SBO_BIT    = UINT8_C(1) << 1; // 00000010 (2) // small buffer optimization
-    uint8_t m_bit_state;
-
-    uint64_t m_size;
-    
-    union{
-        cell stack[STACK_CAPACITY];
-
-        struct{
-            cell *memory;
-            uint64_t capacity;
-        } heap;
-    } m_data;
-
 
 };
 
