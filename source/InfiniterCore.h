@@ -28,6 +28,7 @@ public:
 
 private:
 
+
 };
 
 #endif // INFINITERCORE_H
