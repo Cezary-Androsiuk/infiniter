@@ -32,6 +32,29 @@ typedef uint8_t     bit_t;
 #define REALLOC_PADDING_SIZE( ___ ) _REALLOC_CONSTANT
 #endif
 
+
+
+union BitsUS{ /// bits union struct
+    uint8_t _byte = 0; /// ensures clear bit space
+    struct {
+        uint8_t sbo_active  : 1;
+        uint8_t sign        : 1;
+        // uint8_t
+        // uint8_t
+        // uint8_t
+        // uint8_t
+        // uint8_t
+        // uint8_t
+    };
+};
+
+
+
+/// prints what is happening - what methods are executed
+#define INFINITER_MEMORY_DEBUG_PRINT true
+#define INFINITER_CORE_DEBUG_PRINT true
+
+
 // ####################### INFINITER MEMORY #######################
 
 /// Infiniter variable should be set to 0 after allocation? or leave it without overwriting old data

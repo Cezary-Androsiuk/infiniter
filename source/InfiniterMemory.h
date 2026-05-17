@@ -5,10 +5,6 @@
 
 #include "InfiniterCommon.hpp"
 
-/// prints what is happening - what methods are executed
-#define INFINITER_MEMORY_DEBUG_PRINT true
-
-
 class InfiniterMemory
 {
 protected:
@@ -48,9 +44,10 @@ protected:
     cell_t *m_memory;
     uint64_t m_capacity;
 
+    BitsUS m_bits;
+
 private:
     cell_t m_sbo_buffer[SBO_CAPACITY];
-    bool m_sbo_active;
 
     // heap memory is allocated directly on m_memory
 
