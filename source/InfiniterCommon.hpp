@@ -20,6 +20,7 @@ typedef uint8_t     bit_t;
 #define BYTES_PER_CELL  8
 #define BITS_PER_CELL   64
 
+/// Can't be less than 1
 #define SBO_CAPACITY 3
 
 #define USE_DYNAMIC_PADDING_SIZE true
@@ -59,10 +60,13 @@ union BitsUS{ /// bits union struct
 
 /// Infiniter variable should be set to 0 after allocation? or leave it without overwriting old data
 /// after allocation memory will be set to 0 if enabled, if disabled memory can have trash in in
-#define CLEAR_ALLOCATED_MEMORY true
+#define IM_CLEAR_ALLOCATED_MEMORY true
 
-#define ENSURE_NEW_OBJECT_AFTER_MOVE true
 /// if not ensured, object after std::move will be corrupted and need to be deleted, but it is few operation faster
+#define IM_ENSURE_NEW_OBJECT_AFTER_MOVE true
+
+/// declares method that can be used by friendly functions to display raw memory in hex
+#define IM_ENABLE_DB_PRINT_METHOD true
 
 // ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER MEMORY ^^^^^^^^^^^^^^^^^^^^^^^
 

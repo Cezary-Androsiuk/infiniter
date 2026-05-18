@@ -25,19 +25,36 @@ InfiniterCore::InfiniterCore() noexcept
     : InfiniterMemory()
 {
     ic_dbgprintf("IC Constructed   DEFAULT       %p\n", this);
+    m_bits.sign = false;
 }
 
 InfiniterCore::InfiniterCore(uint64_t p_capacity)
-    : InfiniterMemory(p_capacity)
+    : InfiniterMemory(p_capacity) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
     ic_dbgprintf("IC Constructed   PARAMETER 1   %p\n", this);
+    m_bits.sign = false;
 }
 
 InfiniterCore::InfiniterCore(uint64_t p_capacity, uint64_t p_value, bool p_negative_value)
-    : InfiniterMemory(p_capacity)
+    : InfiniterMemory(p_capacity) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
     ic_dbgprintf("IC Constructed   PARAMETER 2   %p\n", this);
+
+    m_bits.sign = p_negative_value;
     // assign value
+    m_memory[0] = p_value;
+
+#if CLEAR_ALLOCATED_MEMORY
+
+#endif
+
+/// that wil be interesing idea to handle msb if sbo_capacity is 1, but it is not necessary
+// #if SBO_CAPACITY > 1
+//     m_memory[0] = p_value;
+// #else
+// #endif
+
+
 }
 
 InfiniterCore::InfiniterCore(const InfiniterCore &p_source)

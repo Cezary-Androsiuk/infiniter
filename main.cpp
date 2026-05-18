@@ -53,32 +53,32 @@ void test_reasigning_data_to_new_array()
 void infiniterMemoryTests()
 {
     InfiniterMemory im0;
-    im0.dbg_print();
+    im_dbg_print(im0);
 
     InfiniterMemory im(30);
-    im.dbg_print();
+    im_dbg_print(im);
 
     printf("\n");
 
     InfiniterMemory im2(im);
-    im2.dbg_print();
+    im_dbg_print(im2);
 
     printf("\n");
 
     InfiniterMemory im3(std::move(im));
-    im3.dbg_print();
-    im.dbg_print();
-    im2.dbg_print();
+    im_dbg_print(im3);
+    im_dbg_print(im);
+    im_dbg_print(im2);
 
     printf("\n");
 
     im = im0;
-    im.dbg_print();
+    im_dbg_print(im);
     im = im2;
-    im.dbg_print();
+    im_dbg_print(im);
     im = std::move(im0);
-    im.dbg_print();
-    im0.dbg_print();
+    im_dbg_print(im);
+    im_dbg_print(im0);
 
 
     printf("\n");
@@ -95,36 +95,36 @@ void infiniterMemoryTests()
     {
         InfiniterMemory _im(SBO_CAPACITY +5);
         _im.m_memory[SBO_CAPACITY +1] = -1;
-        _im.dbg_print();
+        im_dbg_print(_im);
         _im.shrink();
-        _im.dbg_print();
+        im_dbg_print(_im);
         printf("\n");
     }
 
     {
         InfiniterMemory _im(SBO_CAPACITY +5);
         _im.m_memory[SBO_CAPACITY] = -1;
-        _im.dbg_print();
+        im_dbg_print(_im);
         _im.shrink();
-        _im.dbg_print();
+        im_dbg_print(_im);
         printf("\n");
     }
 
     {
         InfiniterMemory _im(SBO_CAPACITY +5);
         _im.m_memory[SBO_CAPACITY -1] = -1;
-        _im.dbg_print();
+        im_dbg_print(_im);
         _im.shrink();
-        _im.dbg_print();
+        im_dbg_print(_im);
         printf("\n");
     }
 
     {
         InfiniterMemory _im(SBO_CAPACITY +5);
         _im.m_memory[SBO_CAPACITY -2] = -1;
-        _im.dbg_print();
+        im_dbg_print(_im);
         _im.shrink();
-        _im.dbg_print();
+        im_dbg_print(_im);
         printf("\n");
     }
 

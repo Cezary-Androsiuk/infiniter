@@ -19,9 +19,9 @@
 #if INFINITER_MEMORY_DEBUG_PRINT
 #include <cstdio>
 #define im_dbgprintf(...) printf(__VA_ARGS__);
-#else
+#else // INFINITER_MEMORY_DEBUG_PRINT
 #define im_dbgprintf(...)
-#endif
+#endif // INFINITER_MEMORY_DEBUG_PRINT
 
 
 InfiniterMemory::InfiniterMemory() noexcept
@@ -30,26 +30,28 @@ InfiniterMemory::InfiniterMemory() noexcept
     , m_bits({
         .sbo_active = true
       })
-#if CLEAR_ALLOCATED_MEMORY
+#if IM_CLEAR_ALLOCATED_MEMORY
     , m_sbo_buffer()
-#endif
+#endif // IM_CLEAR_ALLOCATED_MEMORY
 {
     im_dbgprintf("IM Constructed   DEFAULT       %p\n", this);
 }
 
 InfiniterMemory::InfiniterMemory(uint64_t p_capacity)
 {
+    /// NOTE: p_capacity smaller than SBO_CAPACITY will be treated as SBO_CAPACITY
+
     im_dbgprintf("IM Constructed   PARAMETER     %p\n", this);
 
     /// often when this constructor will be called, user wants more that SBO size
     if(LIKELY( p_capacity > SBO_CAPACITY ))
     {
         /// heap memory
-#if CLEAR_ALLOCATED_MEMORY
+#if IM_CLEAR_ALLOCATED_MEMORY
         m_memory = new cell_t[p_capacity]();
-#else
+#else // IM_CLEAR_ALLOCATED_MEMORY
         m_memory = new cell_t[p_capacity];
-#endif
+#endif // IM_CLEAR_ALLOCATED_MEMORY
         if(m_memory == nullptr) throw std::bad_alloc();
 
         m_capacity = p_capacity;
@@ -62,9 +64,9 @@ InfiniterMemory::InfiniterMemory(uint64_t p_capacity)
         m_capacity = SBO_CAPACITY;
         m_bits.sbo_active = true;
 
-#if CLEAR_ALLOCATED_MEMORY
+#if IM_CLEAR_ALLOCATED_MEMORY
         std::fill_n(m_sbo_buffer, SBO_CAPACITY, 0);
-#endif
+#endif // IM_CLEAR_ALLOCATED_MEMORY
     }
 }
 
@@ -72,7 +74,7 @@ InfiniterMemory::InfiniterMemory(const InfiniterMemory &p_source)
 {
 #if INFINITER_MEMORY_DEBUG_PRINT
     im_dbgprintf("IM Constructed   COPY          %p\n", this);
-#endif
+#endif // INFINITER_MEMORY_DEBUG_PRINT
 
     /// set stack or heap
     m_memory = p_source.m_bits.sbo_active ? m_sbo_buffer : new cell_t[p_source.m_capacity];
@@ -107,16 +109,16 @@ InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source) noexcept
         p_source.m_memory = nullptr;
     }
 
-#if ENSURE_NEW_OBJECT_AFTER_MOVE
+#if IM_ENSURE_NEW_OBJECT_AFTER_MOVE
     /// reset source by hand (to prevent memory deallocation)
     p_source.m_memory = p_source.m_sbo_buffer;
     p_source.m_capacity = SBO_CAPACITY;
     p_source.m_bits.sbo_active = true;
 
-#if CLEAR_ALLOCATED_MEMORY
+#if IM_CLEAR_ALLOCATED_MEMORY
     std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, 0);
-#endif
-#endif
+#endif // IM_CLEAR_ALLOCATED_MEMORY
+#endif // IM_ENSURE_NEW_OBJECT_AFTER_MOVE
 }
 
 InfiniterMemory::~InfiniterMemory()
@@ -294,11 +296,12 @@ void InfiniterMemory::reset() noexcept
     m_capacity = SBO_CAPACITY;
     m_bits.sbo_active = true;
 
-#if CLEAR_ALLOCATED_MEMORY
+#if IM_CLEAR_ALLOCATED_MEMORY
     std::fill_n(m_sbo_buffer, SBO_CAPACITY, 0);
-#endif
+#endif // IM_CLEAR_ALLOCATED_MEMORY
 }
 
+#if IM_ENABLE_DB_PRINT_METHOD
 void InfiniterMemory::dbg_print() const
 {
     printf("obj: %p, size: %llu\n", this, m_capacity);
@@ -308,6 +311,7 @@ void InfiniterMemory::dbg_print() const
     }
     printf("\n");
 }
+#endif // IM_ENABLE_DB_PRINT_METHOD
 
 bool InfiniterMemory::isSBOActive() const
 {
@@ -364,16 +368,16 @@ InfiniterMemory &InfiniterMemory::operator =(InfiniterMemory &&p_source)
             p_source.m_memory = nullptr;
         }
 
-#if ENSURE_NEW_OBJECT_AFTER_MOVE
+#if IM_ENSURE_NEW_OBJECT_AFTER_MOVE
         /// reset source by hand (to prevent memory deallocation)
         p_source.m_memory = p_source.m_sbo_buffer;
         p_source.m_capacity = SBO_CAPACITY;
         p_source.m_bits.sbo_active = true;
 
-#if CLEAR_ALLOCATED_MEMORY
+#if IM_CLEAR_ALLOCATED_MEMORY
         std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, 0);
-#endif
-#endif
+#endif // IM_CLEAR_ALLOCATED_MEMORY
+#endif // IM_ENSURE_NEW_OBJECT_AFTER_MOVE
     }
 
     return *this;

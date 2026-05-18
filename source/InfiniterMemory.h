@@ -31,7 +31,12 @@ protected:
 
     void reset() noexcept;
 
+#if IM_ENABLE_DB_PRINT_METHOD
     void dbg_print() const;
+#define im_dbg_print(obj) obj.dbg_print()
+#else // IM_ENABLE_DB_PRINT_METHOD
+#define im_dbg_print(obj) printf("dbg_print disabled\n");
+#endif // IM_ENABLE_DB_PRINT_METHOD
 
     /// Getters
     bool isSBOActive() const;
