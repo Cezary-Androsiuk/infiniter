@@ -9,18 +9,18 @@
 /// Constructed     TYPE    %p
 /// Assigned        TYPE    %p
 /// DEL                     %p
-/// im_dbgprintf("IM Constructed   DEFAULT       %p\n", this);
-/// im_dbgprintf("IM Constructed   PARAMETER     %p\n", this);
-/// im_dbgprintf("IM Constructed   COPY          %p\n", this);
-/// im_dbgprintf("IM Constructed   MOVE          %p\n", this);
-/// im_dbgprintf("IM DEL                         %p\n", this);
-/// im_dbgprintf("IM Assigned      COPY          %p\n", this);
-/// im_dbgprintf("IM Assigned      MOVE          %p\n", this);
+/// _im_dbgprintf("IM Constructed   DEFAULT       %p\n", this);
+/// _im_dbgprintf("IM Constructed   PARAMETER     %p\n", this);
+/// _im_dbgprintf("IM Constructed   COPY          %p\n", this);
+/// _im_dbgprintf("IM Constructed   MOVE          %p\n", this);
+/// _im_dbgprintf("IM DEL                         %p\n", this);
+/// _im_dbgprintf("IM Assigned      COPY          %p\n", this);
+/// _im_dbgprintf("IM Assigned      MOVE          %p\n", this);
 #if INFINITER_MEMORY_DEBUG_PRINT
 #include <cstdio>
-#define im_dbgprintf(...) printf(__VA_ARGS__);
+#define _im_dbgprintf(...) printf(__VA_ARGS__);
 #else // INFINITER_MEMORY_DEBUG_PRINT
-#define im_dbgprintf(...)
+#define _im_dbgprintf(...)
 #endif // INFINITER_MEMORY_DEBUG_PRINT
 
 
@@ -34,14 +34,14 @@ InfiniterMemory::InfiniterMemory() noexcept
     , m_sbo_buffer()
 #endif // IM_CLEAR_ALLOCATED_MEMORY
 {
-    im_dbgprintf("IM Constructed   DEFAULT       %p\n", this);
+    _im_dbgprintf("IM Constructed   DEFAULT       %p\n", this);
 }
 
 InfiniterMemory::InfiniterMemory(uint64_t p_capacity)
 {
     /// NOTE: p_capacity smaller than SBO_CAPACITY will be treated as SBO_CAPACITY
 
-    im_dbgprintf("IM Constructed   PARAMETER     %p\n", this);
+    _im_dbgprintf("IM Constructed   PARAMETER     %p\n", this);
 
     /// often when this constructor will be called, user wants more that SBO size
     if(LIKELY( p_capacity > SBO_CAPACITY ))
@@ -73,7 +73,7 @@ InfiniterMemory::InfiniterMemory(uint64_t p_capacity)
 InfiniterMemory::InfiniterMemory(const InfiniterMemory &p_source)
 {
 #if INFINITER_MEMORY_DEBUG_PRINT
-    im_dbgprintf("IM Constructed   COPY          %p\n", this);
+    _im_dbgprintf("IM Constructed   COPY          %p\n", this);
 #endif // INFINITER_MEMORY_DEBUG_PRINT
 
     /// set stack or heap
@@ -92,7 +92,7 @@ InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source) noexcept
     : m_bits({ .sbo_active = p_source.m_bits.sbo_active })
     , m_capacity( p_source.m_capacity )
 {
-    im_dbgprintf("IM Constructed   MOVE          %p\n", this);
+    _im_dbgprintf("IM Constructed   MOVE          %p\n", this);
 
     /// ensure speed up for moving heap memory, stack here is already slow
     if(UNLIKELY( m_bits.sbo_active ))
@@ -123,7 +123,7 @@ InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source) noexcept
 
 InfiniterMemory::~InfiniterMemory() noexcept
 {
-    im_dbgprintf("IM DEL                         %p\n", this);
+    _im_dbgprintf("IM DEL                         %p\n", this);
 
     if(!m_bits.sbo_active)
     {
@@ -320,7 +320,7 @@ bool InfiniterMemory::isSBOActive() const
 
 InfiniterMemory &InfiniterMemory::operator =(const InfiniterMemory &p_source)
 {
-    im_dbgprintf("IM Assigned      COPY          %p\n", this);
+    _im_dbgprintf("IM Assigned      COPY          %p\n", this);
 
     if( &p_source != this )
     {
@@ -346,7 +346,7 @@ InfiniterMemory &InfiniterMemory::operator =(const InfiniterMemory &p_source)
 
 InfiniterMemory &InfiniterMemory::operator =(InfiniterMemory &&p_source)
 {
-    im_dbgprintf("IM Assigned      MOVE          %p\n", this);
+    _im_dbgprintf("IM Assigned      MOVE          %p\n", this);
 
     if( &p_source != this )
     {

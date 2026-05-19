@@ -7,24 +7,24 @@
 /// Constructed     TYPE    %p
 /// Assigned        TYPE    %p
 /// DEL                     %p
-/// ic_dbgprintf("IC Constructed   DEFAULT       %p\n", this);
-/// ic_dbgprintf("IC Constructed   PARAMETER     %p\n", this);
-/// ic_dbgprintf("IC Constructed   COPY          %p\n", this);
-/// ic_dbgprintf("IC Constructed   MOVE          %p\n", this);
-/// ic_dbgprintf("IC DEL                         %p\n", this);
-/// ic_dbgprintf("IC Assigned      COPY          %p\n", this);
-/// ic_dbgprintf("IC Assigned      MOVE          %p\n", this);
+/// _ic_dbgprintf("IC Constructed   DEFAULT       %p\n", this);
+/// _ic_dbgprintf("IC Constructed   PARAMETER     %p\n", this);
+/// _ic_dbgprintf("IC Constructed   COPY          %p\n", this);
+/// _ic_dbgprintf("IC Constructed   MOVE          %p\n", this);
+/// _ic_dbgprintf("IC DEL                         %p\n", this);
+/// _ic_dbgprintf("IC Assigned      COPY          %p\n", this);
+/// _ic_dbgprintf("IC Assigned      MOVE          %p\n", this);
 #if INFINITER_CORE_DEBUG_PRINT
 #include <cstdio>
-#define ic_dbgprintf(...) printf(__VA_ARGS__);
-#else
-#define ic_dbgprintf(...)
-#endif
+#define _ic_dbgprintf(...) printf(__VA_ARGS__);
+#else // INFINITER_CORE_DEBUG_PRINT
+#define _ic_dbgprintf(...)
+#endif // INFINITER_CORE_DEBUG_PRINT
 
 InfiniterCore::InfiniterCore() noexcept
     : InfiniterMemory()
 {
-    ic_dbgprintf("IC Constructed   DEFAULT       %p\n", this);
+    _ic_dbgprintf("IC Constructed   DEFAULT       %p\n", this);
 
     m_bits.sign = false;
     m_size = 1ull;
@@ -33,7 +33,7 @@ InfiniterCore::InfiniterCore() noexcept
 InfiniterCore::InfiniterCore(uint64_t p_capacity)
     : InfiniterMemory(p_capacity) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
-    ic_dbgprintf("IC Constructed   PARAMETER 1   %p\n", this);
+    _ic_dbgprintf("IC Constructed   PARAMETER 1   %p\n", this);
 
     m_bits.sign = false;
     m_size = 1ull;
@@ -42,27 +42,27 @@ InfiniterCore::InfiniterCore(uint64_t p_capacity)
 InfiniterCore::InfiniterCore(uint64_t p_capacity, uint64_t p_value, bool p_negative_value)
     : InfiniterMemory(p_capacity) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
-    ic_dbgprintf("IC Constructed   PARAMETER 2   %p\n", this);
+    _ic_dbgprintf("IC Constructed   PARAMETER 2   %p\n", this);
 
     m_bits.sign = p_negative_value;
     m_size = 1ull;
 
     /// assign value
     m_memory[0] = p_value;
+}
 
-/// that wil be interesing idea to handle msb if sbo_capacity is 1, but it is not necessary
-// #if SBO_CAPACITY > 1
-//     m_memory[0] = p_value;
-// #else
-// #endif
+InfiniterCore::InfiniterCore(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
+    : InfiniterMemory(p_size) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
+{
+    _ic_dbgprintf("IC Constructed   PARAMETER 3   %p\n", this);
 
-
+    for() /// check ealier implementation - było obsługiwane utrzymanie największej wartości pustej
 }
 
 InfiniterCore::InfiniterCore(const InfiniterCore &p_source)
     : InfiniterMemory(p_source)
 {
-    ic_dbgprintf("IC Constructed   COPY          %p\n", this);
+    _ic_dbgprintf("IC Constructed   COPY          %p\n", this);
 
     /// entire memory was copied in IM
 
@@ -73,7 +73,7 @@ InfiniterCore::InfiniterCore(const InfiniterCore &p_source)
 InfiniterCore::InfiniterCore(InfiniterCore &&p_source) noexcept
     : InfiniterMemory(std::move(p_source))
 {
-    ic_dbgprintf("IC Constructed   MOVE          %p\n", this);
+    _ic_dbgprintf("IC Constructed   MOVE          %p\n", this);
 
     /// entire memory was moved in IM
 
@@ -83,6 +83,8 @@ InfiniterCore::InfiniterCore(InfiniterCore &&p_source) noexcept
 
 InfiniterCore::~InfiniterCore() noexcept
 {
+    _ic_dbgprintf("IC DEL                         %p\n", this);
+
     /// everything was done in InfiniterMemory
 }
 
@@ -159,7 +161,7 @@ void InfiniterCore::dbg_print() const
 
 InfiniterCore &InfiniterCore::operator =(const InfiniterCore &p_source)
 {
-    ic_dbgprintf("IC Assigned      COPY          %p\n", this);
+    _ic_dbgprintf("IC Assigned      COPY          %p\n", this);
 
     if( &p_source != this )
     {
@@ -177,7 +179,7 @@ InfiniterCore &InfiniterCore::operator =(const InfiniterCore &p_source)
 
 InfiniterCore &InfiniterCore::operator =(InfiniterCore &&p_source)
 {
-    ic_dbgprintf("IC Assigned      MOVE          %p\n", this);
+    _ic_dbgprintf("IC Assigned      MOVE          %p\n", this);
 
     if( &p_source != this )
     {

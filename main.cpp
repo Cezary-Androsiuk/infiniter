@@ -148,6 +148,10 @@ void infiniterCoreTests()
     InfiniterCore ic0;
     ic_dbg_print(ic0);
 
+    InfiniterCore ic1(20, 1234, true);
+    ic_dbg_print(ic1);
+    ic1.getData()[1] = 123;
+    ic_dbg_print(ic1);
 
 }
 

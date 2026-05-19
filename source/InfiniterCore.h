@@ -18,11 +18,9 @@ public:
     explicit InfiniterCore(uint64_t p_capacity, uint64_t p_value, bool p_negative_value=false); /// throws bad_alloc
     // czy opłaca się oznaczać konstruktory z uint64_t jako explicit?
     // tak samo w IM
+    explicit InfiniterCore(const cell_t *p_array, uint64_t p_size, , bool p_negative_value=false);
 
-    /// Copy Constructor
     explicit InfiniterCore(const InfiniterCore &p_source); /// throws bad_alloc
-
-    /// Move Constructor
     explicit InfiniterCore(InfiniterCore &&p_source) noexcept;
 
     ~InfiniterCore() noexcept;

@@ -38,8 +38,8 @@ typedef uint8_t     bit_t;
 union BitsUS{ /// bits union struct
     uint8_t _byte = 0; /// = 0 ensures clear bit space while initialization
     struct {
-        uint8_t sbo_active  : 1;
-        uint8_t sign        : 1;
+        uint8_t sbo_active  : 1; // IM
+        uint8_t sign        : 1; // IC
         // uint8_t
         // uint8_t
         // uint8_t
