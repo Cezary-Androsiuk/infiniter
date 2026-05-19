@@ -121,7 +121,7 @@ InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source) noexcept
 #endif // IM_ENSURE_NEW_OBJECT_AFTER_MOVE
 }
 
-InfiniterMemory::~InfiniterMemory()
+InfiniterMemory::~InfiniterMemory() noexcept
 {
     im_dbgprintf("IM DEL                         %p\n", this);
 
@@ -129,6 +129,22 @@ InfiniterMemory::~InfiniterMemory()
     {
         delete [] m_memory;
     }
+}
+
+void InfiniterMemory::reset() noexcept
+{
+    if(!m_bits.sbo_active)
+    {
+        delete [] m_memory; /// for scalar array exception won't be thrown
+    }
+
+    m_memory = m_sbo_buffer;
+    m_capacity = SBO_CAPACITY;
+    m_bits.sbo_active = true;
+
+#if IM_CLEAR_ALLOCATED_MEMORY
+    std::fill_n(m_sbo_buffer, SBO_CAPACITY, 0);
+#endif // IM_CLEAR_ALLOCATED_MEMORY
 }
 
 void InfiniterMemory::reserve(uint64_t p_new_capacity)
@@ -283,22 +299,6 @@ void InfiniterMemory::shrink(uint64_t p_target_capacity)
         m_bits.sbo_active = false;
         m_capacity = p_target_capacity;
     }
-}
-
-void InfiniterMemory::reset() noexcept
-{
-    if(!m_bits.sbo_active)
-    {
-        delete [] m_memory; /// for scalar array exception won't be thrown
-    }
-
-    m_memory = m_sbo_buffer;
-    m_capacity = SBO_CAPACITY;
-    m_bits.sbo_active = true;
-
-#if IM_CLEAR_ALLOCATED_MEMORY
-    std::fill_n(m_sbo_buffer, SBO_CAPACITY, 0);
-#endif // IM_CLEAR_ALLOCATED_MEMORY
 }
 
 #if IM_ENABLE_DB_PRINT_METHOD

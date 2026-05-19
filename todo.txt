@@ -1,0 +1,3 @@
+make methods inline
+
+consider copying entire m_bits._byte instead of each bit

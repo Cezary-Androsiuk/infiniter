@@ -25,16 +25,29 @@ public:
     /// Move Constructor
     explicit InfiniterCore(InfiniterCore &&p_source) noexcept;
 
+    ~InfiniterCore() noexcept;
 
+    void reset() noexcept;
 
+    void reserve(uint64_t p_new_capacity);
+    void reserve(const InfiniterCore &p_source);
+    void extend(uint64_t p_additional_capacity);
+    void shrink();
+
+    cell_t *getData() noexcept;
+    const cell_t *getData() const noexcept;
+    uint64_t getSize() const noexcept;
+    uint64_t getCapacity() const noexcept;
+
+    uint8_t getSign() const noexcept;
 
 
     /// Operators
     InfiniterCore &operator =(const InfiniterCore &p_source);
     InfiniterCore &operator =(InfiniterCore &&p_source);
 
-private:
-
+protected:
+    uint64_t m_size;
 
 };
 
