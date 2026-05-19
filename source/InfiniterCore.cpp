@@ -143,6 +143,20 @@ uint8_t InfiniterCore::getSign() const noexcept
     return m_bits.sign;
 }
 
+#if IC_ENABLE_DB_PRINT_METHOD
+void InfiniterCore::dbg_print() const
+{
+    printf("IC obj: %p, capacity: %llu, size: %llu, sbo: %d, sign: %d\n",
+           this, m_capacity, m_size,
+           m_bits.sbo_active, m_bits.sign);
+    for(uint64_t i=0; i<m_capacity; i++)
+    {
+        printf("%016llx ", m_memory[m_capacity-1-i]);
+    }
+    printf("\n");
+}
+#endif // IC_ENABLE_DB_PRINT_METHOD
+
 InfiniterCore &InfiniterCore::operator =(const InfiniterCore &p_source)
 {
     ic_dbgprintf("IC Assigned      COPY          %p\n", this);

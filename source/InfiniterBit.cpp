@@ -76,7 +76,7 @@ void InfiniterBit::shiftLSB(uint64_t lsb)
     // optional safe addition
     lsb = !!lsb; // change 010010...100101 to 00...01
 
-    cell *data = this->getData();
+    cell_t *data = this->getData();
     uint64_t nextLSB;
 
     for(uint64_t i=0; i<this->getSize(); i++)
@@ -97,7 +97,7 @@ void InfiniterBit::shiftMSB(uint64_t msb)
 
     msb <<= 63; // change 00...01 to 10...00
 
-    cell *data = this->getData();
+    cell_t *data = this->getData();
     uint64_t nextMSB;
 
     for(uint64_t i=this->getSize(); i>0; i--)

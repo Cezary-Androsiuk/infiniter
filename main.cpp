@@ -52,6 +52,7 @@ void test_reasigning_data_to_new_array()
 
 void infiniterMemoryTests()
 {
+    printf("==================================================\n");
     InfiniterMemory im0;
     im_dbg_print(im0);
 
@@ -92,41 +93,41 @@ void infiniterMemoryTests()
     // im10.shrink();
     // im10.dbg_print();
 
-    {
-        InfiniterMemory _im(SBO_CAPACITY +5);
-        _im.m_memory[SBO_CAPACITY +1] = -1;
-        im_dbg_print(_im);
-        _im.shrink();
-        im_dbg_print(_im);
-        printf("\n");
-    }
+    // {
+    //     InfiniterMemory _im(SBO_CAPACITY +5);
+    //     _im.m_memory[SBO_CAPACITY +1] = -1;
+    //     im_dbg_print(_im);
+    //     _im.shrink();
+    //     im_dbg_print(_im);
+    //     printf("\n");
+    // }
 
-    {
-        InfiniterMemory _im(SBO_CAPACITY +5);
-        _im.m_memory[SBO_CAPACITY] = -1;
-        im_dbg_print(_im);
-        _im.shrink();
-        im_dbg_print(_im);
-        printf("\n");
-    }
+    // {
+    //     InfiniterMemory _im(SBO_CAPACITY +5);
+    //     _im.m_memory[SBO_CAPACITY] = -1;
+    //     im_dbg_print(_im);
+    //     _im.shrink();
+    //     im_dbg_print(_im);
+    //     printf("\n");
+    // }
 
-    {
-        InfiniterMemory _im(SBO_CAPACITY +5);
-        _im.m_memory[SBO_CAPACITY -1] = -1;
-        im_dbg_print(_im);
-        _im.shrink();
-        im_dbg_print(_im);
-        printf("\n");
-    }
+    // {
+    //     InfiniterMemory _im(SBO_CAPACITY +5);
+    //     _im.m_memory[SBO_CAPACITY -1] = -1;
+    //     im_dbg_print(_im);
+    //     _im.shrink();
+    //     im_dbg_print(_im);
+    //     printf("\n");
+    // }
 
-    {
-        InfiniterMemory _im(SBO_CAPACITY +5);
-        _im.m_memory[SBO_CAPACITY -2] = -1;
-        im_dbg_print(_im);
-        _im.shrink();
-        im_dbg_print(_im);
-        printf("\n");
-    }
+    // {
+    //     InfiniterMemory _im(SBO_CAPACITY +5);
+    //     _im.m_memory[SBO_CAPACITY -2] = -1;
+    //     im_dbg_print(_im);
+    //     _im.shrink();
+    //     im_dbg_print(_im);
+    //     printf("\n");
+    // }
 
 
 
@@ -140,6 +141,28 @@ void infiniterMemoryTests()
     printf("\n");
 
 }
+
+void infiniterCoreTests()
+{
+    printf("==================================================\n");
+    InfiniterCore ic0;
+    ic_dbg_print(ic0);
+
+
+}
+
+
+void infiniterIOTests()
+{
+    printf("==================================================\n");
+    InfiniterIO iio0;
+    iio_dbg_print(iio0);
+
+
+
+
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -191,5 +214,7 @@ int main(int argc, char *argv[])
 
     infiniterMemoryTests();
 
+    infiniterCoreTests();
 
+    infiniterIOTests();
 }

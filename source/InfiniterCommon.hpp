@@ -71,6 +71,23 @@ union BitsUS{ /// bits union struct
 // ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER MEMORY ^^^^^^^^^^^^^^^^^^^^^^^
 
 
+
+// ####################### INFINITER CORE #######################
+
+/// declares method that can be used by friendly functions to display raw memory in hex
+#define IC_ENABLE_DB_PRINT_METHOD true
+
+// ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER CORE ^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+// ####################### INFINITER CORE #######################
+
+/// declares method that can be used by friendly functions to display raw memory in hex
+#define IIO_ENABLE_DB_PRINT_METHOD true
+
+// ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER CORE ^^^^^^^^^^^^^^^^^^^^^^^
+
 #define LIKELY(x)       __builtin_expect(!!(x), 1)
 #define UNLIKELY(x)     __builtin_expect(!!(x), 0)
 

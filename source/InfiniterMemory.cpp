@@ -304,7 +304,7 @@ void InfiniterMemory::shrink(uint64_t p_target_capacity)
 #if IM_ENABLE_DB_PRINT_METHOD
 void InfiniterMemory::dbg_print() const
 {
-    printf("obj: %p, size: %llu\n", this, m_capacity);
+    printf("IM obj: %p, capacity: %llu, sbo: %c\n", this, m_capacity, m_bits.sbo_active + '0');
     for(uint64_t i=0; i<m_capacity; i++)
     {
         printf("%016llx ", m_memory[m_capacity-1-i]);

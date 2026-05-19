@@ -41,6 +41,14 @@ public:
 
     uint8_t getSign() const noexcept;
 
+public:
+#if IC_ENABLE_DB_PRINT_METHOD
+    void dbg_print() const;
+#define ic_dbg_print(obj) obj.dbg_print()
+#else // IC_ENABLE_DB_PRINT_METHOD
+#define ic_dbg_print(obj) printf("ic_dbg_print disabled\n");
+#endif // IC_ENABLE_DB_PRINT_METHOD
+public:
 
     /// Operators
     InfiniterCore &operator =(const InfiniterCore &p_source);
@@ -49,6 +57,7 @@ public:
 protected:
     uint64_t m_size;
 
+    friend void infiniterCoreTests();
 };
 
 #endif // INFINITERCORE_H

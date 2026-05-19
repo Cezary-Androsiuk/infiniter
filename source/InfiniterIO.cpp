@@ -1,5 +1,7 @@
 #include "InfiniterIO.h"
 
+#include "InfiniterCommon.hpp"
+
 #include <cstdio>
 #include <cstdlib>
 
@@ -24,7 +26,7 @@ void InfiniterIO::serialize(std::string file_path) const
         return;
     }
 
-    fwrite(this->getData(), sizeof(cell), this->getSize(), file);
+    fwrite(this->getData(), sizeof(cell_t), this->getSize(), file);
 
     fclose(file);
 }
@@ -39,22 +41,23 @@ void InfiniterIO::deserialize(std::string file_path)
         return;
     }
 
-    // check file size
+    /// check file size
     fseek(file, 0, SEEK_END);
     uint64_t fsize = ftell(file);
     rewind(file);
 
-    if(fsize % sizeof(cell) != 0 || fsize == 0)
+    /// check if data format is correct
+    if(fsize % sizeof(cell_t) != 0 || fsize == 0)
     {
         fprintf(stderr, "Error: Invalid file format in \"%s\"!\n", file_path.c_str());
         fclose(file);
         return;
     }
 
-    this->clear();
-    this->reserve(fsize / sizeof(cell) );
+    this->reset();
+    this->reserve( fsize / sizeof(cell_t) );
 
-    uint64_t bytes_read = fread(this->getData(), sizeof(cell), fsize, file);
+    uint64_t bytes_read = fread(this->getData(), sizeof(cell_t), fsize, file);
 
     if (bytes_read != fsize) {
         fprintf(stderr, "Warning: Could not read the entire file properly, read %llu from %llu bytes.\n", bytes_read, fsize);

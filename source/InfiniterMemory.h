@@ -27,12 +27,14 @@ protected:
     void extend(uint64_t p_additional_capacity); /// throws bad_alloc
     void shrink(uint64_t p_target_capacity); /// throws bad_alloc
 
+public:
 #if IM_ENABLE_DB_PRINT_METHOD
     void dbg_print() const;
 #define im_dbg_print(obj) obj.dbg_print()
 #else // IM_ENABLE_DB_PRINT_METHOD
-#define im_dbg_print(obj) printf("dbg_print disabled\n");
+#define im_dbg_print(obj) printf("im_dbg_print disabled\n");
 #endif // IM_ENABLE_DB_PRINT_METHOD
+protected:
 
     /// Getters
     bool isSBOActive() const;
