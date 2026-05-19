@@ -25,9 +25,6 @@ protected:
     void reserve(uint64_t p_new_capacity); /// throws bad_alloc // in upper classes operator uint64_t() will be implemented, then Infiniter can be converted to scalars
     void reserve(const InfiniterMemory &p_source); /// throws bad_alloc
     void extend(uint64_t p_additional_capacity); /// throws bad_alloc
-
-    /// might require m_size update in InfiniterCore
-    void shrink(); /// throws bad_alloc
     void shrink(uint64_t p_target_capacity); /// throws bad_alloc
 
 #if IM_ENABLE_DB_PRINT_METHOD

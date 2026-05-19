@@ -190,63 +190,6 @@ void InfiniterMemory::extend(uint64_t p_additional_capacity)
     this->reserve(m_capacity + p_additional_capacity);
 }
 
-void InfiniterMemory::shrink()
-{
-    /// auto shinks to first non zero cell
-    /// for example:
-    /// INPUT:  000 000 000 100 000 000 101 101 000
-    /// OUTPUT:             100 000 000 101 101 000
-
-    /// might require m_size update in InfiniterCore
-
-    /// SBO is smallest possible size, so if active then skip it
-    /// propably not often someone want to shrink SBO more
-    if(UNLIKELY(m_bits.sbo_active))
-        return;
-
-    /// find first non zero cell going from the left (from MSB)
-    /// if msb_index is smaller than SBO_CAPACITY just enable SBO
-    uint64_t msb_index = m_capacity;
-    while( !(m_memory[--msb_index]) && msb_index>=SBO_CAPACITY )
-        ;
-
-
-    if(msb_index+1 == SBO_CAPACITY)
-    {
-        /// shrink to match SBO
-
-        /// copy old data
-        std::copy_n(m_memory, SBO_CAPACITY, m_sbo_buffer);
-
-        /// dealocate old memory
-        delete [] m_memory;
-
-        m_memory = m_sbo_buffer;
-        m_bits.sbo_active = true;
-        m_capacity = SBO_CAPACITY;
-    }
-    else
-    {
-        /// shrink heap
-
-        uint64_t new_capacity = msb_index +1;
-
-        cell_t *tmp_memory = new cell_t[new_capacity];
-        /// will throw if allocation failed, but object instance, won't be corrupted
-
-        /// copy old data
-        std::copy_n(m_memory, new_capacity, tmp_memory);
-
-        /// dealocate old memory
-        delete [] m_memory;
-
-        m_memory = tmp_memory;
-        m_bits.sbo_active = false;
-        m_capacity = new_capacity;
-    }
-
-}
-
 void InfiniterMemory::shrink(uint64_t p_target_capacity)
 {
     /// shinks to fit target capacity
