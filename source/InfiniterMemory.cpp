@@ -1,7 +1,7 @@
 #include "InfiniterMemory.h"
 
 #include <new> // std::bad_alloc
-#include <algorithm> // std::copy_n, std::fill_n
+#include <algorithm> // std::copy_n, std::fill_n, std::min
 // #include <cstring> // std::memcpy
 
 #include "InfiniterCommon.hpp"
@@ -23,6 +23,10 @@
 #define _im_dbgprintf(...)
 #endif // INFINITER_MEMORY_DEBUG_PRINT
 
+
+// #define IM_LIMIT_CAPACITY(capacity) ( capacity == IM_CAPACITY_LOOP_STOP ? IM_MAX_CAPACITY : capacity )
+// #define IM_CAP_LIMIT(capacity) std::min(capacity, IM_MAX_CAPACITY)
+#define IM_CAP_LIMIT(capacity) if(capacity == IM_CAPACITY_LOOP_STOP) capacity = IM_MAX_CAPACITY;
 
 InfiniterMemory::InfiniterMemory() noexcept
     : m_memory( m_sbo_buffer )
@@ -46,6 +50,8 @@ InfiniterMemory::InfiniterMemory(uint64_t p_capacity)
     /// often when this constructor will be called, user wants more that SBO size
     if(LIKELY( p_capacity > SBO_CAPACITY ))
     {
+
+
         /// heap memory
 #if IM_CLEAR_ALLOCATED_MEMORY
         m_memory = new cell_t[p_capacity]();

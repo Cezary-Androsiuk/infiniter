@@ -68,6 +68,10 @@ union BitsUS{ /// bits union struct
 /// declares method that can be used by friendly functions to display raw memory in hex
 #define IM_ENABLE_DB_PRINT_METHOD true
 
+/// specify loop stop value and max capacity of InfiniterMemory array, it is important because 'for' loop require stop value (in that case stop value is 0b111...111 or UINT64_MAX or (~UINT64_C(0)))
+#define IM_CAPACITY_LOOP_STOP UINT64_MAX
+#define IM_MAX_CAPACITY (IM_CAPACITY_LOOP_STOP - 1)
+
 // ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER MEMORY ^^^^^^^^^^^^^^^^^^^^^^^
 
 
