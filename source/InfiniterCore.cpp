@@ -127,6 +127,11 @@ void InfiniterCore::shrink()
     InfiniterMemory::shrink(m_size);
 }
 
+void InfiniterCore::optimize()
+{
+    this->shrink();
+}
+
 cell_t *InfiniterCore::getData() noexcept
 {
     return m_memory;
@@ -152,8 +157,78 @@ uint8_t InfiniterCore::getSign() const noexcept
     return m_bits.sign;
 }
 
+uint64_t InfiniterCore::setSize(uint64_t p_new_size) noexcept
+{
+    m_size = p_new_size > m_capacity ? m_capacity : p_new_size;
+
+    return m_size;
+}
+
+void InfiniterCore::setSizeWithExtend(uint64_t p_new_size)
+{
+    if(p_new_size > m_capacity)
+    {
+        this->reserve( REALLOC_PADDING_SIZE(p_new_size) );
+    }
+
+    m_size = p_new_size;
+}
+
+void InfiniterCore::setSign(bool p_new_sign) noexcept
+{
+    m_bits.sign = p_new_sign;
+}
+
+void InfiniterCore::setPositiveSign() noexcept
+{
+    m_bits.sign = 0;
+}
+
+void InfiniterCore::setNegativeSign() noexcept
+{
+    m_bits.sign = 1;
+}
+
+void InfiniterCore::assign(uint64_t p_value, bool p_negative_value) noexcept
+{
+    m_memory[0] = p_value;
+
+    m_bits.sign = p_negative_value;
+    m_size = 1ull;
+}
+
+void InfiniterCore::assign(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
+{
+    /// reserve more if needed
+    /// UNLIKELY to speed up operations where memory isn't realocated
+    if(UNLIKELY(p_size > m_capacity))
+    {
+        this->reserve( REALLOC_PADDING_SIZE(p_size) );
+    }
+
+    for(uint64_t i=0; i<p_size; i++)
+    {
+        m_memory[i] = p_array[i];
+    }
+
+    m_size = p_size;
+    m_bits.sign = p_negative_value;
+}
+
 #if IC_ENABLE_DB_PRINT_METHOD
 void InfiniterCore::dbg_print_data() const
+{
+    printf("IC obj: %p, capacity: %llu, size: %llu, sbo: %d, sign: %d\n",
+           this, m_capacity, m_size,
+           m_bits.sbo_active, m_bits.sign);
+    for(uint64_t i=0; i<m_size; i++)
+    {
+        printf("%016llx ", m_memory[m_size-1-i]);
+    }
+    printf("\n");
+}
+
+void InfiniterCore::dbg_print_memory() const
 {
     printf("IC obj: %p, capacity: %llu, size: %llu, sbo: %d, sign: %d\n",
            this, m_capacity, m_size,

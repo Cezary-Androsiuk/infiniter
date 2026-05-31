@@ -103,28 +103,40 @@ InfiniterIO::~InfiniterIO() noexcept
     /// everything was done in InfiniterMemory
 }
 
-void InfiniterIO::serialize(std::string file_path) const
+void InfiniterIO::serialize(std::string p_file_path, bool p_ignore_capacity) const
 {
-    FILE* file = fopen(file_path.c_str(), "wb");
+    FILE* file = fopen(p_file_path.c_str(), "wb");
     if(file == NULL)
     {
         int err = errno;
-        fprintf(stderr, "Error: Cannot open \"%s\" file! Reason: %s\n", file_path.c_str(), strerror(err));
+        fprintf(stderr, "Error: Cannot open \"%s\" file! Reason: %s\n", p_file_path.c_str(), strerror(err));
         return;
     }
 
+    /// save header
+    uint64_t size = this->getSize();
+    uint64_t capacity = p_ignore_capacity ? size : this->getCapacity();
+    uint64_t sign = static_cast<uint64_t>(this->getSign());
+    /// to add more bit values divide size by half to uint32_t, uint16_t or uint8_t
+
+    fwrite(&capacity, sizeof(uint64_t), 1, file);
+    fwrite(&size, sizeof(uint64_t), 1, file);
+    fwrite(&sign, sizeof(uint64_t), 1, file);
+
+    /// save data
+    /// m_size allways is greater than 0
     fwrite(this->getData(), sizeof(cell_t), this->getSize(), file);
 
     fclose(file);
 }
 
-void InfiniterIO::deserialize(std::string file_path)
+void InfiniterIO::deserialize(std::string p_file_path, bool p_ignore_capacity)
 {
-    FILE* file = fopen(file_path.c_str(), "rb");
+    FILE* file = fopen(p_file_path.c_str(), "rb");
     if(file == NULL)
     {
         int err = errno;
-        fprintf(stderr, "Error: Cannot open \"%s\" file! Reason: %s\n", file_path.c_str(), strerror(err));
+        fprintf(stderr, "Error: Cannot open \"%s\" file! Reason: %s\n", p_file_path.c_str(), strerror(err));
         return;
     }
 
@@ -133,16 +145,43 @@ void InfiniterIO::deserialize(std::string file_path)
     uint64_t fsize = ftell(file);
     rewind(file);
 
-    /// check if data format is correct
-    if(fsize % sizeof(cell_t) != 0 || fsize == 0)
+    /// check header
+    constexpr uint64_t header_size = 3 * sizeof(uint64_t); /// 24 bytes
+
+    if(fsize < header_size)
     {
-        fprintf(stderr, "Error: Invalid file format in \"%s\"!\n", file_path.c_str());
+        fprintf(stderr, "Error: File \"%s\" is too small to contain the header!\n", p_file_path.c_str());
+        fclose(file);
+        return;
+    }
+
+    /// read header
+    uint64_t size = 1;
+    uint64_t capacity = 1;
+    uint64_t sign = 0;
+    /// to add more bit values divide size by half to uint32_t, uint16_t or uint8_t
+
+    fread(&capacity, sizeof(uint64_t), 1, file);
+    fread(&size, sizeof(uint64_t), 1, file);
+    fread(&sign, sizeof(uint64_t), 1, file);
+
+    /// case protection
+    if(capacity < size)
+        capacity = size;
+
+    /// check if data format is correct
+    uint64_t expected_data_size = size * sizeof(cell_t);
+    if(fsize - header_size != expected_data_size)
+    {
+        fprintf(stderr, "Error: Invalid file format in \"%s\"!\n", p_file_path.c_str());
         fclose(file);
         return;
     }
 
     this->reset();
-    this->reserve( fsize / sizeof(cell_t) );
+    this->reserve( p_ignore_capacity ? size : capacity );
+    this->setSize(size); /// ignore return value, size <= m_capacity
+    this->setSign(sign);
 
     uint64_t bytes_read = fread(this->getData(), sizeof(cell_t), fsize, file);
 
@@ -151,6 +190,34 @@ void InfiniterIO::deserialize(std::string file_path)
     }
 
     fclose(file);
+}
+
+bool InfiniterIO::isPowerOfTwo(int p_number)
+{
+    /// power of two has always one bit set to 1, and this formula checks that
+    return (p_number > 0) && ((p_number & (p_number - 1)) == 0);
+}
+
+void InfiniterIO::assign(uint64_t p_value, bool p_negative_value) noexcept
+{
+    InfiniterCore::assign(p_value, p_negative_value);
+}
+
+void InfiniterIO::assign(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
+{
+    InfiniterCore::assign(p_array, p_size, p_negative_value);
+}
+
+void InfiniterIO::assign(const std::string &p_number, int p_base, bool p_negative_value)
+{
+    if(InfiniterIO::isPowerOfTwo(p_base))
+    {
+
+    }
+    else
+    {
+
+    }
 }
 
 void InfiniterIO::print(uint64_t base) const{

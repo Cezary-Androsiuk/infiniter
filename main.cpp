@@ -150,13 +150,45 @@ void infiniterCoreTests()
 {
     printf("==================================================\n");
     InfiniterCore ic0;
-    ic_dbg_print(ic0);
+    ic_dbg_print_memory(ic0);
+    ic0.assign(0xABCDEF, false);
+    ic_dbg_print_memory(ic0);
 
-    InfiniterCore ic1(20, 1234, true);
-    ic_dbg_print(ic1);
+    InfiniterCore ic1(20, 0x1234, true);
+    ic_dbg_print_memory(ic1);
     ic1.getData()[1] = 123;
-    ic_dbg_print(ic1);
+    ic_dbg_print_memory(ic1);
 
+    uint64_t array[] = {
+        0,1,2,3,4,5,6,7,8,9,
+        10,11,12,13,14,15,16,17,18,19,
+        20,21,22,23,24,25,26,27,28,29,
+        30,31,32,33,34,35,36,37,38,39,
+        40,41,42,43,44,45,46,47,48,49,
+        50,51,52,53,54,55,56,57,58,59,
+        60,61,62,63,64,65,66,67,68,69,
+        70,71,72,73,74,75,76,77,78,79,
+        80,81,82,83,84,85,86,87,88,89,
+        90,91,92,93,94,95,96,97,98,99};
+
+    ic1.assign(array, sizeof(array)/sizeof(uint64_t), true);
+    ic_dbg_print_memory(ic1);
+    ic1.optimize();
+    ic_dbg_print_memory(ic1);
+    ic1.reset();
+    ic_dbg_print_memory(ic1);
+    ic1.reserve(100);
+    ic_dbg_print_memory(ic1);
+    ic1.assign(array, sizeof(array)/sizeof(uint64_t), true);
+    ic_dbg_print_memory(ic1);
+
+    ic1 = ic0;
+    ic_dbg_print_memory(ic1);
+    ic1.getData()[1] = 0x12345;
+    ic_dbg_print_memory(ic1);
+    ic0 = std::move(ic1);
+    ic_dbg_print_memory(ic0);
+    ic_dbg_print_memory(ic1);
 }
 
 
@@ -164,7 +196,7 @@ void infiniterIOTests()
 {
     printf("==================================================\n");
     InfiniterIO iio0;
-    iio_dbg_print(iio0);
+    // iio_dbg_print(iio0);
 
 
 

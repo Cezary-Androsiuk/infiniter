@@ -48,7 +48,7 @@ protected:
     InfiniterMemory &operator =(InfiniterMemory &&p_source);
 
 protected:
-    cell_t *m_memory;
+    cell_t *m_memory; /// would be perfect to create alias m_data for child classes
     uint64_t m_capacity;
 
     BitsUS m_bits;

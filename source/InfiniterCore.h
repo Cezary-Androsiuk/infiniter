@@ -30,13 +30,27 @@ public:
     void reserve(const InfiniterCore &p_source);
     void extend(uint64_t p_additional_capacity);
     void shrink();
+    void optimize();
 
     cell_t *getData() noexcept;
     const cell_t *getData() const noexcept;
+
     uint64_t getSize() const noexcept;
     uint64_t getCapacity() const noexcept;
-
     uint8_t getSign() const noexcept;
+
+    /// returns what size was set
+    /// if p_new_size > m_capacity, then size will be set to m_capacity
+    uint64_t setSize(uint64_t p_new_size) noexcept;
+    void setSizeWithExtend(uint64_t p_new_size);
+
+    void setSign(bool p_new_sign) noexcept;
+    void setPositiveSign() noexcept;
+    void setNegativeSign() noexcept;
+
+    void assign(uint64_t p_value, bool p_negative_value=false) noexcept;
+    void assign(const cell_t *p_array, uint64_t p_size, bool p_negative_value=false);
+
 
 public:
 #if IC_ENABLE_DB_PRINT_METHOD
@@ -58,7 +72,7 @@ public:
     InfiniterCore &operator =(const InfiniterCore &p_source);
     InfiniterCore &operator =(InfiniterCore &&p_source);
 
-protected:
+private:
     uint64_t m_size;
 
     friend void infiniterCoreTests();
