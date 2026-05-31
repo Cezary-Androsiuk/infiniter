@@ -38,22 +38,19 @@ typedef uint8_t     bit_t;
 union BitsUS{ /// bits union struct
     uint8_t _byte = 0; /// = 0 ensures clear bit space while initialization
     struct {
-        uint8_t sbo_active  : 1; // IM
-        uint8_t sign        : 1; // IC
-        // uint8_t
-        // uint8_t
-        // uint8_t
-        // uint8_t
-        // uint8_t
-        // uint8_t
+        bit_t sbo_active  : 1; // IM
+        bit_t sign        : 1; // IC
+        // bit_t
+        // bit_t
+        // bit_t
+        // bit_t
+        // bit_t
+        // bit_t
     };
 };
 
 
-
-/// prints what is happening - what methods are executed
-#define INFINITER_MEMORY_DEBUG_PRINT true
-#define INFINITER_CORE_DEBUG_PRINT true
+/// Little Endian aproach
 
 
 // ####################### INFINITER MEMORY #######################
@@ -64,6 +61,9 @@ union BitsUS{ /// bits union struct
 
 /// if not ensured, object after std::move will be corrupted and need to be deleted, but it is few operation faster
 #define IM_ENSURE_NEW_OBJECT_AFTER_MOVE true
+
+/// prints what is happening - what constructors are executed
+#define IM_DEBUG_EXECUTION_PRINT true
 
 /// declares method that can be used by friendly functions to display raw memory in hex
 #define IM_ENABLE_DB_PRINT_METHOD true
@@ -78,6 +78,9 @@ union BitsUS{ /// bits union struct
 
 // ####################### INFINITER CORE #######################
 
+/// prints what is happening - what constructors are executed
+#define IC_DEBUG_EXECUTION_PRINT true
+
 /// declares method that can be used by friendly functions to display raw memory in hex
 #define IC_ENABLE_DB_PRINT_METHOD true
 
@@ -86,6 +89,9 @@ union BitsUS{ /// bits union struct
 
 
 // ####################### INFINITER CORE #######################
+
+/// prints what is happening - what constructors are executed
+#define IIO_DEBUG_EXECUTION_PRINT true
 
 /// declares method that can be used by friendly functions to display raw memory in hex
 #define IIO_ENABLE_DB_PRINT_METHOD true

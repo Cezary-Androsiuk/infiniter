@@ -29,10 +29,14 @@ protected:
 
 public:
 #if IM_ENABLE_DB_PRINT_METHOD
+
     void dbg_print() const;
-#define im_dbg_print(obj) obj.dbg_print()
+#define im_dbg_print(obj) obj.dbg_print() /// macro for safe usage
+
 #else // IM_ENABLE_DB_PRINT_METHOD
-#define im_dbg_print(obj) printf("im_dbg_print disabled\n");
+
+#define im_dbg_print(obj) printf("im_dbg_print disabled\n") /// macro for safe usage
+
 #endif // IM_ENABLE_DB_PRINT_METHOD
 protected:
 

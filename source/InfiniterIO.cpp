@@ -27,12 +27,12 @@
 /// _iio_dbgprintf("IIO DEL                         %p\n", this);
 /// _iio_dbgprintf("IIO Assigned      COPY          %p\n", this);
 /// _iio_dbgprintf("IIO Assigned      MOVE          %p\n", this);
-#if INFINITER_IO_DEBUG_PRINT
+#if IIO_DEBUG_EXECUTION_PRINT
 #include <cstdio>
 #define _iio_dbgprintf(...) printf(__VA_ARGS__);
-#else // INFINITER_IO_DEBUG_PRINT
+#else // IIO_DEBUG_EXECUTION_PRINT
 #define _iio_dbgprintf(...)
-#endif // INFINITER_IO_DEBUG_PRINT
+#endif // IIO_DEBUG_EXECUTION_PRINT
 
 
 InfiniterIO::InfiniterIO() noexcept
@@ -55,22 +55,33 @@ InfiniterIO::InfiniterIO(uint64_t p_capacity, uint64_t p_value, bool p_negative_
 
 }
 
-InfiniterIO::InfiniterIO(const cell_t *p_array, uint64_t p_size)
+InfiniterIO::InfiniterIO(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
 {
     _iio_dbgprintf("IIO Constructed   PARAMETER 3   %p\n", this);
 
 }
 
-InfiniterIO::InfiniterIO(const std::string &p_number)
+InfiniterIO::InfiniterIO(const std::string &p_number, int p_base, bool p_negative_value)
+{
+    _iio_dbgprintf("IIO Constructed   PARAMETER 5   %p\n", this);
+
+}
+
+InfiniterIO::InfiniterIO(const std::vector<uint8_t> &p_number, int p_base, bool p_negative_value)
 {
     _iio_dbgprintf("IIO Constructed   PARAMETER 4   %p\n", this);
 
 }
 
-InfiniterIO::InfiniterIO(const std::vector &p_number)
+InfiniterIO::InfiniterIO(const std::vector<unsigned int> &p_number, int p_base, bool p_negative_value)
 {
-    _iio_dbgprintf("IIO Constructed   PARAMETER 5   %p\n", this);
+    _iio_dbgprintf("IIO Constructed   PARAMETER 6   %p\n", this);
 
+}
+
+InfiniterIO::InfiniterIO(const std::vector<uint64_t> &p_number, int p_base, bool p_negative_value)
+{
+    _iio_dbgprintf("IIO Constructed   PARAMETER 7   %p\n", this);
 }
 
 InfiniterIO::InfiniterIO(const InfiniterIO &p_source)

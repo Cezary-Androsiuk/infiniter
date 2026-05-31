@@ -1,14 +1,18 @@
 #include "source/InfiniterMemory.h"
 #include "source/InfiniterCore.h"
 #include "source/InfiniterIO.h"
+
 #include <cstdio>
+#include <algorithm> // std::copy_n, std::fill_n, std::move
 
 /*
  * Infiniter
- * InfiniterMath
+ * InfiniterExtended
+ * InfiniterArithmetic
  * InfiniterBit (InfiniterLow)
  * InfiniterIO
  * InfiniterCore
+ * InfiniterMemory
  */
 
 void print_array(uint64_t *array, uint64_t size)

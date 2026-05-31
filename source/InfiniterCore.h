@@ -14,11 +14,10 @@ public:
 
     explicit InfiniterCore(uint64_t p_capacity); /// throws bad_alloc
 
-    /// value only covers first cell, purpose of this is to initialize instance with 1 or something like that
+    /// value only covers first cell, purpose of this is to initialize instance with 1 or other scalar values
     explicit InfiniterCore(uint64_t p_capacity, uint64_t p_value, bool p_negative_value=false); /// throws bad_alloc
-    // czy opłaca się oznaczać konstruktory z uint64_t jako explicit?
-    // tak samo w IM
-    explicit InfiniterCore(const cell_t *p_array, uint64_t p_size, , bool p_negative_value=false);
+
+    explicit InfiniterCore(const cell_t *p_array, uint64_t p_size, bool p_negative_value=false); /// throws bad_alloc
 
     explicit InfiniterCore(const InfiniterCore &p_source); /// throws bad_alloc
     explicit InfiniterCore(InfiniterCore &&p_source) noexcept;
@@ -41,10 +40,17 @@ public:
 
 public:
 #if IC_ENABLE_DB_PRINT_METHOD
-    void dbg_print() const;
-#define ic_dbg_print(obj) obj.dbg_print()
+
+    void dbg_print_data() const;
+#define ic_dbg_print_data(obj) obj.dbg_print_data() /// macro for safe usage
+    void dbg_print_memory() const;
+#define ic_dbg_print_memory(obj) obj.dbg_print_memory() /// macro for safe usage
+
 #else // IC_ENABLE_DB_PRINT_METHOD
-#define ic_dbg_print(obj) printf("ic_dbg_print disabled\n");
+
+#define ic_dbg_print_data(obj) printf("ic_dbg_print_memory disabled\n") /// macro for safe usage
+#define ic_dbg_print_memory(obj) printf("ic_dbg_print_memory disabled\n") /// macro for safe usage
+
 #endif // IC_ENABLE_DB_PRINT_METHOD
 public:
 

@@ -14,12 +14,12 @@
 /// _ic_dbgprintf("IC DEL                         %p\n", this);
 /// _ic_dbgprintf("IC Assigned      COPY          %p\n", this);
 /// _ic_dbgprintf("IC Assigned      MOVE          %p\n", this);
-#if INFINITER_CORE_DEBUG_PRINT
+#if IC_DEBUG_EXECUTION_PRINT
 #include <cstdio>
 #define _ic_dbgprintf(...) printf(__VA_ARGS__);
-#else // INFINITER_CORE_DEBUG_PRINT
+#else // IC_DEBUG_EXECUTION_PRINT
 #define _ic_dbgprintf(...)
-#endif // INFINITER_CORE_DEBUG_PRINT
+#endif // IC_DEBUG_EXECUTION_PRINT
 
 InfiniterCore::InfiniterCore() noexcept
     : InfiniterMemory()
@@ -56,7 +56,13 @@ InfiniterCore::InfiniterCore(const cell_t *p_array, uint64_t p_size, bool p_nega
 {
     _ic_dbgprintf("IC Constructed   PARAMETER 3   %p\n", this);
 
-    for() /// check ealier implementation - było obsługiwane utrzymanie największej wartości pustej
+    for(uint64_t i=0; i<p_size; i++)
+    {
+        m_memory[i] = p_array[i];
+    }
+
+    m_bits.sign = p_negative_value;
+    m_size = p_size;
 }
 
 InfiniterCore::InfiniterCore(const InfiniterCore &p_source)
@@ -92,6 +98,7 @@ void InfiniterCore::reset() noexcept
 {
     InfiniterMemory::reset(); /// makes m_capacity == SBO_CAPACITY
     m_bits.sign = false;
+    m_size = 1ull;
 
     for(int i=0; i<m_capacity; i++)
     {
@@ -146,7 +153,7 @@ uint8_t InfiniterCore::getSign() const noexcept
 }
 
 #if IC_ENABLE_DB_PRINT_METHOD
-void InfiniterCore::dbg_print() const
+void InfiniterCore::dbg_print_data() const
 {
     printf("IC obj: %p, capacity: %llu, size: %llu, sbo: %d, sign: %d\n",
            this, m_capacity, m_size,

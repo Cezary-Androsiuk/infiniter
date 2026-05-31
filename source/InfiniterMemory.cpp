@@ -16,17 +16,16 @@
 /// _im_dbgprintf("IM DEL                         %p\n", this);
 /// _im_dbgprintf("IM Assigned      COPY          %p\n", this);
 /// _im_dbgprintf("IM Assigned      MOVE          %p\n", this);
-#if INFINITER_MEMORY_DEBUG_PRINT
+#if IM_DEBUG_EXECUTION_PRINT
 #include <cstdio>
 #define _im_dbgprintf(...) printf(__VA_ARGS__);
-#else // INFINITER_MEMORY_DEBUG_PRINT
+#else // IM_DEBUG_EXECUTION_PRINT
 #define _im_dbgprintf(...)
-#endif // INFINITER_MEMORY_DEBUG_PRINT
+#endif // IM_DEBUG_EXECUTION_PRINT
 
 
-// #define IM_LIMIT_CAPACITY(capacity) ( capacity == IM_CAPACITY_LOOP_STOP ? IM_MAX_CAPACITY : capacity )
-// #define IM_CAP_LIMIT(capacity) std::min(capacity, IM_MAX_CAPACITY)
-#define IM_CAP_LIMIT(capacity) if(capacity == IM_CAPACITY_LOOP_STOP) capacity = IM_MAX_CAPACITY;
+/// Macro for limitting capacity of variable
+#define IM_CAP_LIMIT(capacity) if(UNLIKELY((capacity) == IM_CAPACITY_LOOP_STOP)) (capacity) = IM_MAX_CAPACITY;
 
 InfiniterMemory::InfiniterMemory() noexcept
     : m_memory( m_sbo_buffer )
@@ -50,7 +49,7 @@ InfiniterMemory::InfiniterMemory(uint64_t p_capacity)
     /// often when this constructor will be called, user wants more that SBO size
     if(LIKELY( p_capacity > SBO_CAPACITY ))
     {
-
+        IM_CAP_LIMIT(p_capacity);
 
         /// heap memory
 #if IM_CLEAR_ALLOCATED_MEMORY
@@ -161,6 +160,9 @@ void InfiniterMemory::reserve(uint64_t p_new_capacity)
     /// and it happends only when SBO is active
     if(UNLIKELY( p_new_capacity <= m_capacity ))
         return;
+
+
+    IM_CAP_LIMIT(p_new_capacity);
 
     /// m_capacity < p_new_capacity at this point
 
