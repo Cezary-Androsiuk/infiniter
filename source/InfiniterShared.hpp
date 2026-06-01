@@ -1,5 +1,5 @@
-#ifndef INFINITERCOMMON_HPP
-#define INFINITERCOMMON_HPP
+#ifndef INFINITERSHARED_HPP
+#define INFINITERSHARED_HPP
 
 #include <cstdint>
 
@@ -111,4 +111,4 @@ union BitsUS{ /// bits union struct
 #define LIKELY(x)       __builtin_expect(!!(x), 1)
 #define UNLIKELY(x)     __builtin_expect(!!(x), 0)
 
-#endif // INFINITERCOMMON_HPP
+#endif // INFINITERSHARED_HPP

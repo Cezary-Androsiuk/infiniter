@@ -6,13 +6,17 @@
 #include <algorithm> // std::copy_n, std::fill_n, std::move
 
 /*
- * Infiniter
- * InfiniterExtended
- * InfiniterArithmetic
- * InfiniterBit (InfiniterLow)
- * InfiniterIO
- * InfiniterCore
- * InfiniterMemory
+ * InfiniterException   IE
+ * InfiniterShared      IS
+ * 
+ * 
+ * Infiniter            I
+ * InfiniterUtility     IU
+ * InfiniterArithmetic  IA
+ * InfiniterBit         IB
+ * InfiniterIO          IO
+ * InfiniterCore        IC
+ * InfiniterMemory      IM
  */
 
 void print_array(uint64_t *array, uint64_t size)

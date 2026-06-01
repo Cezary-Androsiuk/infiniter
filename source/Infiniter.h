@@ -1,9 +1,9 @@
 #ifndef INFINITER_H
 #define INFINITER_H
 
-#include "InfiniterMath.h"
+#include "InfiniterUtility.h"
 
-class Infiniter : public InfiniterMath
+class Infiniter : public InfiniterUtility
 {
 public:
     Infiniter();
