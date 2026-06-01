@@ -15,12 +15,13 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 add_executable(Infiniter
   main.cpp
   source/InfiniterShared.hpp
-  source/Infiniter.h source/Infiniter.cpp
-  source/InfiniterCore.h source/InfiniterCore.cpp
-  source/InfiniterBit.h source/InfiniterBit.cpp
-  source/InfiniterIO.h source/InfiniterIO.cpp
-  source/InfiniterMath.h source/InfiniterMath.cpp
   source/InfiniterMemory.h source/InfiniterMemory.cpp
+  source/InfiniterCore.h source/InfiniterCore.cpp
+  source/InfiniterIO.h source/InfiniterIO.cpp
+  source/InfiniterBit.h source/InfiniterBit.cpp
+  source/InfiniterArithmetic.h source/InfiniterArithmetic.cpp
+  source/InfiniterUtility.h source/InfiniterUtility.cpp
+  source/Infiniter.h source/Infiniter.cpp
 )
 target_link_libraries(Infiniter Qt${QT_VERSION_MAJOR}::Core)
 
