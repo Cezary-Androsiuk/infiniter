@@ -1,13 +1,13 @@
 #ifndef INFINITERIO_H
 #define INFINITERIO_H
 
-#include "InfiniterCommon.hpp"
-#include "InfiniterCore.h"
+#include "InfiniterShared.hpp"
+#include "InfiniterUtility.h"
 
 #include <string>
 #include <vector>
 
-class InfiniterIO : public InfiniterCore
+class InfiniterIO : public InfiniterUtility
 {
 public:
     explicit InfiniterIO() noexcept;
@@ -39,6 +39,12 @@ public:
     void assign(const std::string &p_number, int p_base=10, bool p_negative_value=false);
 
     void print(uint64_t base) const;
+
+protected:
+    void printBase2() const;
+    void printBase4() const;
+    void printBase8() const;
+    void printBase16() const;
 
     void saveToFile(); //////
 

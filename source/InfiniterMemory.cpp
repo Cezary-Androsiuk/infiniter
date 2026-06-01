@@ -1,10 +1,10 @@
 #include "InfiniterMemory.h"
 
+#include "InfiniterShared.hpp"
+
 #include <new> // std::bad_alloc
 #include <algorithm> // std::copy_n, std::fill_n, std::min
 // #include <cstring> // std::memcpy
-
-#include "InfiniterCommon.hpp"
 
 /// Constructed     TYPE    %p
 /// Assigned        TYPE    %p

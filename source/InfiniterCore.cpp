@@ -1,6 +1,6 @@
 #include "InfiniterCore.h"
 
-#include "InfiniterCommon.hpp"
+#include "InfiniterShared.hpp"
 
 #include <utility> // std::move
 

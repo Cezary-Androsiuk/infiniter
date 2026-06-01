@@ -5,19 +5,34 @@
 #include <cstdio>
 #include <algorithm> // std::copy_n, std::fill_n, std::move
 
+#include <x86intrin.h> // GCC/Clang only // for MSVC (Windows) use <intrin.h>
+
 /*
  * InfiniterException   IE
  * InfiniterShared      IS
  * 
  * 
  * Infiniter            I
+ * InfiniterIO          IO
  * InfiniterUtility     IU
  * InfiniterArithmetic  IA
  * InfiniterBit         IB
- * InfiniterIO          IO
  * InfiniterCore        IC
  * InfiniterMemory      IM
  */
+
+inline uint64_t read_tsc_start() {
+    _mm_lfence(); // Czeka, aż wszystkie wcześniejsze instrukcje zostaną zakończone
+    return __rdtsc();
+}
+
+// Funkcja końcowa z barierą wyjścia
+inline uint64_t read_tsc_end() {
+    unsigned int aux;
+    uint64_t tsc = __rdtscp(&aux); // rdtscp jest instrukcją serializującą (czeka na kod przed nią)
+    _mm_lfence(); // Zapobiega przeskoczeniu późniejszych instrukcji przed rdtscp
+    return tsc;
+}
 
 void print_array(uint64_t *array, uint64_t size)
 {
@@ -199,11 +214,101 @@ void infiniterCoreTests()
 void infiniterIOTests()
 {
     printf("==================================================\n");
-    InfiniterIO iio0;
-    // iio_dbg_print(iio0);
+    InfiniterIO iio0(0x1, false);
+    iio0.dbg_print_memory();
+
+    // for(int j=0; j<40; j++)
+    // {
+    //     iio0.assign(1, false);
+
+    //     uint64_t warm1_start = read_tsc_start();
+    //     uint64_t warm1_end = read_tsc_end();
+    //     uint64_t warm2_start = read_tsc_start();
+    //     uint64_t warm2_end = read_tsc_end();
+
+    //     uint64_t start = read_tsc_start();
+
+    //     for(int i=0; i<64*10*j; i++)
+    //     {
+    //         iio0.pushLSB(1);
+    //     }
+
+    //     uint64_t end = read_tsc_end();
+
+    //     // printf("Warm 1 time: %llu\n", warm1_end - warm1_start);
+    //     // printf("Warm 2 time: %llu\n", warm2_end - warm2_start);
+    //     printf("Iterations: %d\n", j*10);
+    //     printf("Clock cycles: %llu\n", end - start);
+    // }
+
+    // {
+    //     uint64_t warm1_start = read_tsc_start();
+    //     uint64_t warm1_end = read_tsc_end();
+    //     uint64_t warm2_start = read_tsc_start();
+    //     uint64_t warm2_end = read_tsc_end();
+
+    //     uint64_t start = read_tsc_start();
+
+    //     for(int i=0; i<64*100; i++)
+    //     {
+    //         iio0.pushLSB(1);
+    //     }
+
+    //     uint64_t end = read_tsc_end();
+
+    //     printf("Warm 1 time: %llu\n", warm1_end - warm1_start);
+    //     printf("Warm 2 time: %llu\n", warm2_end - warm2_start);
+    //     printf("Clock cycles: %llu\n", end - start);
+    // }
+    // {
+    //     uint64_t warm1_start = read_tsc_start();
+    //     uint64_t warm1_end = read_tsc_end();
+    //     uint64_t warm2_start = read_tsc_start();
+    //     uint64_t warm2_end = read_tsc_end();
+
+    //     uint64_t start = read_tsc_start();
+
+    //     for(int i=0; i<64*1'000; i++)
+    //     {
+    //         iio0.pushLSB(1);
+    //     }
+
+    //     uint64_t end = read_tsc_end();
+
+    //     printf("Warm 1 time: %llu\n", warm1_end - warm1_start);
+    //     printf("Warm 2 time: %llu\n", warm2_end - warm2_start);
+    //     printf("Clock cycles: %llu\n", end - start);
+    // }
+    // {
+    //     uint64_t warm1_start = read_tsc_start();
+    //     uint64_t warm1_end = read_tsc_end();
+    //     uint64_t warm2_start = read_tsc_start();
+    //     uint64_t warm2_end = read_tsc_end();
+
+    //     uint64_t start = read_tsc_start();
+
+    //     for(int i=0; i<64*100'000; i++)
+    //     {
+    //         iio0.pushLSB(1);
+    //     }
+
+    //     uint64_t end = read_tsc_end();
+
+    //     printf("Warm 1 time: %llu\n", warm1_end - warm1_start);
+    //     printf("Warm 2 time: %llu\n", warm2_end - warm2_start);
+    //     printf("Clock cycles: %llu\n", end - start);
+    // }
+    // iio0.dbg_print_memory();
 
 
-
+    iio0.assign(0x1);
+    for(int i=0; i<64*3; i++)
+    {
+        iio0.pushLSB(0);
+        iio0.print(10);
+        printf("\n");
+    }
+    printf("\n\n");
 
 }
 

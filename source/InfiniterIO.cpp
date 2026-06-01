@@ -1,6 +1,6 @@
 #include "InfiniterIO.h"
 
-#include "InfiniterCommon.hpp"
+#include "InfiniterShared.hpp"
 
 #include <utility> // std::move
 #include <string>
@@ -36,26 +36,27 @@
 
 
 InfiniterIO::InfiniterIO() noexcept
-    : InfiniterCore()
+    : InfiniterUtility()
 {
     _iio_dbgprintf("IIO Constructed   DEFAULT       %p\n", this);
 }
 
 InfiniterIO::InfiniterIO(uint64_t p_capacity)
-    : InfiniterCore(p_capacity)
+    : InfiniterUtility(p_capacity)
 {
     _iio_dbgprintf("IIO Constructed   PARAMETER 1   %p\n", this);
 
 }
 
 InfiniterIO::InfiniterIO(uint64_t p_capacity, uint64_t p_value, bool p_negative_value)
-    : InfiniterCore(p_capacity, p_value, p_negative_value)
+    : InfiniterUtility(p_capacity, p_value, p_negative_value)
 {
     _iio_dbgprintf("IIO Constructed   PARAMETER 2   %p\n", this);
 
 }
 
 InfiniterIO::InfiniterIO(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
+    : InfiniterUtility(p_array, p_size, p_negative_value)
 {
     _iio_dbgprintf("IIO Constructed   PARAMETER 3   %p\n", this);
 
@@ -218,6 +219,71 @@ void InfiniterIO::assign(const std::string &p_number, int p_base, bool p_negativ
     {
 
     }
+}
+
+// void InfiniterIO::print(uint64_t p_base) const
+// {
+//     if(p_base < 2 || 16  < p_base)
+//         printf("No valid base (2-16)\n");
+
+//     switch(p_base)
+//     {
+//     case 2:     this->printBase2();     return;
+//     case 4:     this->printBase4();     return;
+//     case 8:     this->printBase8();     return;
+//     case 16:    this->printBase16();    return;
+//     }
+
+
+// }
+
+void InfiniterIO::printBase2() const
+{
+    const cell_t *data = this->getData();
+    const uint64_t size = this->getSize();
+
+    char cell_buffer[64+1];
+
+    bool non_zero_cell_found = false;
+
+    for(uint64_t i=0; i<size; i++)
+    {
+        cell_t cell = data[size -i -1];
+        if(cell == 0 && !non_zero_cell_found)
+            continue;
+
+        non_zero_cell_found = true;
+
+        for(int i=0; i<64; i++)
+        {
+            bool bit = cell & (1ull << (63-i));
+            cell_buffer[i] = bit ? '1' : '0';
+        }
+        cell_buffer[64] = 0;
+
+        if(i+1 == size)
+            printf("%s", cell_buffer);
+        else
+            printf("%s ", cell_buffer);
+    }
+
+    if(!non_zero_cell_found)
+        printf("0");
+}
+
+void InfiniterIO::printBase4() const
+{
+
+}
+
+void InfiniterIO::printBase8() const
+{
+
+}
+
+void InfiniterIO::printBase16() const
+{
+
 }
 
 void InfiniterIO::print(uint64_t base) const{

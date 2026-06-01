@@ -1,9 +1,9 @@
 #ifndef INFINITERMEMORY_H
 #define INFINITERMEMORY_H
 
-#include <cstdint>
+#include "InfiniterShared.hpp"
 
-#include "InfiniterCommon.hpp"
+#include <cstdint>
 
 class InfiniterMemory
 {
@@ -27,7 +27,7 @@ protected:
     void extend(uint64_t p_additional_capacity); /// throws bad_alloc
     void shrink(uint64_t p_target_capacity); /// throws bad_alloc
 
-public:
+protected:
 #if IM_ENABLE_DB_PRINT_METHOD
 
     void dbg_print() const;

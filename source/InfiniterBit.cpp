@@ -1,12 +1,30 @@
 #include "InfiniterBit.h"
 
+#include "InfiniterShared.hpp"
+
 #include <stdexcept>
 #include <sstream>
 
-#include "InfiniterCommon.hpp"
+InfiniterBit::InfiniterBit() noexcept
+    : InfiniterCore()
+{
 
-InfiniterBit::InfiniterBit()
-    : InfiniterIO()
+}
+
+InfiniterBit::InfiniterBit(uint64_t p_capacity)
+    : InfiniterCore(p_capacity)
+{
+
+}
+
+InfiniterBit::InfiniterBit(uint64_t p_capacity, uint64_t p_value, bool p_negative_value)
+    : InfiniterCore(p_capacity, p_value, p_negative_value)
+{
+
+}
+
+InfiniterBit::InfiniterBit(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
+    : InfiniterCore(p_array, p_size, p_negative_value)
 {
 
 }
@@ -74,7 +92,7 @@ void InfiniterBit::toggleBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept
 void InfiniterBit::shiftLSB(uint64_t lsb)
 {
     // optional safe addition
-    lsb = !!lsb; // change 010010...100101 to 00...01
+    lsb = !!lsb; // change 010010...100101 to 000...001
 
     cell_t *data = this->getData();
     uint64_t nextLSB;
@@ -123,10 +141,11 @@ void InfiniterBit::shiftRight()
 void InfiniterBit::pushLSB(uint64_t lsb)
 {
     /// check for possible overflow before shifting left
-    if(this->getData()[this->getSize()-1] & M100)
+    const uint64_t size = this->getSize();
+    if(this->getData()[size-1] & M100)
     {
         // MSB is 1 and memory need to be expanded
-
+        this->setSizeWithExtend(size +1);
     }
 
     this->shiftLSB(lsb);

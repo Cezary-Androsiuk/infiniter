@@ -1,14 +1,18 @@
 #ifndef INFINITERBIT_H
 #define INFINITERBIT_H
 
-#include "InfiniterIO.h"
+#include "InfiniterShared.hpp"
+#include "InfiniterCore.h"
 
-#include "InfiniterCommon.hpp"
-
-class InfiniterBit : public InfiniterIO
+class InfiniterBit : public InfiniterCore
 {
 public:
-    InfiniterBit();
+    explicit InfiniterBit() noexcept;
+
+    explicit InfiniterBit(uint64_t p_capacity); /// throws bad_alloc
+    explicit InfiniterBit(uint64_t p_capacity, uint64_t p_value, bool p_negative_value=false); /// throws bad_alloc
+    explicit InfiniterBit(const cell_t *p_array, uint64_t p_size, bool p_negative_value=false); /// throws bad_alloc
+
 
     // maybe change all uint64_t to cell where context is abaout bits or cells
 
@@ -34,6 +38,7 @@ public:
     void pushLSB(uint64_t lsb);
     void pushMSB(uint64_t msb);
     
+
 
 };
 

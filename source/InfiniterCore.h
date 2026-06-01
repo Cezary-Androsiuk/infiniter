@@ -1,10 +1,10 @@
 #ifndef INFINITERCORE_H
 #define INFINITERCORE_H
 
-#include <cstdint>
-
-#include "InfiniterCommon.hpp"
+#include "InfiniterShared.hpp"
 #include "InfiniterMemory.h"
+
+#include <cstdint>
 
 class InfiniterCore : private InfiniterMemory
 {
