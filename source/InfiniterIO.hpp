@@ -1,8 +1,8 @@
-#ifndef INFINITERIO_H
-#define INFINITERIO_H
+#ifndef INFINITERIO_HPP
+#define INFINITERIO_HPP
 
 #include "InfiniterShared.hpp"
-#include "InfiniterUtility.h"
+#include "InfiniterUtility.hpp"
 
 #include <string>
 #include <vector>
@@ -68,4 +68,4 @@ public:
     friend void infiniterIOTests();
 };
 
-#endif // INFINITERIO_H
+#endif // INFINITERIO_HPP

@@ -1,8 +1,8 @@
-#ifndef INFINITERCORE_H
-#define INFINITERCORE_H
+#ifndef INFINITERCORE_HPP
+#define INFINITERCORE_HPP
 
 #include "InfiniterShared.hpp"
-#include "InfiniterMemory.h"
+#include "InfiniterMemory.hpp"
 
 #include <cstdint>
 
@@ -75,4 +75,4 @@ private:
     friend void infiniterCoreTests();
 };
 
-#endif // INFINITERCORE_H
+#endif // INFINITERCORE_HPP

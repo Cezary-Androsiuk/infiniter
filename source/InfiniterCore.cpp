@@ -1,4 +1,4 @@
-#include "InfiniterCore.h"
+#include "InfiniterCore.hpp"
 
 #include "InfiniterShared.hpp"
 

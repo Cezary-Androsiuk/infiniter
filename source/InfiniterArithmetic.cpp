@@ -1,4 +1,4 @@
-#include "InfiniterArithmetic.h"
+#include "InfiniterArithmetic.hpp"
 
 
 InfiniterArithmetic::InfiniterArithmetic() noexcept

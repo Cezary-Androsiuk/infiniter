@@ -1,5 +1,5 @@
-#ifndef INFINITERMEMORY_H
-#define INFINITERMEMORY_H
+#ifndef INFINITERMEMORY_HPP
+#define INFINITERMEMORY_HPP
 
 #include "InfiniterShared.hpp"
 
@@ -63,4 +63,4 @@ private:
 
 
 
-#endif // INFINITERMEMORY_H
+#endif // INFINITERMEMORY_HPP

@@ -1,8 +1,8 @@
-#ifndef INFINITERBIT_H
-#define INFINITERBIT_H
+#ifndef INFINITERBIT_HPP
+#define INFINITERBIT_HPP
 
 #include "InfiniterShared.hpp"
-#include "InfiniterCore.h"
+#include "InfiniterCore.hpp"
 
 class Infiniter;
 
@@ -121,4 +121,4 @@ public:
 
 };
 
-#endif // INFINITERBIT_H
+#endif // INFINITERBIT_HPP

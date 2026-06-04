@@ -1,4 +1,4 @@
-#include "InfiniterMemory.h"
+#include "InfiniterMemory.hpp"
 
 #include "InfiniterShared.hpp"
 

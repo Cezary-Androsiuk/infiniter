@@ -2,28 +2,20 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Infiniter LANGUAGES CXX)
 
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 add_executable(Infiniter
   main.cpp
   source/InfiniterShared.hpp
-  source/InfiniterMemory.h source/InfiniterMemory.cpp
-  source/InfiniterCore.h source/InfiniterCore.cpp
-  source/InfiniterIO.h source/InfiniterIO.cpp
-  source/InfiniterBit.h source/InfiniterBit.cpp
-  source/InfiniterArithmetic.h source/InfiniterArithmetic.cpp
-  source/InfiniterUtility.h source/InfiniterUtility.cpp
-  source/Infiniter.h source/Infiniter.cpp
+  source/InfiniterMemory.hpp source/InfiniterMemory.cpp
+  source/InfiniterCore.hpp source/InfiniterCore.cpp
+  source/InfiniterIO.hpp source/InfiniterIO.cpp
+  source/InfiniterBit.hpp source/InfiniterBit.cpp
+  source/InfiniterArithmetic.hpp source/InfiniterArithmetic.cpp
+  source/InfiniterUtility.hpp source/InfiniterUtility.cpp
+  source/Infiniter.hpp source/Infiniter.cpp
 )
-target_link_libraries(Infiniter Qt${QT_VERSION_MAJOR}::Core)
 
 include(GNUInstallDirs)
 install(TARGETS Infiniter

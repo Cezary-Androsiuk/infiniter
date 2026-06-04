@@ -1,8 +1,8 @@
-#include "InfiniterBit.h"
+#include "InfiniterBit.hpp"
 
 #include "InfiniterShared.hpp"
 
-#include "Infiniter.h"
+#include "Infiniter.hpp"
 
 #include <utility> // std::move
 #include <stdexcept> // std::out_of_range

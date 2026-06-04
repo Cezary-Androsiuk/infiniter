@@ -1,8 +1,8 @@
-#ifndef INFINITERARITHMETIC_H
-#define INFINITERARITHMETIC_H
+#ifndef INFINITERARITHMETIC_HPP
+#define INFINITERARITHMETIC_HPP
 
 #include "InfiniterShared.hpp"
-#include "InfiniterBit.h"
+#include "InfiniterBit.hpp"
 
 class InfiniterArithmetic : public InfiniterBit
 {
@@ -23,4 +23,4 @@ public:
 
 };
 
-#endif // INFINITERARITHMETIC_H
+#endif // INFINITERARITHMETIC_HPP

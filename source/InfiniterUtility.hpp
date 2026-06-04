@@ -1,7 +1,7 @@
-#ifndef INFINITERUTILITY_H
-#define INFINITERUTILITY_H
+#ifndef INFINITERUTILITY_HPP
+#define INFINITERUTILITY_HPP
 
-#include "InfiniterArithmetic.h"
+#include "InfiniterArithmetic.hpp"
 
 class InfiniterUtility : public InfiniterArithmetic
 {
@@ -14,4 +14,4 @@ public:
 
 };
 
-#endif // INFINITERUTILITY_H
+#endif // INFINITERUTILITY_HPP

@@ -1,4 +1,4 @@
-#include "Infiniter.h"
+#include "Infiniter.hpp"
 
 Infiniter::Infiniter()
     : InfiniterUtility()
