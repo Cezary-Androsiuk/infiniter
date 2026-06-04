@@ -17,89 +17,81 @@
 
 
 
-/// Constructed     TYPE    %p
-/// Assigned        TYPE    %p
-/// DEL                     %p
-/// _iio_dbgprintf("IIO Constructed   DEFAULT       %p\n", this);
-/// _iio_dbgprintf("IIO Constructed   PARAMETER     %p\n", this);
-/// _iio_dbgprintf("IIO Constructed   COPY          %p\n", this);
-/// _iio_dbgprintf("IIO Constructed   MOVE          %p\n", this);
-/// _iio_dbgprintf("IIO DEL                         %p\n", this);
-/// _iio_dbgprintf("IIO Assigned      COPY          %p\n", this);
-/// _iio_dbgprintf("IIO Assigned      MOVE          %p\n", this);
-#if IIO_DEBUG_EXECUTION_PRINT
+/// _io_dbgprintf("--- DEBUG IO %p | Constructed   DEFAULT\n", this);
+/// _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER\n", this);
+/// _io_dbgprintf("--- DEBUG IO %p | Constructed   COPY\n", this);
+/// _io_dbgprintf("--- DEBUG IO %p | Constructed   MOVE\n", this);
+/// _io_dbgprintf("--- DEBUG IO %p | Assigned      COPY\n", this);
+/// _io_dbgprintf("--- DEBUG IO %p | Assigned      MOVE\n", this);
+/// _io_dbgprintf("--- DEBUG IO %p | Delete\n", this);
+/// _io_dbgprintf("--- DEBUG IO %p | Other         (...)\n", this);
+#if IO_DEBUG_EXECUTION_PRINT
 #include <cstdio>
-#define _iio_dbgprintf(...) printf(__VA_ARGS__);
-#else // IIO_DEBUG_EXECUTION_PRINT
-#define _iio_dbgprintf(...)
-#endif // IIO_DEBUG_EXECUTION_PRINT
+#define _io_dbgprintf(...) printf(__VA_ARGS__);
+#else // IO_DEBUG_EXECUTION_PRINT
+#define _io_dbgprintf(...)
+#endif // IO_DEBUG_EXECUTION_PRINT
 
 
 InfiniterIO::InfiniterIO() noexcept
     : InfiniterUtility()
 {
-    _iio_dbgprintf("IIO Constructed   DEFAULT       %p\n", this);
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   DEFAULT\n", this);
 }
 
 InfiniterIO::InfiniterIO(uint64_t p_capacity)
     : InfiniterUtility(p_capacity)
 {
-    _iio_dbgprintf("IIO Constructed   PARAMETER 1   %p\n", this);
-
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER uint64_t\n", this);
 }
 
 InfiniterIO::InfiniterIO(uint64_t p_capacity, uint64_t p_value, bool p_negative_value)
     : InfiniterUtility(p_capacity, p_value, p_negative_value)
 {
-    _iio_dbgprintf("IIO Constructed   PARAMETER 2   %p\n", this);
-
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER uint64_t uint64_t bool\n", this);
 }
 
 InfiniterIO::InfiniterIO(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
     : InfiniterUtility(p_array, p_size, p_negative_value)
 {
-    _iio_dbgprintf("IIO Constructed   PARAMETER 3   %p\n", this);
-
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER cell_t* uint64_t bool\n", this);
 }
 
 InfiniterIO::InfiniterIO(const std::string &p_number, int p_base, bool p_negative_value)
 {
-    _iio_dbgprintf("IIO Constructed   PARAMETER 5   %p\n", this);
-
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER std::string int bool\n", this);
 }
 
 InfiniterIO::InfiniterIO(const std::vector<uint8_t> &p_number, int p_base, bool p_negative_value)
 {
-    _iio_dbgprintf("IIO Constructed   PARAMETER 4   %p\n", this);
-
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER std::vector<uint8_t> int bool\n", this);
 }
 
 InfiniterIO::InfiniterIO(const std::vector<unsigned int> &p_number, int p_base, bool p_negative_value)
 {
-    _iio_dbgprintf("IIO Constructed   PARAMETER 6   %p\n", this);
-
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER std::vector<unsigned int> int bool\n", this);
 }
 
 InfiniterIO::InfiniterIO(const std::vector<uint64_t> &p_number, int p_base, bool p_negative_value)
 {
-    _iio_dbgprintf("IIO Constructed   PARAMETER 7   %p\n", this);
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER std::vector<uint64_t> int bool\n", this);
 }
 
 InfiniterIO::InfiniterIO(const InfiniterIO &p_source)
 {
-    _iio_dbgprintf("IIO Constructed   COPY          %p\n", this);
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   COPY\n", this);
 
 }
 
 InfiniterIO::InfiniterIO(InfiniterIO &&p_source) noexcept
 {
-    _iio_dbgprintf("IIO Constructed   MOVE          %p\n", this);
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   MOVE\n", this);
 
 }
 
 InfiniterIO::~InfiniterIO() noexcept
 {
-    _iio_dbgprintf("IIO DEL                         %p\n", this);
+    _io_dbgprintf("--- DEBUG IO %p | Delete\n", this);
 
     /// everything was done in InfiniterMemory
 }
@@ -337,13 +329,13 @@ void InfiniterIO::print(uint64_t base) const{
 
 InfiniterIO &InfiniterIO::operator =(const InfiniterIO &p_source)
 {
-    _iio_dbgprintf("IIO Assigned      COPY          %p\n", this);
+    _io_dbgprintf("--- DEBUG IO %p | Assigned      COPY\n", this);
 
 }
 
 InfiniterIO &InfiniterIO::operator =(InfiniterIO &&p_source)
 {
-    _iio_dbgprintf("IIO Assigned      MOVE          %p\n", this);
+    _io_dbgprintf("--- DEBUG IO %p | Assigned      MOVE\n", this);
 
 }
 

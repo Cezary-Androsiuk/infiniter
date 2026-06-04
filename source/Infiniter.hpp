@@ -1,13 +1,16 @@
 #ifndef INFINITER_HPP
 #define INFINITER_HPP
 
-#include "InfiniterUtility.hpp"
+#include "InfiniterIO.hpp"
 
-class Infiniter : public InfiniterUtility
+class Infiniter : public InfiniterIO
 {
 public:
     Infiniter();
 
+
+
+    /// InfiniterIO methods
 };
 
 #endif // INFINITER_HPP

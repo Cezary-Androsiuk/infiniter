@@ -6,15 +6,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(Infiniter
-  main.cpp
-  source/InfiniterShared.hpp
-  source/InfiniterMemory.hpp source/InfiniterMemory.cpp
-  source/InfiniterCore.hpp source/InfiniterCore.cpp
-  source/InfiniterIO.hpp source/InfiniterIO.cpp
-  source/InfiniterBit.hpp source/InfiniterBit.cpp
-  source/InfiniterArithmetic.hpp source/InfiniterArithmetic.cpp
-  source/InfiniterUtility.hpp source/InfiniterUtility.cpp
-  source/Infiniter.hpp source/Infiniter.cpp
+    main.cpp
+    source/InfiniterShared.hpp
+    source/InfiniterMemory.hpp source/InfiniterMemory.cpp
+    source/InfiniterCore.hpp source/InfiniterCore.cpp
+    source/InfiniterIO.hpp source/InfiniterIO.cpp
+    source/InfiniterBit.hpp source/InfiniterBit.cpp
+    source/InfiniterArithmetic.hpp source/InfiniterArithmetic.cpp
+    source/InfiniterUtility.hpp source/InfiniterUtility.cpp
+    source/Infiniter.hpp source/Infiniter.cpp
 )
 
 include(GNUInstallDirs)

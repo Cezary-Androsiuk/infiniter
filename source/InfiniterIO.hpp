@@ -26,6 +26,8 @@ public:
 
     ~InfiniterIO() noexcept;
 
+    /// InfiniterUtility methods
+
     void serialize(std::string p_file_path, bool p_ignore_capacity = false) const;
     void deserialize(std::string p_file_path, bool p_ignore_capacity = false);
 

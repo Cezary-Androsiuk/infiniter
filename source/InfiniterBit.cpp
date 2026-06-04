@@ -32,19 +32,19 @@ InfiniterBit::InfiniterBit() noexcept
 InfiniterBit::InfiniterBit(uint64_t p_capacity)
     : InfiniterCore(p_capacity)
 {
-    _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER 1\n", this);
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER uint64_t\n", this);
 }
 
 InfiniterBit::InfiniterBit(uint64_t p_capacity, uint64_t p_value, bool p_negative_value)
     : InfiniterCore(p_capacity, p_value, p_negative_value)
 {
-    _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER 2\n", this);
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER uint64_t uint64_t bool\n", this);
 }
 
 InfiniterBit::InfiniterBit(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
     : InfiniterCore(p_array, p_size, p_negative_value)
 {
-    _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER 3\n", this);
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER cell_t* uint64_t bool\n", this);
 }
 
 InfiniterBit::InfiniterBit(const InfiniterBit &p_source)
@@ -93,7 +93,9 @@ cell_t InfiniterBit::getMSBCell() const noexcept
     /// until non 0 cell found, then return its value
     do{
         if(*(--cellPtr) != UINT64_C(0))
+        {
             return *cellPtr;
+        }
     }
     while(cellPtr != data);
 
@@ -270,7 +272,25 @@ uint64_t InfiniterBit::getMSBCellPos(uint8_t &r_bit_pos) const noexcept
 
 uint8_t InfiniterBit::getMSBPos() const noexcept
 {
+    const cell_t *const data = this->getData();
+    const cell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
 
+    /// iterate from most significant cell, to least significant
+    /// until non 0 cell found, then return its value
+    do{
+        if(*(--cellPtr) != UINT64_C(0))
+        {
+            /// find MSB in cell
+            /// clzll stands for "Count Leading Zeros Long Long"
+            return 63 - __builtin_clzll(*cellPtr);
+        }
+    }
+    while(cellPtr != data);
+
+    /// in any case (0 or non 0 value) return least significant cell value
+    /// find MSB in that cell
+    /// clzll stands for "Count Leading Zeros Long Long"
+    return 63 - __builtin_clzll(*cellPtr);
 }
 
 uint64_t InfiniterBit::getMSBGlobalPosUnsafe() const noexcept // handle edge case
