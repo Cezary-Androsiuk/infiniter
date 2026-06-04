@@ -164,7 +164,7 @@ uint64_t InfiniterCore::setSize(uint64_t p_new_size) noexcept
     return m_size;
 }
 
-void InfiniterCore::setSizeWithExtend(uint64_t p_new_size)
+uint64_t InfiniterCore::setSizeWithExtend(uint64_t p_new_size)
 {
     if(p_new_size > m_capacity)
     {
@@ -172,6 +172,7 @@ void InfiniterCore::setSizeWithExtend(uint64_t p_new_size)
     }
 
     m_size = p_new_size;
+    return m_size;
 }
 
 void InfiniterCore::setSign(bool p_new_sign) noexcept

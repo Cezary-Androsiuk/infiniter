@@ -15,13 +15,18 @@
 
 typedef uint64_t    cell_t;
 typedef uint8_t     bit_t;
+//icell_t celli_t cell_ti
+//isize_t
 
 #define BITS_PER_BYTE   8
 #define BYTES_PER_CELL  8
 #define BITS_PER_CELL   64
 
+
 /// Can't be less than 1
 #define SBO_CAPACITY 3
+
+
 
 #define ENABLE_MEMORY_ALLOCATION_PADDING true
 #define USE_DYNAMIC_PADDING_SIZE true
@@ -98,13 +103,37 @@ union BitsUS{ /// bits union struct
 
 
 
-// ####################### INFINITER CORE #######################
+// ####################### INFINITER BIT #######################
 
 /// prints what is happening - what constructors are executed
-#define IIO_DEBUG_EXECUTION_PRINT true
+#define IB_DEBUG_EXECUTION_PRINT true
 
-/// declares method that can be used by friendly functions to display raw memory in hex
-#define IIO_ENABLE_DB_PRINT_METHOD true
+// ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER BIT ^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+// ####################### INFINITER ARITHMETIC #######################
+
+/// prints what is happening - what constructors are executed
+#define IA_DEBUG_EXECUTION_PRINT true
+
+// ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER ARITHMETIC ^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+// ####################### INFINITER UTILITY #######################
+
+/// prints what is happening - what constructors are executed
+#define IU_DEBUG_EXECUTION_PRINT true
+
+// ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER UTILITY ^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+// ####################### INFINITER IO #######################
+
+/// prints what is happening - what constructors are executed
+#define IO_DEBUG_EXECUTION_PRINT true
 
 // ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER CORE ^^^^^^^^^^^^^^^^^^^^^^^
 

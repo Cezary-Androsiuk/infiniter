@@ -42,7 +42,7 @@ public:
     /// returns what size was set
     /// if p_new_size > m_capacity, then size will be set to m_capacity
     uint64_t setSize(uint64_t p_new_size) noexcept;
-    void setSizeWithExtend(uint64_t p_new_size);
+    uint64_t setSizeWithExtend(uint64_t p_new_size);
 
     void setSign(bool p_new_sign) noexcept;
     void setPositiveSign() noexcept;

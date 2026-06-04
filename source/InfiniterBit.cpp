@@ -29,49 +29,75 @@ InfiniterBit::InfiniterBit(const cell_t *p_array, uint64_t p_size, bool p_negati
 
 }
 
-void InfiniterBit::checkCellPos(uint64_t cell_id, uint8_t pos)
+InfiniterBit::InfiniterBit(const InfiniterBit &p_source)
+{
+
+}
+
+InfiniterBit::InfiniterBit(InfiniterBit &&p_source) noexcept
+{
+
+}
+
+InfiniterBit::~InfiniterBit() noexcept
+{
+
+}
+
+bool InfiniterBit::checkCellPos(uint64_t cell_id, uint8_t pos)
+{
+    return cell_id < this->getSize() && pos < 64;
+}
+
+void InfiniterBit::checkCellPosTry(uint64_t cell_id, uint8_t pos)
 {
     if(cell_id >= this->getSize() || pos >= 64)
     {
-        std::ostringstream ss;
-        ss << "Range error: cell_id " << cell_id << " (max < " << this->getSize()
-            << "), pos " << static_cast<int>(pos) << " (max < 64)";
+        // std::ostringstream ss;
+        // ss << "Range error: cell_id " << cell_id << " (max < " << this->getSize()
+        //     << "), pos " << static_cast<int>(pos) << " (max < 64)";
 
-        throw std::out_of_range( ss.str() );
+        // throw std::out_of_range( ss.str() );
+        throw std::out_of_range(
+            "Range error: cell_id " + std::to_string(cell_id) +
+            " (max < " + std::to_string(this->getSize()) +
+            "), pos " + std::to_string(static_cast<int>(pos)) +
+            " (max < 64)"
+        );
     }
 }
 
-uint64_t InfiniterBit::getBit(uint64_t cell_id, uint8_t pos)
+uint8_t InfiniterBit::getBit(uint64_t cell_id, uint8_t pos)
 {
-    this->checkCellPos(cell_id, pos);
+    this->checkCellPosTry(cell_id, pos);
     
-    return this->getData()[cell_id] & (UINT64_C(1) << pos);
+    return this->getData()[cell_id] & (UINT64_C(1) << pos) ? UINT8_C(1) : UINT8_C(0);
 }
 
 void InfiniterBit::setBit(uint64_t cell_id, uint8_t pos)
 {
-    this->checkCellPos(cell_id, pos);
+    this->checkCellPosTry(cell_id, pos);
     
     this->getData()[cell_id] |= (UINT64_C(1) << pos);
 }
 
 void InfiniterBit::clearBit(uint64_t cell_id, uint8_t pos)
 {
-    this->checkCellPos(cell_id, pos);
+    this->checkCellPosTry(cell_id, pos);
 
     this->getData()[cell_id] &= ~(UINT64_C(1) << pos);
 }
 
 void InfiniterBit::toggleBit(uint64_t cell_id, uint8_t pos)
 {
-    this->checkCellPos(cell_id, pos);
+    this->checkCellPosTry(cell_id, pos);
 
     this->getData()[cell_id] ^= (UINT64_C(1) << pos);
 }
 
-uint64_t InfiniterBit::getBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept
+uint8_t InfiniterBit::getBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept
 {
-    return this->getData()[cell_id] & (UINT64_C(1) << pos);
+    return this->getData()[cell_id] & (UINT64_C(1) << pos) ? UINT8_C(1) : UINT8_C(0);
 }
 
 void InfiniterBit::setBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept
@@ -153,6 +179,16 @@ void InfiniterBit::pushLSB(uint64_t lsb)
 
 void InfiniterBit::pushMSB(uint64_t msb)
 {
+    cell_t *data = this->getData();
+    uint64_t size = this->getSize();
+    if(data[size-1] & M100)
+    {
+        size = this->setSizeWithExtend(size +1);
+    }
+
+
+
+
     this->shiftMSB(msb);
 }
 
