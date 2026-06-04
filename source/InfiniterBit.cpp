@@ -2,46 +2,68 @@
 
 #include "InfiniterShared.hpp"
 
-#include <stdexcept>
-#include <sstream>
+#include "Infiniter.h"
+
+#include <utility> // std::move
+#include <stdexcept> // std::out_of_range
+#include <string> // std::to_string
+
+/// _ib_dbgprintf("--- DEBUG IB %p | Constructed   DEFAULT\n", this);
+/// _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER\n", this);
+/// _ib_dbgprintf("--- DEBUG IB %p | Constructed   COPY\n", this);
+/// _ib_dbgprintf("--- DEBUG IB %p | Constructed   MOVE\n", this);
+/// _ib_dbgprintf("--- DEBUG IB %p | Assigned      COPY\n", this);
+/// _ib_dbgprintf("--- DEBUG IB %p | Assigned      MOVE\n", this);
+/// _ib_dbgprintf("--- DEBUG IB %p | Delete\n", this);
+/// _ib_dbgprintf("--- DEBUG IB %p | Other         (...)\n", this);
+#if IB_DEBUG_EXECUTION_PRINT
+#include <cstdio>
+#define _ib_dbgprintf(...) printf(__VA_ARGS__);
+#else // IB_DEBUG_EXECUTION_PRINT
+#define _ib_dbgprintf(...)
+#endif // IB_DEBUG_EXECUTION_PRINT
 
 InfiniterBit::InfiniterBit() noexcept
     : InfiniterCore()
 {
-
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed   DEFAULT\n", this);
 }
 
 InfiniterBit::InfiniterBit(uint64_t p_capacity)
     : InfiniterCore(p_capacity)
 {
-
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER 1\n", this);
 }
 
 InfiniterBit::InfiniterBit(uint64_t p_capacity, uint64_t p_value, bool p_negative_value)
     : InfiniterCore(p_capacity, p_value, p_negative_value)
 {
-
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER 2\n", this);
 }
 
 InfiniterBit::InfiniterBit(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
     : InfiniterCore(p_array, p_size, p_negative_value)
 {
-
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER 3\n", this);
 }
 
 InfiniterBit::InfiniterBit(const InfiniterBit &p_source)
+    : InfiniterCore(p_source)
 {
-
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed   COPY\n", this);
 }
 
 InfiniterBit::InfiniterBit(InfiniterBit &&p_source) noexcept
+    : InfiniterCore(std::move(p_source))
 {
-
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed   MOVE\n", this);
 }
 
 InfiniterBit::~InfiniterBit() noexcept
 {
+    _ib_dbgprintf("--- DEBUG IB %p | Delete\n", this);
 
+    /// everything was done in InfiniterMemory
 }
 
 bool InfiniterBit::checkCellPos(uint64_t cell_id, uint8_t pos)
@@ -53,11 +75,6 @@ void InfiniterBit::checkCellPosTry(uint64_t cell_id, uint8_t pos)
 {
     if(cell_id >= this->getSize() || pos >= 64)
     {
-        // std::ostringstream ss;
-        // ss << "Range error: cell_id " << cell_id << " (max < " << this->getSize()
-        //     << "), pos " << static_cast<int>(pos) << " (max < 64)";
-
-        // throw std::out_of_range( ss.str() );
         throw std::out_of_range(
             "Range error: cell_id " + std::to_string(cell_id) +
             " (max < " + std::to_string(this->getSize()) +
@@ -66,6 +83,300 @@ void InfiniterBit::checkCellPosTry(uint64_t cell_id, uint8_t pos)
         );
     }
 }
+
+cell_t InfiniterBit::getMSBCell() const noexcept
+{
+    const cell_t *const data = this->getData();
+    const cell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
+
+    /// iterate from most significant cell, to least significant
+    /// until non 0 cell found, then return its value
+    do{
+        if(*(--cellPtr) != UINT64_C(0))
+            return *cellPtr;
+    }
+    while(cellPtr != data);
+
+    /// in any case (0 or non 0 value) return least significant cell value
+    return *cellPtr;
+}
+
+const cell_t *InfiniterBit::getMSBCellPtr() const noexcept
+{
+    const cell_t *const data = this->getData();
+    const cell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
+
+    /// iterate from most significant cell, to least significant
+    /// until non 0 cell found, then return the cell ptr
+    do{
+        if(*(--cellPtr) != UINT64_C(0))
+        {
+            return cellPtr;
+        }
+    }
+    while(cellPtr != data);
+
+    /// in any case (0 or non 0 value) return least significant cell
+    return cellPtr;
+}
+
+cell_t *InfiniterBit::getMSBCellPtr() noexcept
+{
+    cell_t *const data = this->getData();
+    cell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
+
+    /// iterate from most significant cell, to least significant
+    /// until non 0 cell found, then return the cell ptr
+    do{
+        if(*(--cellPtr) != UINT64_C(0))
+        {
+            return cellPtr;
+        }
+    }
+    while(cellPtr != data);
+
+    /// in any case (0 or non 0 value) return least significant cell
+    return cellPtr;
+}
+
+uint64_t InfiniterBit::getMSBCellPos() const noexcept
+{
+    uint64_t size = this->getSize();
+    const cell_t *data = this->getData();
+
+    /// iterate from most significant cell, to least significant
+    /// until non 0 cell found, then return its index
+    for(uint64_t i=0; i<size; i++)
+    {
+        const uint64_t pos = size -1 -i;
+        if(data[pos] != UINT64_C(0))
+        {
+            return pos;
+        }
+    }
+
+    /// in any case (0 or non 0 value) return least significant cell index
+    return 0;
+}
+
+cell_t InfiniterBit::getMSBCell(uint8_t &r_bit_pos) const noexcept
+{
+    const cell_t *const data = this->getData();
+    const cell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
+
+    /// iterate from most significant cell, to least significant
+    /// until non 0 cell found, then return its value
+    do{
+        if(*(--cellPtr) != UINT64_C(0))
+        {
+            /// find MSB in cell
+            /// clzll stands for "Count Leading Zeros Long Long"
+            r_bit_pos = 63 - __builtin_clzll(*cellPtr);
+
+            return *cellPtr;
+        }
+    }
+    while(cellPtr != data);
+
+    /// in any case (0 or non 0 value) return least significant cell value
+    /// but first find MSB in cell
+    /// clzll stands for "Count Leading Zeros Long Long"
+    r_bit_pos = 63 - __builtin_clzll(*cellPtr);
+
+    return *cellPtr;
+}
+
+const cell_t *InfiniterBit::getMSBCellPtr(uint8_t &r_bit_pos) const noexcept
+{
+    const cell_t *const data = this->getData();
+    const cell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
+
+    /// iterate from most significant cell, to least significant
+    /// until non 0 cell found, then return its value
+    do{
+        if(*(--cellPtr) != UINT64_C(0))
+        {
+            /// find MSB in cell
+            /// clzll stands for "Count Leading Zeros Long Long"
+            r_bit_pos = 63 - __builtin_clzll(*cellPtr);
+
+            return cellPtr;
+        }
+    }
+    while(cellPtr != data);
+
+    /// in any case (0 or non 0 value) return least significant cell value
+    /// but first find MSB in cell
+    /// clzll stands for "Count Leading Zeros Long Long"
+    r_bit_pos = 63 - __builtin_clzll(*cellPtr);
+
+    return cellPtr;
+}
+
+cell_t *InfiniterBit::getMSBCellPtr(uint8_t &r_bit_pos) noexcept
+{
+    cell_t *const data = this->getData();
+    cell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
+
+    /// iterate from most significant cell, to least significant
+    /// until non 0 cell found, then return its value
+    do{
+        if(*(--cellPtr) != UINT64_C(0))
+        {
+            /// find MSB in cell
+            /// clzll stands for "Count Leading Zeros Long Long"
+            r_bit_pos = 63 - __builtin_clzll(*cellPtr);
+
+            return cellPtr;
+        }
+    }
+    while(cellPtr != data);
+
+    /// in any case (0 or non 0 value) return least significant cell value
+    /// but first find MSB in cell
+    /// clzll stands for "Count Leading Zeros Long Long"
+    r_bit_pos = 63 - __builtin_clzll(*cellPtr);
+
+    return cellPtr;
+}
+
+uint64_t InfiniterBit::getMSBCellPos(uint8_t &r_bit_pos) const noexcept
+{
+    uint64_t size = this->getSize();
+    const cell_t *data = this->getData();
+
+    /// iterate from most significant cell, to least significant
+    /// until non 0 cell found, then return its index
+    for(uint64_t i=0; i<size; i++)
+    {
+        const uint64_t pos = size -1 -i;
+        if(data[pos] != UINT64_C(0))
+        {
+            /// find MSB in cell
+            /// clzll stands for "Count Leading Zeros Long Long"
+            r_bit_pos = 63 - __builtin_clzll(data[pos]);
+
+            return pos;
+        }
+    }
+
+    /// in any case (0 or non 0 value) return least significant cell index
+    /// find MSB in cell
+    /// clzll stands for "Count Leading Zeros Long Long"
+    r_bit_pos = 63 - __builtin_clzll(data[0]);
+
+    return 0;
+}
+
+uint8_t InfiniterBit::getMSBPos() const noexcept
+{
+
+}
+
+uint64_t InfiniterBit::getMSBGlobalPosUnsafe() const noexcept // handle edge case
+{
+
+}
+
+Infiniter InfiniterBit::getMSBGlobalPos() const // throws bad_alloc
+{
+
+}
+
+uint8_t InfiniterBit::getMSBPos(cell_t &r_cell) const noexcept
+{
+
+}
+
+uint8_t InfiniterBit::getMSBPos(uint64_t *&r_cell_ptr) const noexcept
+{
+
+}
+
+uint8_t InfiniterBit::getMSBPosCellPos(uint64_t &r_cell_pos) const noexcept
+{
+
+}
+
+
+
+
+
+cell_t InfiniterBit::getLSBCell() const noexcept
+{
+
+}
+
+const cell_t *InfiniterBit::getLSBCellPtr() const noexcept
+{
+
+}
+
+cell_t *InfiniterBit::getLSBCellPtr() noexcept
+{
+
+}
+
+uint64_t InfiniterBit::getLSBCellPos() const noexcept
+{
+
+}
+
+cell_t InfiniterBit::getLSBCell(uint8_t &r_bit_pos) const noexcept
+{
+
+}
+
+const cell_t *InfiniterBit::getLSBCellPtr(uint8_t &r_bit_pos) const noexcept
+{
+
+}
+
+cell_t *InfiniterBit::getLSBCellPtr(uint8_t &r_bit_pos) noexcept
+{
+
+}
+
+uint64_t InfiniterBit::getLSBCellPos(uint8_t &r_bit_pos) const noexcept
+{
+
+}
+
+uint8_t InfiniterBit::getLSBPos() const noexcept
+{
+
+}
+
+uint64_t InfiniterBit::getLSBGlobalPosUnsafe() const noexcept // handle edge case
+{
+
+}
+
+Infiniter InfiniterBit::getLSBGlobalPos() const // throws bad_alloc
+{
+
+}
+
+uint8_t InfiniterBit::getLSBPos(cell_t &r_cell) const noexcept
+{
+
+}
+
+uint8_t InfiniterBit::getLSBPos(uint64_t *&r_cell_ptr) const noexcept
+{
+
+}
+
+uint8_t InfiniterBit::getLSBPosCellPos(uint64_t &r_cell_pos) const noexcept
+{
+
+}
+
+
+
+
+
+
 
 uint8_t InfiniterBit::getBit(uint64_t cell_id, uint8_t pos)
 {

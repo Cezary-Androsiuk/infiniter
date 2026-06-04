@@ -20,6 +20,7 @@ public:
 
     ~InfiniterBit() noexcept;
 
+    /// InfiniterCore methods
 
     // maybe change all uint64_t to cell where context is abaout bits or cells
 
@@ -27,20 +28,72 @@ public:
     void checkCellPosTry(uint64_t cell_id, uint8_t pos); // throws out_of_range
 
 
+    /// Returns value of cell with MSB
     cell_t getMSBCell() const noexcept;
-    cell_t *getMSBCellPtr() const noexcept;
+    /// Returns const pointer to cell with MSB
+    const cell_t *getMSBCellPtr() const noexcept;
+    /// Returns pointer to cell with MSB
+    cell_t *getMSBCellPtr() noexcept;
+    /// Returns position of cell with MSB
     uint64_t getMSBCellPos() const noexcept;
 
+    /// Returns value of cell with MSB and get MSB position in cell
     cell_t getMSBCell(uint8_t &r_bit_pos) const noexcept;
-    cell_t *getMSBCellPtr(uint8_t &r_bit_pos) const noexcept;
+    /// Returns const pointer to cell with MSB and get MSB position in cell
+    const cell_t *getMSBCellPtr(uint8_t &r_bit_pos) const noexcept;
+    /// Returns pointer to cell with MSB and get MSB position in cell
+    cell_t *getMSBCellPtr(uint8_t &r_bit_pos) noexcept;
+    /// Returns position of cell with MSB and get MSB position in cell
     uint64_t getMSBCellPos(uint8_t &r_bit_pos) const noexcept;
 
+    /// Returns MSB position in cell
     uint8_t getMSBPos() const noexcept;
+    /// Returns MSB global position in cell  (could fail for large numbers)
     uint64_t getMSBGlobalPosUnsafe() const noexcept; // handle edge case
+    /// Returns MSB global position in cell
     Infiniter getMSBGlobalPos() const; // throws bad_alloc
 
-    cell_t getMSBPos(cell_t &r_cell) const noexcept;
-    cell_t getMSBPos(uint64_t &r_cell_pos) const noexcept;
+    /// Returns MSB position in cell and get MSB cell value
+    uint8_t getMSBPos(cell_t &r_cell) const noexcept;
+    /// Returns MSB position in cell and get MSB cell pointer
+    uint8_t getMSBPos(uint64_t *&r_cell_ptr) const noexcept;
+    /// Returns MSB position in cell and get MSB cell position
+    uint8_t getMSBPosCellPos(uint64_t &r_cell_pos) const noexcept;
+
+
+
+    /// Returns value of cell with LSB
+    cell_t getLSBCell() const noexcept;
+    /// Returns const pointer to cell with LSB
+    const cell_t *getLSBCellPtr() const noexcept;
+    /// Returns pointer to cell with LSB
+    cell_t *getLSBCellPtr() noexcept;
+    /// Returns position of cell with LSB
+    uint64_t getLSBCellPos() const noexcept;
+
+    /// Returns value of cell with LSB and get LSB position in cell
+    cell_t getLSBCell(uint8_t &r_bit_pos) const noexcept;
+    /// Returns const pointer to cell with LSB and get LSB position in cell
+    const cell_t *getLSBCellPtr(uint8_t &r_bit_pos) const noexcept;
+    /// Returns pointer to cell with LSB and get LSB position in cell
+    cell_t *getLSBCellPtr(uint8_t &r_bit_pos) noexcept;
+    /// Returns position of cell with LSB and get LSB position in cell
+    uint64_t getLSBCellPos(uint8_t &r_bit_pos) const noexcept;
+
+    /// Returns LSB position in cell
+    uint8_t getLSBPos() const noexcept;
+    /// Returns LSB global position in cell  (could fail for large numbers)
+    uint64_t getLSBGlobalPosUnsafe() const noexcept; // handle edge case
+    /// Returns LSB global position in cell
+    Infiniter getLSBGlobalPos() const; // throws bad_alloc
+
+    /// Returns LSB position in cell and get LSB cell value
+    uint8_t getLSBPos(cell_t &r_cell) const noexcept;
+    /// Returns LSB position in cell and get LSB cell pointer
+    uint8_t getLSBPos(uint64_t *&r_cell_ptr) const noexcept;
+    /// Returns LSB position in cell and get LSB cell position
+    uint8_t getLSBPosCellPos(uint64_t &r_cell_pos) const noexcept;
+
 
 
     uint8_t getBit(uint64_t cell_id, uint8_t pos); // throws out_of_range

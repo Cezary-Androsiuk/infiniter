@@ -8,14 +8,11 @@
 class InfiniterMemory
 {
 protected:
-    /// Constructor
     explicit InfiniterMemory() noexcept;
+
     explicit InfiniterMemory(uint64_t p_capacity); /// throws bad_alloc
 
-    /// Copy Constructor
     explicit InfiniterMemory(const InfiniterMemory &p_source); /// throws bad_alloc
-
-    /// Move Constructor
     explicit InfiniterMemory(InfiniterMemory &&p_source) noexcept;
 
     ~InfiniterMemory() noexcept; /// NOT VIRTUAL
@@ -60,5 +57,10 @@ private:
 
     friend void infiniterMemoryTests();
 };
+
+
+
+
+
 
 #endif // INFINITERMEMORY_H

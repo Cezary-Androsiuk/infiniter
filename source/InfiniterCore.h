@@ -9,14 +9,11 @@
 class InfiniterCore : private InfiniterMemory
 {
 public:
-    /// Constructor
     explicit InfiniterCore() noexcept;
 
     explicit InfiniterCore(uint64_t p_capacity); /// throws bad_alloc
-
     /// value only covers first cell, purpose of this is to initialize instance with 1 or other scalar values
     explicit InfiniterCore(uint64_t p_capacity, uint64_t p_value, bool p_negative_value=false); /// throws bad_alloc
-
     explicit InfiniterCore(const cell_t *p_array, uint64_t p_size, bool p_negative_value=false); /// throws bad_alloc
 
     explicit InfiniterCore(const InfiniterCore &p_source); /// throws bad_alloc
