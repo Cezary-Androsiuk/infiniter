@@ -15,6 +15,7 @@ add_executable(Infiniter
     source/InfiniterArithmetic.hpp source/InfiniterArithmetic.cpp
     source/InfiniterUtility.hpp source/InfiniterUtility.cpp
     source/Infiniter.hpp source/Infiniter.cpp
+    source/InfiniterException.hpp source/InfiniterException.cpp
 )
 
 include(GNUInstallDirs)

@@ -1,10 +1,13 @@
 #include "InfiniterIO.hpp"
 
 #include "InfiniterShared.hpp"
+#include "InfiniterException.hpp"
 
 #include <utility> // std::move
 #include <string>
 #include <vector>
+
+#include <cmath>
 
 
 #include <cstdio>
@@ -60,6 +63,11 @@ InfiniterIO::InfiniterIO(const cell_t *p_array, uint64_t p_size, bool p_negative
 InfiniterIO::InfiniterIO(const std::string &p_number, int p_base, bool p_negative_value)
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER std::string int bool\n", this);
+
+    validateStringNumber(p_number, p_base)
+
+    size_t number_size = p_number;
+
 }
 
 InfiniterIO::InfiniterIO(const std::vector<uint8_t> &p_number, int p_base, bool p_negative_value)
@@ -78,12 +86,14 @@ InfiniterIO::InfiniterIO(const std::vector<uint64_t> &p_number, int p_base, bool
 }
 
 InfiniterIO::InfiniterIO(const InfiniterIO &p_source)
+    : InfiniterUtility(p_source)
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   COPY\n", this);
 
 }
 
 InfiniterIO::InfiniterIO(InfiniterIO &&p_source) noexcept
+    : InfiniterUtility(std::move(p_source))
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   MOVE\n", this);
 
@@ -189,6 +199,80 @@ bool InfiniterIO::isPowerOfTwo(int p_number)
 {
     /// power of two has always one bit set to 1, and this formula checks that
     return (p_number > 0) && ((p_number & (p_number - 1)) == 0);
+}
+
+double InfiniterIO::log(double p_base, double p_value) noexcept
+{
+    if(p_base <= 0 || p_value <= 0)
+        return 0.0;
+
+    return std::log2(p_value) / std::log2(p_base);
+}
+
+uint64_t InfiniterIO::maxLengthAfterConversion(uint64_t p_number_length,
+                                               uint8_t p_number_base,
+                                               uint8_t p_target_base) noexcept
+{
+    if(p_number_base < 2 || p_target_base < 2)
+        return 0;
+
+    double ratio = InfiniterIO::log(p_number_base, p_target_base);
+
+    return std::ceill(static_cast<double>(p_number_length) * ratio);
+}
+
+void InfiniterIO::validateStringNumber(const std::string &p_number, int p_base)
+{
+    /// limit base
+    if (p_base < 2 || p_base > 36)
+    {
+        throw std::invalid_argument("Base must be between 2 and 36");
+    }
+
+    /// empty string
+    if (p_number.empty())
+    {
+        throw InfiniterException::InvalidStringFormat("Empty string");
+    }
+
+    size_t start_index = 0;
+
+    /// handle number sign
+    if (p_number[0] == '-' || p_number[0] == '+') {
+        if (p_number.length() == 1) {
+            throw InfiniterException::InvalidStringFormat("String contains only sign");
+        }
+        start_index = 1;
+    }
+
+    /// handle leading zeros (01 or -001123 are not allowed)
+    /// ignore '0'
+    if (p_number.length() - start_index > 1 && p_number[start_index] == '0') {
+        throw InfiniterException::InvalidStringFormat("Leading zeros are not allowed");
+    }
+
+    /// main validation
+    for (size_t i = start_index; i < p_number.length(); ++i) {
+        const char c = p_number[i];
+        bool is_valid = false;
+
+        if (c >= '0' && c <= '9') {
+            if (c - '0' < p_base) is_valid = true;
+        }
+        else if (c >= 'a' && c <= 'z') {
+            if (10 + (c - 'a') < p_base) is_valid = true;
+        }
+        else if (c >= 'A' && c <= 'Z') {
+            if (10 + (c - 'A') < p_base) is_valid = true;
+        }
+
+        if (!is_valid) {
+            throw InfiniterException::InvalidStringFormat(
+                std::string("String contains invalid character '") + c +
+                "' for base " + std::to_string(p_base)
+                );
+        }
+    }
 }
 
 void InfiniterIO::assign(uint64_t p_value, bool p_negative_value) noexcept

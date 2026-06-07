@@ -16,7 +16,7 @@ public:
     explicit InfiniterIO(uint64_t p_capacity, uint64_t p_value, bool p_negative_value=false); /// throws bad_alloc
     explicit InfiniterIO(const cell_t *p_array, uint64_t p_size, bool p_negative_value=false); /// throws bad_alloc
 
-    explicit InfiniterIO(const std::string &p_number, int p_base=10, bool p_negative_value=false); /// throws bad_alloc
+    explicit InfiniterIO(const std::string &p_number, int p_base=10, bool p_negative_value=false); /// throws bad_alloc /// InfiniterException::InvalidStringFormat
     explicit InfiniterIO(const std::vector<uint8_t> &p_number, int p_base=10, bool p_negative_value=false); /// throws bad_alloc
     explicit InfiniterIO(const std::vector<unsigned int> &p_number, int p_base=10, bool p_negative_value=false); /// throws bad_alloc
     explicit InfiniterIO(const std::vector<uint64_t> &p_number, int p_base=10, bool p_negative_value=false); /// throws bad_alloc
@@ -33,6 +33,11 @@ public:
 
 protected:
     static bool isPowerOfTwo(int p_number);
+    static double log(double p_base, double p_value) noexcept;
+    static uint64_t maxLengthAfterConversion(uint64_t p_number_length,
+                                             uint8_t p_number_base,
+                                             uint8_t p_target_base) noexcept;
+    static void validateStringNumber(const std::string &p_number, int p_base);
 public:
 
     void assign(uint64_t p_value, bool p_negative_value=false) noexcept;
