@@ -43,7 +43,7 @@ protected:
     InfiniterMemory &operator =(InfiniterMemory &&p_source);
 
 protected:
-    icell_t *m_memory; /// would be perfect to create alias m_data for child classes
+    icell_t *m_data; /// would be perfect to create alias m_data for child classes
     isize_t m_capacity;
 
     BitsUS m_bits;
@@ -51,7 +51,7 @@ protected:
 private:
     icell_t m_sbo_buffer[SBO_CAPACITY];
 
-    // heap memory is allocated directly on m_memory
+    // heap memory is allocated directly on m_data
 
     friend void infiniterMemoryTests();
 };

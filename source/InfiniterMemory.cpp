@@ -25,7 +25,7 @@
 #define IM_CAP_LIMIT(capacity) if(UNLIKELY((capacity) == IM_CAPACITY_LOOP_STOP)) (capacity) = IM_MAX_CAPACITY;
 
 InfiniterMemory::InfiniterMemory() noexcept
-    : m_memory( m_sbo_buffer )
+    : m_data( m_sbo_buffer )
     , m_capacity( SBO_CAPACITY )
     , m_bits({
         .sbo_active = true
@@ -50,11 +50,11 @@ InfiniterMemory::InfiniterMemory(isize_t p_capacity)
 
         /// heap memory
 #if IM_CLEAR_ALLOCATED_MEMORY
-        m_memory = new icell_t[p_capacity]();
+        m_data = new icell_t[p_capacity]();
 #else // IM_CLEAR_ALLOCATED_MEMORY
-        m_memory = new icell_t[p_capacity];
+        m_data = new icell_t[p_capacity];
 #endif // IM_CLEAR_ALLOCATED_MEMORY
-        if(m_memory == nullptr) throw std::bad_alloc();
+        if(m_data == nullptr) throw std::bad_alloc();
 
         m_capacity = p_capacity;
         m_bits.sbo_active = false;
@@ -62,7 +62,7 @@ InfiniterMemory::InfiniterMemory(isize_t p_capacity)
     else
     {
         /// stack memory // much slower than default constructor
-        m_memory = m_sbo_buffer;
+        m_data = m_sbo_buffer;
         m_capacity = SBO_CAPACITY;
         m_bits.sbo_active = true;
 
@@ -77,7 +77,7 @@ InfiniterMemory::InfiniterMemory(const InfiniterMemory &p_source)
     _im_dbgprintf("--- DEBUG IM %p | Constructed   COPY\n", this);
 
     /// set stack or heap
-    m_memory = p_source.m_bits.sbo_active ? m_sbo_buffer : new icell_t[p_source.m_capacity];
+    m_data = p_source.m_bits.sbo_active ? m_sbo_buffer : new icell_t[p_source.m_capacity];
     /// do not clear new allocated memory - it will be overwrited in a while
     /// if operator new thows here std::bad_alloc(), object instance won't be corrupted here
 
@@ -85,7 +85,7 @@ InfiniterMemory::InfiniterMemory(const InfiniterMemory &p_source)
     m_capacity = p_source.m_capacity;
 
     /// copy old data
-    std::copy_n(p_source.m_memory, m_capacity, m_memory);
+    std::copy_n(p_source.m_data, m_capacity, m_data);
 }
 
 InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source) noexcept
@@ -97,21 +97,21 @@ InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source) noexcept
     /// ensure speed up for moving heap memory, stack here is already slow
     if(UNLIKELY( m_bits.sbo_active ))
     {
-        m_memory = m_sbo_buffer;
+        m_data = m_sbo_buffer;
 
         /// copy stack memory
-        std::copy_n(p_source.m_memory, m_capacity, m_memory);
+        std::copy_n(p_source.m_data, m_capacity, m_data);
     }
     else
     {
         /// move already allocated memory from source here
-        m_memory = p_source.m_memory;
-        p_source.m_memory = nullptr;
+        m_data = p_source.m_data;
+        p_source.m_data = nullptr;
     }
 
 #if IM_ENSURE_NEW_OBJECT_AFTER_MOVE
     /// reset source by hand (to prevent memory deallocation)
-    p_source.m_memory = p_source.m_sbo_buffer;
+    p_source.m_data = p_source.m_sbo_buffer;
     p_source.m_capacity = SBO_CAPACITY;
     p_source.m_bits.sbo_active = true;
 
@@ -127,7 +127,7 @@ InfiniterMemory::~InfiniterMemory() noexcept
 
     if(!m_bits.sbo_active)
     {
-        delete [] m_memory;
+        delete [] m_data;
     }
 }
 
@@ -137,10 +137,10 @@ void InfiniterMemory::reset() noexcept
 
     if(!m_bits.sbo_active)
     {
-        delete [] m_memory; /// for scalar array exception won't be thrown
+        delete [] m_data; /// for scalar array exception won't be thrown
     }
 
-    m_memory = m_sbo_buffer;
+    m_data = m_sbo_buffer;
     m_capacity = SBO_CAPACITY;
     m_bits.sbo_active = true;
 
@@ -165,23 +165,23 @@ void InfiniterMemory::reserve(isize_t p_new_capacity)
 
     /// m_capacity < p_new_capacity at this point
 
-    icell_t *tmp_memory = new icell_t[p_new_capacity];
+    icell_t *tmp_data = new icell_t[p_new_capacity];
     /// will throw if allocation failed, but object instance, won't be corrupted
 
     /// copy old data
-    std::copy_n(m_memory, m_capacity, tmp_memory);
+    std::copy_n(m_data, m_capacity, tmp_data);
 
     /// set new cells to 0
     isize_t cells_added = p_new_capacity - m_capacity;
-    std::fill_n(tmp_memory + m_capacity, cells_added, ICELL_C(0));
+    std::fill_n(tmp_data + m_capacity, cells_added, ICELL_C(0));
 
     /// dealocate old memory if allocated
     if(!m_bits.sbo_active)
     {
-        delete [] m_memory;
+        delete [] m_data;
     }
 
-    m_memory = tmp_memory;
+    m_data = tmp_data;
     m_bits.sbo_active = false;
     m_capacity = p_new_capacity;
 
@@ -218,7 +218,7 @@ void InfiniterMemory::extend(isize_t p_additional_capacity)
 //     /// find first non zero cell going from the left (from MSB)
 //     /// if msb_index is smaller than SBO_CAPACITY just enable SBO
 //     isize_t msb_index = m_capacity;
-//     while( !(m_memory[--msb_index]) && msb_index>=SBO_CAPACITY )
+//     while( !(m_data[--msb_index]) && msb_index>=SBO_CAPACITY )
 //         ;
 
 
@@ -227,12 +227,12 @@ void InfiniterMemory::extend(isize_t p_additional_capacity)
 //         /// shrink to match SBO
 
 //         /// copy old data
-//         std::copy_n(m_memory, SBO_CAPACITY, m_sbo_buffer);
+//         std::copy_n(m_data, SBO_CAPACITY, m_sbo_buffer);
 
 //         /// dealocate old memory
-//         delete [] m_memory;
+//         delete [] m_data;
 
-//         m_memory = m_sbo_buffer;
+//         m_data = m_sbo_buffer;
 //         m_bits.sbo_active = true;
 //         m_capacity = SBO_CAPACITY;
 //     }
@@ -242,16 +242,16 @@ void InfiniterMemory::extend(isize_t p_additional_capacity)
 
 //         isize_t new_capacity = msb_index +1;
 
-//         icell_t *tmp_memory = new icell_t[new_capacity];
+//         icell_t *tmp_data = new icell_t[new_capacity];
 //         /// will throw if allocation failed, but object instance, won't be corrupted
 
 //         /// copy old data
-//         std::copy_n(m_memory, new_capacity, tmp_memory);
+//         std::copy_n(m_data, new_capacity, tmp_data);
 
 //         /// dealocate old memory
-//         delete [] m_memory;
+//         delete [] m_data;
 
-//         m_memory = tmp_memory;
+//         m_data = tmp_data;
 //         m_bits.sbo_active = false;
 //         m_capacity = new_capacity;
 //     }
@@ -286,12 +286,12 @@ void InfiniterMemory::shrink(isize_t p_target_capacity)
         /// shrink to match SBO
 
         /// copy old data
-        std::copy_n(m_memory, SBO_CAPACITY, m_sbo_buffer);
+        std::copy_n(m_data, SBO_CAPACITY, m_sbo_buffer);
 
         /// dealocate old memory
-        delete [] m_memory;
+        delete [] m_data;
 
-        m_memory = m_sbo_buffer;
+        m_data = m_sbo_buffer;
         m_bits.sbo_active = true;
         m_capacity = SBO_CAPACITY;
     }
@@ -299,16 +299,16 @@ void InfiniterMemory::shrink(isize_t p_target_capacity)
     {
         /// shrink heap
 
-        icell_t *tmp_memory = new icell_t[p_target_capacity];
+        icell_t *tmp_data = new icell_t[p_target_capacity];
         /// will throw if allocation failed, but object instance, won't be corrupted
 
         /// copy old data
-        std::copy_n(m_memory, p_target_capacity, tmp_memory);
+        std::copy_n(m_data, p_target_capacity, tmp_data);
 
         /// dealocate old memory
-        delete [] m_memory;
+        delete [] m_data;
 
-        m_memory = tmp_memory;
+        m_data = tmp_data;
         m_bits.sbo_active = false;
         m_capacity = p_target_capacity;
     }
@@ -320,7 +320,7 @@ void InfiniterMemory::dbg_print() const
     printf("IM obj: %p, capacity: %llu, sbo: %c\n", this, m_capacity, m_bits.sbo_active + '0');
     for(isize_t i=0; i<m_capacity; i++)
     {
-        printf("%016llx ", m_memory[m_capacity - ISIZE_C(1) - i]);
+        printf("%016llx ", m_data[m_capacity - ISIZE_C(1) - i]);
     }
     printf("\n");
 }
@@ -337,21 +337,21 @@ InfiniterMemory &InfiniterMemory::operator =(const InfiniterMemory &p_source)
 
     if( &p_source != this )
     {
-        icell_t *tmp_memory = p_source.m_bits.sbo_active ? m_sbo_buffer : new icell_t[p_source.m_capacity];
+        icell_t *tmp_data = p_source.m_bits.sbo_active ? m_sbo_buffer : new icell_t[p_source.m_capacity];
         /// will throw if allocation failed, but object instance, won't be corrupted
 
         /// dealocate old memory if allocated
         if(!m_bits.sbo_active)
         {
-            delete [] m_memory;
+            delete [] m_data;
         }
 
-        m_memory = tmp_memory;
+        m_data = tmp_data;
         m_bits.sbo_active = p_source.m_bits.sbo_active;
         m_capacity = p_source.m_capacity;
 
         /// copy old data
-        std::copy_n(p_source.m_memory, m_capacity, m_memory);
+        std::copy_n(p_source.m_data, m_capacity, m_data);
     }
 
     return *this;
@@ -369,21 +369,21 @@ InfiniterMemory &InfiniterMemory::operator =(InfiniterMemory &&p_source)
         /// ensure speed up for moving heap memory, stack here is already slow
         if(UNLIKELY( m_bits.sbo_active ))
         {
-            m_memory = m_sbo_buffer;
+            m_data = m_sbo_buffer;
 
             /// copy stack memory
-            std::copy_n(p_source.m_memory, m_capacity, m_memory);
+            std::copy_n(p_source.m_data, m_capacity, m_data);
         }
         else
         {
             /// move already allocated memory from source here
-            m_memory = p_source.m_memory;
-            p_source.m_memory = nullptr;
+            m_data = p_source.m_data;
+            p_source.m_data = nullptr;
         }
 
 #if IM_ENSURE_NEW_OBJECT_AFTER_MOVE
         /// reset source by hand (to prevent memory deallocation)
-        p_source.m_memory = p_source.m_sbo_buffer;
+        p_source.m_data = p_source.m_sbo_buffer;
         p_source.m_capacity = SBO_CAPACITY;
         p_source.m_bits.sbo_active = true;
 

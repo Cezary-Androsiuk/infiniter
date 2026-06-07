@@ -46,7 +46,7 @@ InfiniterCore::InfiniterCore(isize_t p_capacity, icell_t p_value, bool p_negativ
     m_size = ISIZE_C(1);
 
     /// assign value
-    m_memory[0] = p_value;
+    m_data[0] = p_value;
 }
 
 InfiniterCore::InfiniterCore(const icell_t *p_array, isize_t p_size, bool p_negative_value)
@@ -56,7 +56,7 @@ InfiniterCore::InfiniterCore(const icell_t *p_array, isize_t p_size, bool p_nega
 
     for(isize_t i=0; i<p_size; i++)
     {
-        m_memory[i] = p_array[i];
+        m_data[i] = p_array[i];
     }
 
     m_bits.sign = p_negative_value;
@@ -100,7 +100,7 @@ void InfiniterCore::reset() noexcept
 
     for(isize_t i=0; i<m_capacity; i++)
     {
-        m_memory[i] = ICELL_C(1);
+        m_data[i] = ICELL_C(1);
     }
 }
 
@@ -108,7 +108,7 @@ void InfiniterCore::clear() noexcept
 {
     for(isize_t i=0; i<m_size; i++)
     {
-        m_memory[i] = ICELL_C(0);
+        m_data[i] = ICELL_C(0);
     }
 }
 
@@ -116,7 +116,7 @@ void InfiniterCore::clearReserved() noexcept
 {
     for(isize_t i=0; i<m_capacity; i++)
     {
-        m_memory[i] = ICELL_C(0);
+        m_data[i] = ICELL_C(0);
     }
 }
 
@@ -154,7 +154,7 @@ void InfiniterCore::trim()
         const isize_t i_rev = m_size - ISIZE_C(1) - i;
 
         /// on first non 0 cell stop and reduce m_size by i
-        if(m_memory[i_rev] != ICELL_C(0))
+        if(m_data[i_rev] != ICELL_C(0))
         {
             if(i)
             {
@@ -167,12 +167,12 @@ void InfiniterCore::trim()
 
 icell_t *InfiniterCore::getData() noexcept
 {
-    return m_memory;
+    return m_data;
 }
 
 const icell_t *InfiniterCore::getData() const noexcept
 {
-    return m_memory;
+    return m_data;
 }
 
 isize_t InfiniterCore::getSize() const noexcept
@@ -225,7 +225,7 @@ void InfiniterCore::setNegativeSign() noexcept
 
 void InfiniterCore::assign(icell_t p_value, bool p_negative_value) noexcept
 {
-    m_memory[0] = p_value;
+    m_data[0] = p_value;
 
     m_bits.sign = p_negative_value;
     m_size = ISIZE_C(1);
@@ -242,7 +242,7 @@ void InfiniterCore::assign(const icell_t *p_array, isize_t p_size, bool p_negati
 
     for(isize_t i=0; i<p_size; i++)
     {
-        m_memory[i] = p_array[i];
+        m_data[i] = p_array[i];
     }
 
     m_size = p_size;
@@ -257,7 +257,7 @@ void InfiniterCore::dbg_print_data() const
            m_bits.sbo_active, m_bits.sign);
     for(isize_t i=0; i<m_size; i++)
     {
-        printf("%016llx ", m_memory[m_size - ISIZE_C(1) - i]);
+        printf("%016llx ", m_data[m_size - ISIZE_C(1) - i]);
     }
     printf("\n");
 }
@@ -269,7 +269,7 @@ void InfiniterCore::dbg_print_memory() const
            m_bits.sbo_active, m_bits.sign);
     for(isize_t i=0; i<m_capacity; i++)
     {
-        printf("%016llx ", m_memory[m_capacity - ISIZE_C(1) - i]);
+        printf("%016llx ", m_data[m_capacity - ISIZE_C(1) - i]);
     }
     printf("\n");
 }
