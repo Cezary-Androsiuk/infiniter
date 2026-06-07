@@ -55,12 +55,12 @@ void test_reasigning_data_to_new_array()
 
     /// testing copying and filling what left
 
-    cell_t m_memory[8];
+    icell_t m_memory[8];
     for(int i=0; i<8; i++) m_memory[i] = i+1;
     print_array(m_memory, 8);
 
 
-    cell_t *tmp_memory = new cell_t[10];
+    icell_t *tmp_memory = new icell_t[10];
     for(int i=0; i<10; i++) tmp_memory[i] = UINT64_C(-1);
     print_array(tmp_memory, 10);
 

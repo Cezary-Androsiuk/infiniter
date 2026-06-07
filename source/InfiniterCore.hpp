@@ -11,10 +11,10 @@ class InfiniterCore : private InfiniterMemory
 public:
     explicit InfiniterCore() noexcept;
 
-    explicit InfiniterCore(uint64_t p_capacity); /// throws bad_alloc
+    explicit InfiniterCore(isize_t p_capacity); /// throws bad_alloc
     /// value only covers first cell, purpose of this is to initialize instance with 1 or other scalar values
-    explicit InfiniterCore(uint64_t p_capacity, uint64_t p_value, bool p_negative_value=false); /// throws bad_alloc
-    explicit InfiniterCore(const cell_t *p_array, uint64_t p_size, bool p_negative_value=false); /// throws bad_alloc
+    explicit InfiniterCore(isize_t p_capacity, icell_t p_value, bool p_negative_value=false); /// throws bad_alloc
+    explicit InfiniterCore(const icell_t *p_array, isize_t p_size, bool p_negative_value=false); /// throws bad_alloc
 
     explicit InfiniterCore(const InfiniterCore &p_source); /// throws bad_alloc
     explicit InfiniterCore(InfiniterCore &&p_source) noexcept;
@@ -28,9 +28,9 @@ protected:
     void clearReserved() noexcept;
 
 public:
-    void reserve(uint64_t p_new_capacity);
+    void reserve(isize_t p_new_capacity);
     void reserve(const InfiniterCore &p_source);
-    void extend(uint64_t p_additional_capacity);
+    void extend(isize_t p_additional_capacity);
 
     void shrink();
     void optimize();
@@ -41,24 +41,24 @@ public:
      */
     void trim();
 
-    cell_t *getData() noexcept;
-    const cell_t *getData() const noexcept;
+    icell_t *getData() noexcept;
+    const icell_t *getData() const noexcept;
 
-    uint64_t getSize() const noexcept;
-    uint64_t getCapacity() const noexcept;
-    uint8_t getSign() const noexcept;
+    isize_t getSize() const noexcept;
+    isize_t getCapacity() const noexcept;
+    ibit_t getSign() const noexcept;
 
     /// returns what size was set
     /// if p_new_size > m_capacity, then size will be set to m_capacity
-    uint64_t setSize(uint64_t p_new_size) noexcept;
-    uint64_t setSizeWithExtend(uint64_t p_new_size);
+    isize_t setSize(isize_t p_new_size) noexcept;
+    isize_t setSizeWithExtend(isize_t p_new_size);
 
     void setSign(bool p_new_sign) noexcept;
     void setPositiveSign() noexcept;
     void setNegativeSign() noexcept;
 
-    void assign(uint64_t p_value, bool p_negative_value=false) noexcept;
-    void assign(const cell_t *p_array, uint64_t p_size, bool p_negative_value=false);
+    void assign(icell_t p_value, bool p_negative_value=false) noexcept;
+    void assign(const icell_t *p_array, isize_t p_size, bool p_negative_value=false);
 
 
 public:

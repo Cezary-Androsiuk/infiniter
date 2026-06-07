@@ -27,22 +27,22 @@ InfiniterArithmetic::InfiniterArithmetic() noexcept
     _ia_dbgprintf("--- DEBUG IA %p | Constructed   DEFAULT\n", this);
 }
 
-InfiniterArithmetic::InfiniterArithmetic(uint64_t p_capacity)
+InfiniterArithmetic::InfiniterArithmetic(isize_t p_capacity)
     : InfiniterBit(p_capacity)
 {
-    _ia_dbgprintf("--- DEBUG IA %p | Constructed   PARAMETER uint64_t\n", this);
+    _ia_dbgprintf("--- DEBUG IA %p | Constructed   PARAMETER isize_t\n", this);
 }
 
-InfiniterArithmetic::InfiniterArithmetic(uint64_t p_capacity, uint64_t p_value, bool p_negative_value)
+InfiniterArithmetic::InfiniterArithmetic(isize_t p_capacity, icell_t p_value, bool p_negative_value)
     : InfiniterBit(p_capacity, p_value, p_negative_value)
 {
-    _ia_dbgprintf("--- DEBUG IA %p | Constructed   PARAMETER uint64_t uint64_t bool\n", this);
+    _ia_dbgprintf("--- DEBUG IA %p | Constructed   PARAMETER isize_t icell_t bool\n", this);
 }
 
-InfiniterArithmetic::InfiniterArithmetic(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
+InfiniterArithmetic::InfiniterArithmetic(const icell_t *p_array, isize_t p_size, bool p_negative_value)
     : InfiniterBit(p_array, p_size, p_negative_value)
 {
-    _ia_dbgprintf("--- DEBUG IA %p | Constructed   PARAMETER cell_t* uint64_t bool\n", this);
+    _ia_dbgprintf("--- DEBUG IA %p | Constructed   PARAMETER icell_t* isize_t bool\n", this);
 }
 
 InfiniterArithmetic::InfiniterArithmetic(const InfiniterArithmetic &p_source)

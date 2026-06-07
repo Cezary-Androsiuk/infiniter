@@ -27,22 +27,22 @@ InfiniterUtility::InfiniterUtility() noexcept
     _iu_dbgprintf("--- DEBUG IU %p | Constructed   DEFAULT\n", this);
 }
 
-InfiniterUtility::InfiniterUtility(uint64_t p_capacity)
+InfiniterUtility::InfiniterUtility(isize_t p_capacity)
     : InfiniterArithmetic(p_capacity)
 {
-    _iu_dbgprintf("--- DEBUG IU %p | Constructed   PARAMETER uint64_t\n", this);
+    _iu_dbgprintf("--- DEBUG IU %p | Constructed   PARAMETER isize_t\n", this);
 }
 
-InfiniterUtility::InfiniterUtility(uint64_t p_capacity, uint64_t p_value, bool p_negative_value)
+InfiniterUtility::InfiniterUtility(isize_t p_capacity, icell_t p_value, bool p_negative_value)
     : InfiniterArithmetic(p_capacity, p_value, p_negative_value)
 {
-    _iu_dbgprintf("--- DEBUG IU %p | Constructed   PARAMETER uint64_t uint64_t bool\n", this);
+    _iu_dbgprintf("--- DEBUG IU %p | Constructed   PARAMETER isize_t icell_t bool\n", this);
 }
 
-InfiniterUtility::InfiniterUtility(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
+InfiniterUtility::InfiniterUtility(const icell_t *p_array, isize_t p_size, bool p_negative_value)
     : InfiniterArithmetic(p_array, p_size, p_negative_value)
 {
-    _iu_dbgprintf("--- DEBUG IU %p | Constructed   PARAMETER cell_t* uint64_t bool\n", this);
+    _iu_dbgprintf("--- DEBUG IU %p | Constructed   PARAMETER icell_t* isize_t bool\n", this);
 }
 
 InfiniterUtility::InfiniterUtility(const InfiniterUtility &p_source)

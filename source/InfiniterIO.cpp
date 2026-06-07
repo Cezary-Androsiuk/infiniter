@@ -43,22 +43,22 @@ InfiniterIO::InfiniterIO() noexcept
     _io_dbgprintf("--- DEBUG IO %p | Constructed   DEFAULT\n", this);
 }
 
-InfiniterIO::InfiniterIO(uint64_t p_capacity)
+InfiniterIO::InfiniterIO(isize_t p_capacity)
     : InfiniterUtility(p_capacity)
 {
-    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER uint64_t\n", this);
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER isize_t\n", this);
 }
 
-InfiniterIO::InfiniterIO(uint64_t p_capacity, uint64_t p_value, bool p_negative_value)
+InfiniterIO::InfiniterIO(isize_t p_capacity, icell_t p_value, bool p_negative_value)
     : InfiniterUtility(p_capacity, p_value, p_negative_value)
 {
-    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER uint64_t uint64_t bool\n", this);
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER isize_t icell_t bool\n", this);
 }
 
-InfiniterIO::InfiniterIO(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
+InfiniterIO::InfiniterIO(const icell_t *p_array, isize_t p_size, bool p_negative_value)
     : InfiniterUtility(p_array, p_size, p_negative_value)
 {
-    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER cell_t* uint64_t bool\n", this);
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER icell_t* isize_t bool\n", this);
 }
 
 InfiniterIO::InfiniterIO(const std::string &p_number, int p_base, bool p_negative_value)
@@ -130,8 +130,8 @@ void InfiniterIO::serialize(std::string p_file_path, bool p_ignore_capacity) con
     }
 
     /// save header
-    uint64_t size = this->getSize();
-    uint64_t capacity = p_ignore_capacity ? size : this->getCapacity();
+    uint64_t size = static_cast<uint64_t>(this->getSize());
+    uint64_t capacity = static_cast<uint64_t>(p_ignore_capacity ? size : this->getCapacity());
     uint64_t sign = static_cast<uint64_t>(this->getSign());
     /// to add more bit values divide size by half to uint32_t, uint16_t or uint8_t
 
@@ -141,7 +141,7 @@ void InfiniterIO::serialize(std::string p_file_path, bool p_ignore_capacity) con
 
     /// save data
     /// m_size allways is greater than 0
-    fwrite(this->getData(), sizeof(cell_t), this->getSize(), file);
+    fwrite(this->getData(), sizeof(icell_t), this->getSize(), file);
 
     fclose(file);
 }
@@ -152,7 +152,8 @@ void InfiniterIO::deserialize(std::string p_file_path, bool p_ignore_capacity)
     if(file == NULL)
     {
         int err = errno;
-        fprintf(stderr, "Error: Cannot open \"%s\" file! Reason: %s\n", p_file_path.c_str(), strerror(err));
+        fprintf(stderr, "Error: Cannot open \"%s\" file! "
+                        "Reason: %s\n", p_file_path.c_str(), strerror(err));
         return;
     }
 
@@ -166,7 +167,8 @@ void InfiniterIO::deserialize(std::string p_file_path, bool p_ignore_capacity)
 
     if(fsize < header_size)
     {
-        fprintf(stderr, "Error: File \"%s\" is too small to contain the header!\n", p_file_path.c_str());
+        fprintf(stderr, "Error: File \"%s\" is too small to "
+                        "contain the header!\n", p_file_path.c_str());
         fclose(file);
         return;
     }
@@ -186,7 +188,7 @@ void InfiniterIO::deserialize(std::string p_file_path, bool p_ignore_capacity)
         capacity = size;
 
     /// check if data format is correct
-    uint64_t expected_data_size = size * sizeof(cell_t);
+    uint64_t expected_data_size = size * sizeof(icell_t);
     if(fsize - header_size != expected_data_size)
     {
         fprintf(stderr, "Error: Invalid file format in \"%s\"!\n", p_file_path.c_str());
@@ -199,10 +201,11 @@ void InfiniterIO::deserialize(std::string p_file_path, bool p_ignore_capacity)
     this->setSize(size); /// ignore return value, size <= m_capacity
     this->setSign(sign);
 
-    uint64_t bytes_read = fread(this->getData(), sizeof(cell_t), fsize, file);
+    uint64_t bytes_read = fread(this->getData(), sizeof(icell_t), fsize, file);
 
     if (bytes_read != fsize) {
-        fprintf(stderr, "Warning: Could not read the entire file properly, read %llu from %llu bytes.\n", bytes_read, fsize);
+        fprintf(stderr, "Warning: Could not read the entire file properly, "
+                        "read %llu from %llu bytes.\n", bytes_read, fsize);
     }
 
     fclose(file);
@@ -216,7 +219,7 @@ bool InfiniterIO::isPowerOfTwo(int p_number)
 
 double InfiniterIO::log(double p_base, double p_value) noexcept
 {
-    if(p_base <= 1 || p_value <= 0)
+    if(p_base <= 1.0 || p_value <= 0.0)
         return 0.0;
 
     return std::log2(p_value) / std::log2(p_base);
@@ -318,21 +321,22 @@ void InfiniterIO::assignStringBase2(const std::string &p_binary_number)
     /// prepare data
     this->reserve(requiredCells);
     this->setSize(requiredCells);
-    cell_t *data = this->getData();
-    cell_t *data_ptr = data;
+    icell_t *data = this->getData();
+    icell_t *data_ptr = data;
     const char *raw_number = p_binary_number.data();
 
     size_t size = p_binary_number.size();
     while(size != 0)
     {
         size_t part = std::min(static_cast<size_t>(BITS_PER_CELL), size);
-        cell_t tmp_cell = 0;
+        icell_t tmp_cell = 0;
 
         /// for each bit in cell emplace bit from string
         for(size_t i=0; i<part; i++)
         {
             const size_t i_rev = size -1 -i;
-            const cell_t bit_value = (raw_number[i_rev] == '0') ? 0 : 1;
+            const icell_t bit_value =
+                (raw_number[i_rev] == '0') ? ICELL_C(0) : ICELL_C(1);
 
             tmp_cell <<= 1;
             tmp_cell |= bit_value;
@@ -349,10 +353,9 @@ void InfiniterIO::assignString(const std::string &p_number, uint8_t p_base)
 {
     /// max base is 36 (needs ~5.16 times more characters to write it in binary)
     /// if
-    if(p_number.size() > UINT64_MAX / (64*6))
+    if(p_number.size() > IO_MAX_CONTAINER_INPUT_CAPACITY)
     {
-        // printf("Warning: ")
-        UINT32_MAX;
+
     }
 
     uint64_t binary_cells_total = estimateCellsByBase(p_number.size(), p_base);
@@ -430,16 +433,16 @@ void InfiniterIO::assign(const std::string &p_number, uint8_t p_base, bool p_neg
 
 void InfiniterIO::printBase2() const
 {
-    const cell_t *data = this->getData();
-    const uint64_t size = this->getSize();
+    const icell_t *data = this->getData();
+    const isize_t size = this->getSize();
 
     char cell_buffer[64+1];
 
     bool non_zero_cell_found = false;
 
-    for(uint64_t i=0; i<size; i++)
+    for(isize_t i=0; i<size; i++)
     {
-        cell_t cell = data[size -i -1];
+        icell_t cell = data[size -i -1];
         if(cell == 0 && !non_zero_cell_found)
             continue;
 

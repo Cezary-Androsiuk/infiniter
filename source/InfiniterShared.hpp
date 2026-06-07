@@ -13,14 +13,25 @@
 #define M110 (0b11111111'11111111'11111111'11111111'11111111'11111111'11111111'11111110)
 #define M111 (0b11111111'11111111'11111111'11111111'11111111'11111111'11111111'11111111)
 
-typedef uint64_t    cell_t;
-typedef uint8_t     bit_t;
-//icell_t celli_t cell_ti
-//isize_t
+typedef uint64_t    icell_t;    /// cell capacity
+typedef uint64_t    isize_t;    /// size capacity
+typedef uint8_t     ibit_t;     /// bit capacity
+
+#define IBIT_TRUE UINT8_C(1)
+#define IBIT_FALSE UINT8_C(0)
+
+#define ICELL_C(x) UINT64_C(x)
+#define ISIZE_C(x) UINT64_C(x)
+#define IBIT_C(x) (x ? IBIT_TRUE : IBIT_FALSE)
+
+#define ICELL_MAX UINT64_MAX
+#define ISIZE_MAX UINT64_MAX
 
 #define BITS_PER_BYTE   8
 #define BYTES_PER_CELL  8
 #define BITS_PER_CELL   64
+
+
 
 
 /// Can't be less than 1
@@ -53,14 +64,14 @@ typedef uint8_t     bit_t;
 union BitsUS{ /// bits union struct
     uint8_t _byte = 0; /// = 0 ensures clear bit space while initialization
     struct {
-        bit_t sbo_active  : 1; // IM
-        bit_t sign        : 1; // IC
-        // bit_t
-        // bit_t
-        // bit_t
-        // bit_t
-        // bit_t
-        // bit_t
+        ibit_t sbo_active  : 1; // IM
+        ibit_t sign        : 1; // IC
+        // ibit_t
+        // ibit_t
+        // ibit_t
+        // ibit_t
+        // ibit_t
+        // ibit_t
     };
 };
 
@@ -84,7 +95,7 @@ union BitsUS{ /// bits union struct
 #define IM_ENABLE_DB_PRINT_METHOD true
 
 /// specify loop stop value and max capacity of InfiniterMemory array, it is important because 'for' loop require stop value (in that case stop value is 0b111...111 or UINT64_MAX or (~UINT64_C(0)))
-#define IM_CAPACITY_LOOP_STOP UINT64_MAX
+#define IM_CAPACITY_LOOP_STOP ISIZE_MAX
 #define IM_MAX_CAPACITY (IM_CAPACITY_LOOP_STOP - 1)
 
 // ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER MEMORY ^^^^^^^^^^^^^^^^^^^^^^^
@@ -134,6 +145,8 @@ union BitsUS{ /// bits union struct
 
 /// prints what is happening - what constructors are executed
 #define IO_DEBUG_EXECUTION_PRINT true
+
+#define IO_MAX_CONTAINER_INPUT_CAPACITY static_cast<size_t>(ICELL_MAX >> 16)
 
 // ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER CORE ^^^^^^^^^^^^^^^^^^^^^^^
 

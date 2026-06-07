@@ -12,9 +12,9 @@ class InfiniterIO : public InfiniterUtility
 public:
     explicit InfiniterIO() noexcept;
 
-    explicit InfiniterIO(uint64_t p_capacity); /// throws bad_alloc
-    explicit InfiniterIO(uint64_t p_capacity, uint64_t p_value, bool p_negative_value=false); /// throws bad_alloc
-    explicit InfiniterIO(const cell_t *p_array, uint64_t p_size, bool p_negative_value=false); /// throws bad_alloc
+    explicit InfiniterIO(isize_t p_capacity); /// throws bad_alloc
+    explicit InfiniterIO(isize_t p_capacity, icell_t p_value, bool p_negative_value=false); /// throws bad_alloc
+    explicit InfiniterIO(const icell_t *p_array, isize_t p_size, bool p_negative_value=false); /// throws bad_alloc
 
     explicit InfiniterIO(const std::string &p_number, int p_base=10, bool p_negative_value=false); /// throws bad_alloc /// InfiniterException::InvalidStringFormat
     explicit InfiniterIO(const std::vector<uint8_t> &p_number, int p_base=10, bool p_negative_value=false); /// throws bad_alloc

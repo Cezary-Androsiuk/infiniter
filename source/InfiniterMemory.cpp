@@ -4,7 +4,6 @@
 
 #include <new> // std::bad_alloc
 #include <algorithm> // std::copy_n, std::fill_n, std::min
-// #include <cstring> // std::memcpy
 
 /// _im_dbgprintf("--- DEBUG IM %p | Constructed   DEFAULT\n", this);
 /// _im_dbgprintf("--- DEBUG IM %p | Constructed   PARAMETER\n", this);
@@ -38,11 +37,11 @@ InfiniterMemory::InfiniterMemory() noexcept
     _im_dbgprintf("--- DEBUG IM %p | Constructed   DEFAULT\n", this);
 }
 
-InfiniterMemory::InfiniterMemory(uint64_t p_capacity)
+InfiniterMemory::InfiniterMemory(isize_t p_capacity)
 {
     /// NOTE: p_capacity smaller than SBO_CAPACITY will be treated as SBO_CAPACITY
 
-    _im_dbgprintf("--- DEBUG IM %p | Constructed   PARAMETER uint64_t\n", this);
+    _im_dbgprintf("--- DEBUG IM %p | Constructed   PARAMETER isize_t\n", this);
 
     /// often when this constructor will be called, user wants more that SBO size
     if(LIKELY( p_capacity > SBO_CAPACITY ))
@@ -51,9 +50,9 @@ InfiniterMemory::InfiniterMemory(uint64_t p_capacity)
 
         /// heap memory
 #if IM_CLEAR_ALLOCATED_MEMORY
-        m_memory = new cell_t[p_capacity]();
+        m_memory = new icell_t[p_capacity]();
 #else // IM_CLEAR_ALLOCATED_MEMORY
-        m_memory = new cell_t[p_capacity];
+        m_memory = new icell_t[p_capacity];
 #endif // IM_CLEAR_ALLOCATED_MEMORY
         if(m_memory == nullptr) throw std::bad_alloc();
 
@@ -68,7 +67,7 @@ InfiniterMemory::InfiniterMemory(uint64_t p_capacity)
         m_bits.sbo_active = true;
 
 #if IM_CLEAR_ALLOCATED_MEMORY
-        std::fill_n(m_sbo_buffer, SBO_CAPACITY, 0);
+        std::fill_n(m_sbo_buffer, SBO_CAPACITY, ICELL_C(0));
 #endif // IM_CLEAR_ALLOCATED_MEMORY
     }
 }
@@ -78,7 +77,7 @@ InfiniterMemory::InfiniterMemory(const InfiniterMemory &p_source)
     _im_dbgprintf("--- DEBUG IM %p | Constructed   COPY\n", this);
 
     /// set stack or heap
-    m_memory = p_source.m_bits.sbo_active ? m_sbo_buffer : new cell_t[p_source.m_capacity];
+    m_memory = p_source.m_bits.sbo_active ? m_sbo_buffer : new icell_t[p_source.m_capacity];
     /// do not clear new allocated memory - it will be overwrited in a while
     /// if operator new thows here std::bad_alloc(), object instance won't be corrupted here
 
@@ -117,7 +116,7 @@ InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source) noexcept
     p_source.m_bits.sbo_active = true;
 
 #if IM_CLEAR_ALLOCATED_MEMORY
-    std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, 0);
+    std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, ICELL_C(0));
 #endif // IM_CLEAR_ALLOCATED_MEMORY
 #endif // IM_ENSURE_NEW_OBJECT_AFTER_MOVE
 }
@@ -146,13 +145,13 @@ void InfiniterMemory::reset() noexcept
     m_bits.sbo_active = true;
 
 #if IM_CLEAR_ALLOCATED_MEMORY
-    std::fill_n(m_sbo_buffer, SBO_CAPACITY, 0);
+    std::fill_n(m_sbo_buffer, SBO_CAPACITY, ICELL_C(0));
 #endif // IM_CLEAR_ALLOCATED_MEMORY
 }
 
-void InfiniterMemory::reserve(uint64_t p_new_capacity)
+void InfiniterMemory::reserve(isize_t p_new_capacity)
 {
-    _im_dbgprintf("--- DEBUG IM %p | Other         reserve uint64_t\n", this);
+    _im_dbgprintf("--- DEBUG IM %p | Other         reserve isize_t\n", this);
 
     /// who wants to reserve less than he has?
     /// this condition also covers when p_new_capacity < SBO_CAPACITY
@@ -166,15 +165,15 @@ void InfiniterMemory::reserve(uint64_t p_new_capacity)
 
     /// m_capacity < p_new_capacity at this point
 
-    cell_t *tmp_memory = new cell_t[p_new_capacity];
+    icell_t *tmp_memory = new icell_t[p_new_capacity];
     /// will throw if allocation failed, but object instance, won't be corrupted
 
     /// copy old data
     std::copy_n(m_memory, m_capacity, tmp_memory);
 
     /// set new cells to 0
-    uint64_t cells_added = p_new_capacity - m_capacity;
-    std::fill_n(tmp_memory + m_capacity, cells_added, 0);
+    isize_t cells_added = p_new_capacity - m_capacity;
+    std::fill_n(tmp_memory + m_capacity, cells_added, ICELL_C(0));
 
     /// dealocate old memory if allocated
     if(!m_bits.sbo_active)
@@ -195,9 +194,9 @@ void InfiniterMemory::reserve(const InfiniterMemory &p_source)
     this->reserve(p_source.m_capacity);
 }
 
-void InfiniterMemory::extend(uint64_t p_additional_capacity)
+void InfiniterMemory::extend(isize_t p_additional_capacity)
 {
-    _im_dbgprintf("--- DEBUG IM %p | Other         extend uint64_t\n", this);
+    _im_dbgprintf("--- DEBUG IM %p | Other         extend isize_t\n", this);
 
     this->reserve(m_capacity + p_additional_capacity);
 }
@@ -218,7 +217,7 @@ void InfiniterMemory::extend(uint64_t p_additional_capacity)
 
 //     /// find first non zero cell going from the left (from MSB)
 //     /// if msb_index is smaller than SBO_CAPACITY just enable SBO
-//     uint64_t msb_index = m_capacity;
+//     isize_t msb_index = m_capacity;
 //     while( !(m_memory[--msb_index]) && msb_index>=SBO_CAPACITY )
 //         ;
 
@@ -241,9 +240,9 @@ void InfiniterMemory::extend(uint64_t p_additional_capacity)
 //     {
 //         /// shrink heap
 
-//         uint64_t new_capacity = msb_index +1;
+//         isize_t new_capacity = msb_index +1;
 
-//         cell_t *tmp_memory = new cell_t[new_capacity];
+//         icell_t *tmp_memory = new icell_t[new_capacity];
 //         /// will throw if allocation failed, but object instance, won't be corrupted
 
 //         /// copy old data
@@ -259,9 +258,9 @@ void InfiniterMemory::extend(uint64_t p_additional_capacity)
 
 // }
 
-void InfiniterMemory::shrink(uint64_t p_target_capacity)
+void InfiniterMemory::shrink(isize_t p_target_capacity)
 {
-    _im_dbgprintf("--- DEBUG IM %p | Other         shrink uint64_t\n", this);
+    _im_dbgprintf("--- DEBUG IM %p | Other         shrink isize_t\n", this);
 
     /// shinks to fit target capacity
     /// for example when target capacity is 4:
@@ -300,7 +299,7 @@ void InfiniterMemory::shrink(uint64_t p_target_capacity)
     {
         /// shrink heap
 
-        cell_t *tmp_memory = new cell_t[p_target_capacity];
+        icell_t *tmp_memory = new icell_t[p_target_capacity];
         /// will throw if allocation failed, but object instance, won't be corrupted
 
         /// copy old data
@@ -319,9 +318,9 @@ void InfiniterMemory::shrink(uint64_t p_target_capacity)
 void InfiniterMemory::dbg_print() const
 {
     printf("IM obj: %p, capacity: %llu, sbo: %c\n", this, m_capacity, m_bits.sbo_active + '0');
-    for(uint64_t i=0; i<m_capacity; i++)
+    for(isize_t i=0; i<m_capacity; i++)
     {
-        printf("%016llx ", m_memory[m_capacity-1-i]);
+        printf("%016llx ", m_memory[m_capacity - ISIZE_C(1) - i]);
     }
     printf("\n");
 }
@@ -338,7 +337,7 @@ InfiniterMemory &InfiniterMemory::operator =(const InfiniterMemory &p_source)
 
     if( &p_source != this )
     {
-        cell_t *tmp_memory = p_source.m_bits.sbo_active ? m_sbo_buffer : new cell_t[p_source.m_capacity];
+        icell_t *tmp_memory = p_source.m_bits.sbo_active ? m_sbo_buffer : new icell_t[p_source.m_capacity];
         /// will throw if allocation failed, but object instance, won't be corrupted
 
         /// dealocate old memory if allocated
@@ -389,7 +388,7 @@ InfiniterMemory &InfiniterMemory::operator =(InfiniterMemory &&p_source)
         p_source.m_bits.sbo_active = true;
 
 #if IM_CLEAR_ALLOCATED_MEMORY
-        std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, 0);
+        std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, ICELL_C(0));
 #endif // IM_CLEAR_ALLOCATED_MEMORY
 #endif // IM_ENSURE_NEW_OBJECT_AFTER_MOVE
     }

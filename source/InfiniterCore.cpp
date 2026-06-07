@@ -25,36 +25,36 @@ InfiniterCore::InfiniterCore() noexcept
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   DEFAULT\n", this);
 
     m_bits.sign = false;
-    m_size = 1ull;
+    m_size = ISIZE_C(1);
 }
 
-InfiniterCore::InfiniterCore(uint64_t p_capacity)
+InfiniterCore::InfiniterCore(isize_t p_capacity)
     : InfiniterMemory(p_capacity) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER 1\n", this);
 
     m_bits.sign = false;
-    m_size = 1ull;
+    m_size = ISIZE_C(1);
 }
 
-InfiniterCore::InfiniterCore(uint64_t p_capacity, uint64_t p_value, bool p_negative_value)
+InfiniterCore::InfiniterCore(isize_t p_capacity, icell_t p_value, bool p_negative_value)
     : InfiniterMemory(p_capacity) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER 2\n", this);
 
     m_bits.sign = p_negative_value;
-    m_size = 1ull;
+    m_size = ISIZE_C(1);
 
     /// assign value
     m_memory[0] = p_value;
 }
 
-InfiniterCore::InfiniterCore(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
+InfiniterCore::InfiniterCore(const icell_t *p_array, isize_t p_size, bool p_negative_value)
     : InfiniterMemory(p_size) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER 3\n", this);
 
-    for(uint64_t i=0; i<p_size; i++)
+    for(isize_t i=0; i<p_size; i++)
     {
         m_memory[i] = p_array[i];
     }
@@ -96,31 +96,31 @@ void InfiniterCore::reset() noexcept
 {
     InfiniterMemory::reset(); /// makes m_capacity == SBO_CAPACITY
     m_bits.sign = false;
-    m_size = 1ull;
+    m_size = ISIZE_C(1);
 
-    for(int i=0; i<m_capacity; i++)
+    for(isize_t i=0; i<m_capacity; i++)
     {
-        m_memory[i] = 0;
+        m_memory[i] = ICELL_C(1);
     }
 }
 
 void InfiniterCore::clear() noexcept
 {
-    for(uint64_t i=0; i<m_size; i++)
+    for(isize_t i=0; i<m_size; i++)
     {
-        m_memory[i] = UINT64_C(0);
+        m_memory[i] = ICELL_C(0);
     }
 }
 
 void InfiniterCore::clearReserved() noexcept
 {
-    for(uint64_t i=0; i<m_capacity; i++)
+    for(isize_t i=0; i<m_capacity; i++)
     {
-        m_memory[i] = UINT64_C(0);
+        m_memory[i] = ICELL_C(0);
     }
 }
 
-void InfiniterCore::reserve(uint64_t p_new_capacity)
+void InfiniterCore::reserve(isize_t p_new_capacity)
 {
     InfiniterMemory::reserve(p_new_capacity);
 }
@@ -130,7 +130,7 @@ void InfiniterCore::reserve(const InfiniterCore &p_source)
     InfiniterMemory::reserve(p_source);
 }
 
-void InfiniterCore::extend(uint64_t p_additional_capacity)
+void InfiniterCore::extend(isize_t p_additional_capacity)
 {
     InfiniterMemory::extend(p_additional_capacity);
 }
@@ -149,12 +149,12 @@ void InfiniterCore::optimize()
 void InfiniterCore::trim()
 {
     /// iterate from back
-    for(uint64_t i=0; i<m_size; i++)
+    for(isize_t i=0; i<m_size; i++)
     {
-        const uint64_t i_rev = m_size -1 -i;
+        const isize_t i_rev = m_size - ISIZE_C(1) - i;
 
         /// on first non 0 cell stop and reduce m_size by i
-        if(m_memory[i_rev] != UINT64_C(0))
+        if(m_memory[i_rev] != ICELL_C(0))
         {
             if(i)
             {
@@ -165,39 +165,39 @@ void InfiniterCore::trim()
     }
 }
 
-cell_t *InfiniterCore::getData() noexcept
+icell_t *InfiniterCore::getData() noexcept
 {
     return m_memory;
 }
 
-const cell_t *InfiniterCore::getData() const noexcept
+const icell_t *InfiniterCore::getData() const noexcept
 {
     return m_memory;
 }
 
-uint64_t InfiniterCore::getSize() const noexcept
+isize_t InfiniterCore::getSize() const noexcept
 {
     return m_size;
 }
 
-uint64_t InfiniterCore::getCapacity() const noexcept
+isize_t InfiniterCore::getCapacity() const noexcept
 {
     return m_capacity;
 }
 
-uint8_t InfiniterCore::getSign() const noexcept
+ibit_t InfiniterCore::getSign() const noexcept
 {
     return m_bits.sign;
 }
 
-uint64_t InfiniterCore::setSize(uint64_t p_new_size) noexcept
+isize_t InfiniterCore::setSize(isize_t p_new_size) noexcept
 {
     m_size = p_new_size > m_capacity ? m_capacity : p_new_size;
 
     return m_size;
 }
 
-uint64_t InfiniterCore::setSizeWithExtend(uint64_t p_new_size)
+isize_t InfiniterCore::setSizeWithExtend(isize_t p_new_size)
 {
     if(p_new_size > m_capacity)
     {
@@ -223,15 +223,15 @@ void InfiniterCore::setNegativeSign() noexcept
     m_bits.sign = 1;
 }
 
-void InfiniterCore::assign(uint64_t p_value, bool p_negative_value) noexcept
+void InfiniterCore::assign(icell_t p_value, bool p_negative_value) noexcept
 {
     m_memory[0] = p_value;
 
     m_bits.sign = p_negative_value;
-    m_size = 1ull;
+    m_size = ISIZE_C(1);
 }
 
-void InfiniterCore::assign(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
+void InfiniterCore::assign(const icell_t *p_array, isize_t p_size, bool p_negative_value)
 {
     /// reserve more if needed
     /// UNLIKELY to speed up operations where memory isn't realocated
@@ -240,7 +240,7 @@ void InfiniterCore::assign(const cell_t *p_array, uint64_t p_size, bool p_negati
         this->reserve( REALLOC_PADDING_SIZE(p_size) );
     }
 
-    for(uint64_t i=0; i<p_size; i++)
+    for(isize_t i=0; i<p_size; i++)
     {
         m_memory[i] = p_array[i];
     }
@@ -255,9 +255,9 @@ void InfiniterCore::dbg_print_data() const
     printf("--- DEBUG IC obj: %p, capacity: %llu, size: %llu, sbo: %d, sign: %d\n",
            this, m_capacity, m_size,
            m_bits.sbo_active, m_bits.sign);
-    for(uint64_t i=0; i<m_size; i++)
+    for(isize_t i=0; i<m_size; i++)
     {
-        printf("%016llx ", m_memory[m_size-1-i]);
+        printf("%016llx ", m_memory[m_size - ISIZE_C(1) - i]);
     }
     printf("\n");
 }
@@ -267,9 +267,9 @@ void InfiniterCore::dbg_print_memory() const
     printf("--- DEBUG IC obj: %p, capacity: %llu, size: %llu, sbo: %d, sign: %d\n",
            this, m_capacity, m_size,
            m_bits.sbo_active, m_bits.sign);
-    for(uint64_t i=0; i<m_capacity; i++)
+    for(isize_t i=0; i<m_capacity; i++)
     {
-        printf("%016llx ", m_memory[m_capacity-1-i]);
+        printf("%016llx ", m_memory[m_capacity - ISIZE_C(1) - i]);
     }
     printf("\n");
 }
