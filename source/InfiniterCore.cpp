@@ -104,6 +104,22 @@ void InfiniterCore::reset() noexcept
     }
 }
 
+void InfiniterCore::clear() noexcept
+{
+    for(uint64_t i=0; i<m_size; i++)
+    {
+        m_memory[i] = UINT64_C(0);
+    }
+}
+
+void InfiniterCore::clearReserved() noexcept
+{
+    for(uint64_t i=0; i<m_capacity; i++)
+    {
+        m_memory[i] = UINT64_C(0);
+    }
+}
+
 void InfiniterCore::reserve(uint64_t p_new_capacity)
 {
     InfiniterMemory::reserve(p_new_capacity);
@@ -128,6 +144,25 @@ void InfiniterCore::shrink()
 void InfiniterCore::optimize()
 {
     this->shrink();
+}
+
+void InfiniterCore::trim()
+{
+    /// iterate from back
+    for(uint64_t i=0; i<m_size; i++)
+    {
+        const uint64_t i_rev = m_size -1 -i;
+
+        /// on first non 0 cell stop and reduce m_size by i
+        if(m_memory[i_rev] != UINT64_C(0))
+        {
+            if(i)
+            {
+                this->setSize(m_size-i);
+            }
+            return;
+        }
+    }
 }
 
 cell_t *InfiniterCore::getData() noexcept

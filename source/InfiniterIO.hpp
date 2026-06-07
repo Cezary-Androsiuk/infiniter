@@ -37,13 +37,18 @@ protected:
     static uint64_t maxLengthAfterConversion(uint64_t p_number_length,
                                              uint8_t p_number_base,
                                              uint8_t p_target_base) noexcept;
+    static uint64_t estimateCellsByBase(uint64_t p_number_size, uint8_t p_base); // throws InfiniterException::CapacityExceeded and CapacityApproximationFailed
     static void validateStringNumber(const std::string &p_number, int p_base);
 public:
 
-    void assign(uint64_t p_value, bool p_negative_value=false) noexcept;
-    void assign(const cell_t *p_array, uint64_t p_size, bool p_negative_value=false);
+protected:
+    void assignStringBase2(const std::string &p_binary_number);
+    void assignString(const std::string &p_number, uint8_t p_base); // throws InfiniterException::CapacityExceeded and CapacityApproximationFailed
+public:
 
-    void assign(const std::string &p_number, int p_base=10, bool p_negative_value=false);
+
+    using InfiniterCore::assign; /// prevent shadowing
+    void assign(const std::string &p_number, uint8_t p_base=10, bool p_negative_value=false); // throws InfiniterException::CapacityExceeded and CapacityApproximationFailed
 
     void print(uint64_t base) const;
 
@@ -59,11 +64,11 @@ private:
     void assign_base64();
 
 public:
-#if IIO_ENABLE_DB_PRINT_METHOD
-#define iio_dbg_print(obj) printf("IIO "); static_cast<InfiniterCore>(obj).dbg_print()
-#else // IIO_ENABLE_DB_PRINT_METHOD
-#define iio_dbg_print(obj) printf("iio_dbg_print disabled\n");
-#endif // IIO_ENABLE_DB_PRINT_METHOD
+#if IO_ENABLE_DB_PRINT_METHOD
+#define io_dbg_print(obj) printf("IIO "); static_cast<InfiniterCore>(obj).dbg_print()
+#else // IO_ENABLE_DB_PRINT_METHOD
+#define io_dbg_print(obj) printf("io_dbg_print disabled\n");
+#endif // IO_ENABLE_DB_PRINT_METHOD
 public:
 
 

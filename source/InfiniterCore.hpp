@@ -23,11 +23,23 @@ public:
 
     void reset() noexcept;
 
+protected:
+    void clear() noexcept;
+    void clearReserved() noexcept;
+
+public:
     void reserve(uint64_t p_new_capacity);
     void reserve(const InfiniterCore &p_source);
     void extend(uint64_t p_additional_capacity);
+
     void shrink();
     void optimize();
+
+    /**
+     * @brief trim
+     * reduce size to trim not used zero-cells in front of the number
+     */
+    void trim();
 
     cell_t *getData() noexcept;
     const cell_t *getData() const noexcept;

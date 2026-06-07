@@ -1,6 +1,6 @@
-#include "source/InfiniterMemory.h"
-#include "source/InfiniterCore.h"
-#include "source/InfiniterIO.h"
+#include "source/InfiniterMemory.hpp"
+#include "source/InfiniterCore.hpp"
+#include "source/InfiniterIO.hpp"
 
 #include <cstdio>
 #include <algorithm> // std::copy_n, std::fill_n, std::move
@@ -214,12 +214,11 @@ void infiniterCoreTests()
 void infiniterIOTests()
 {
     printf("==================================================\n");
-    InfiniterIO iio0(0x1, false);
-    iio0.dbg_print_memory();
-
+    InfiniterIO io0(0x1, false);
+    io0.dbg_print_memory();
     // for(int j=0; j<40; j++)
     // {
-    //     iio0.assign(1, false);
+    //     io0.assign(1, false);
 
     //     uint64_t warm1_start = read_tsc_start();
     //     uint64_t warm1_end = read_tsc_end();
@@ -230,7 +229,7 @@ void infiniterIOTests()
 
     //     for(int i=0; i<64*10*j; i++)
     //     {
-    //         iio0.pushLSB(1);
+    //         io0.pushLSB(1);
     //     }
 
     //     uint64_t end = read_tsc_end();
@@ -251,7 +250,7 @@ void infiniterIOTests()
 
     //     for(int i=0; i<64*100; i++)
     //     {
-    //         iio0.pushLSB(1);
+    //         io0.pushLSB(1);
     //     }
 
     //     uint64_t end = read_tsc_end();
@@ -270,7 +269,7 @@ void infiniterIOTests()
 
     //     for(int i=0; i<64*1'000; i++)
     //     {
-    //         iio0.pushLSB(1);
+    //         io0.pushLSB(1);
     //     }
 
     //     uint64_t end = read_tsc_end();
@@ -289,7 +288,7 @@ void infiniterIOTests()
 
     //     for(int i=0; i<64*100'000; i++)
     //     {
-    //         iio0.pushLSB(1);
+    //         io0.pushLSB(1);
     //     }
 
     //     uint64_t end = read_tsc_end();
@@ -298,18 +297,43 @@ void infiniterIOTests()
     //     printf("Warm 2 time: %llu\n", warm2_end - warm2_start);
     //     printf("Clock cycles: %llu\n", end - start);
     // }
-    // iio0.dbg_print_memory();
+    // io0.dbg_print_memory();
 
 
-    iio0.assign(0x1);
+
+    io0.assign(0x1);
     for(int i=0; i<64*3; i++)
     {
-        iio0.pushLSB(0);
-        iio0.print(10);
+        io0.pushLSB(0);
+        io0.print(10);
         printf("\n");
     }
     printf("\n\n");
 
+    ic_dbg_print_memory(io0);
+    ic_dbg_print_data(io0);
+
+    io0.clear();
+
+    ic_dbg_print_memory(io0);
+    ic_dbg_print_data(io0);
+
+    io0.assign(0);
+
+    ic_dbg_print_memory(io0);
+    ic_dbg_print_data(io0);
+
+    io0.reset();
+
+    ic_dbg_print_memory(io0);
+    ic_dbg_print_data(io0);
+
+    printf("\n\n");
+
+    const char *binary_str = "11111000011110000111100001111000011110000111100001111000011110000";
+
+    io0.assignStringBase2(binary_str);
+    ic_dbg_print_data(io0);
 }
 
 

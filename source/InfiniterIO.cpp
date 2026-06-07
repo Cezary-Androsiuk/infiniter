@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <cmath>
+#include <memory> // std::unique_ptr
 
 
 #include <cstdio>
@@ -61,12 +62,24 @@ InfiniterIO::InfiniterIO(const cell_t *p_array, uint64_t p_size, bool p_negative
 }
 
 InfiniterIO::InfiniterIO(const std::string &p_number, int p_base, bool p_negative_value)
+    : InfiniterUtility()
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER std::string int bool\n", this);
 
-    validateStringNumber(p_number, p_base)
+    if (p_base < 2 || p_base > 36)
+    {
+        throw InfiniterException::InvalidBase(p_base, 2, 36);
+    }
 
-    size_t number_size = p_number;
+    validateStringNumber(p_number, p_base);
+
+    if(p_base == 2)
+    {
+
+    }
+
+    size_t number_length = p_number.size();
+    size_t binary_length = InfiniterIO::maxLengthAfterConversion(number_length, p_base, 2);
 
 }
 
@@ -203,7 +216,7 @@ bool InfiniterIO::isPowerOfTwo(int p_number)
 
 double InfiniterIO::log(double p_base, double p_value) noexcept
 {
-    if(p_base <= 0 || p_value <= 0)
+    if(p_base <= 1 || p_value <= 0)
         return 0.0;
 
     return std::log2(p_value) / std::log2(p_base);
@@ -221,12 +234,43 @@ uint64_t InfiniterIO::maxLengthAfterConversion(uint64_t p_number_length,
     return std::ceill(static_cast<double>(p_number_length) * ratio);
 }
 
+uint64_t InfiniterIO::estimateCellsByBase(uint64_t p_number_size, uint8_t p_base)
+{
+    const long double ratio = static_cast<long double>( InfiniterIO::log(2, p_base) );
+
+    const long double estimated_result = std::ceill(
+        static_cast<long double>(p_number_size) * ratio);
+
+    constexpr long double UINT64_MAX_DBL = 0x1p64L; /// static_cast<long double>(UINT64_MAX);
+
+    if(std::isinf(estimated_result) ||
+        std::isnan(estimated_result) ||
+        estimated_result > UINT64_MAX_DBL)
+    {
+        /// overflow occur
+        throw InfiniterException::CapacityExceeded(
+            "Number with length " + std::to_string(p_number_size) +
+            " and base " + std::to_string(p_base) +
+            " to binary conversion exceeds cell limit");
+    }
+
+    if(estimated_result <= 0.0L)
+    {
+        throw InfiniterException::CapacityApproximationFailed(
+            "Number with length " + std::to_string(p_number_size) +
+            " and base " + std::to_string(p_base) +
+            " to binary conversion failed");
+    }
+
+    return static_cast<uint64_t>(estimated_result);
+}
+
 void InfiniterIO::validateStringNumber(const std::string &p_number, int p_base)
 {
     /// limit base
     if (p_base < 2 || p_base > 36)
     {
-        throw std::invalid_argument("Base must be between 2 and 36");
+        throw InfiniterException::InvalidBase(p_base, 2, 36);
     }
 
     /// empty string
@@ -235,24 +279,13 @@ void InfiniterIO::validateStringNumber(const std::string &p_number, int p_base)
         throw InfiniterException::InvalidStringFormat("Empty string");
     }
 
-    size_t start_index = 0;
-
-    /// handle number sign
-    if (p_number[0] == '-' || p_number[0] == '+') {
-        if (p_number.length() == 1) {
-            throw InfiniterException::InvalidStringFormat("String contains only sign");
-        }
-        start_index = 1;
-    }
-
-    /// handle leading zeros (01 or -001123 are not allowed)
-    /// ignore '0'
-    if (p_number.length() - start_index > 1 && p_number[start_index] == '0') {
+    /// handle leading zeros (01 or 001123 are not allowed)
+    if (p_number[0] == '0') {
         throw InfiniterException::InvalidStringFormat("Leading zeros are not allowed");
     }
 
     /// main validation
-    for (size_t i = start_index; i < p_number.length(); ++i) {
+    for (size_t i = 0; i < p_number.length(); ++i) {
         const char c = p_number[i];
         bool is_valid = false;
 
@@ -275,26 +308,108 @@ void InfiniterIO::validateStringNumber(const std::string &p_number, int p_base)
     }
 }
 
-void InfiniterIO::assign(uint64_t p_value, bool p_negative_value) noexcept
+void InfiniterIO::assignStringBase2(const std::string &p_binary_number)
 {
-    InfiniterCore::assign(p_value, p_negative_value);
+    /// compute required cells
+    uint64_t requiredCells = p_binary_number.size() / BITS_PER_CELL;
+    if(p_binary_number.size() % BITS_PER_CELL)
+        requiredCells++;
+
+    /// prepare data
+    this->reserve(requiredCells);
+    this->setSize(requiredCells);
+    cell_t *data = this->getData();
+    cell_t *data_ptr = data;
+    const char *raw_number = p_binary_number.data();
+
+    size_t size = p_binary_number.size();
+    while(size != 0)
+    {
+        size_t part = std::min(static_cast<size_t>(BITS_PER_CELL), size);
+        cell_t tmp_cell = 0;
+
+        /// for each bit in cell emplace bit from string
+        for(size_t i=0; i<part; i++)
+        {
+            const size_t i_rev = size -1 -i;
+            const cell_t bit_value = (raw_number[i_rev] == '0') ? 0 : 1;
+
+            tmp_cell <<= 1;
+            tmp_cell |= bit_value;
+        }
+        size -= part;
+
+        /// emplace cell in data array
+        *data_ptr = tmp_cell;
+        data_ptr++;
+    }
 }
 
-void InfiniterIO::assign(const cell_t *p_array, uint64_t p_size, bool p_negative_value)
+void InfiniterIO::assignString(const std::string &p_number, uint8_t p_base)
 {
-    InfiniterCore::assign(p_array, p_size, p_negative_value);
+    /// max base is 36 (needs ~5.16 times more characters to write it in binary)
+    /// if
+    if(p_number.size() > UINT64_MAX / (64*6))
+    {
+        // printf("Warning: ")
+        UINT32_MAX;
+    }
+
+    uint64_t binary_cells_total = estimateCellsByBase(p_number.size(), p_base);
+
+
+
+    // /// compute required cells
+    // uint64_t requiredCells = p_binary_number.size() / BITS_PER_CELL;
+    // if(p_binary_number.size() % BITS_PER_CELL)
+    //     requiredCells++;
+
+    // size_t number_length = p_number.size();
+    // size_t binary_length = InfiniterIO::maxLengthAfterConversion(number_length, p_base, 2);
+
+    // /// prepare data
+    // this->reserve(requiredCells);
+    // this->setSize(requiredCells);
+    // cell_t *data = this->getData();
+    // cell_t *data_ptr = data;
+    // const char *raw_number = p_binary_number.data();
+
+    // size_t size = p_binary_number.size();
+    // while(size != 0)
+    // {
+    //     size_t part = std::min(static_cast<size_t>(BITS_PER_CELL), size);
+    //     cell_t tmp_cell = 0;
+
+    //     /// for each bit in cell emplace bit from string
+    //     for(size_t i=0; i<part; i++)
+    //     {
+    //         const size_t i_rev = size -1 -i;
+    //         const cell_t bit_value = (raw_number[i_rev] == '0') ? 0 : 1;
+
+    //         tmp_cell <<= 1;
+    //         tmp_cell |= bit_value;
+    //     }
+    //     size -= part;
+
+    //     /// emplace cell in data array
+    //     *data_ptr = tmp_cell;
+    //     data_ptr++;
+    // }
 }
 
-void InfiniterIO::assign(const std::string &p_number, int p_base, bool p_negative_value)
+
+void InfiniterIO::assign(const std::string &p_number, uint8_t p_base, bool p_negative_value)
 {
     if(InfiniterIO::isPowerOfTwo(p_base))
     {
-
+        this->assignStringBase2(p_number);
     }
     else
     {
 
     }
+
+    this->setSign(p_negative_value);
 }
 
 // void InfiniterIO::print(uint64_t p_base) const
