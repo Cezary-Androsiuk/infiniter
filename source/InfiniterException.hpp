@@ -10,6 +10,13 @@ namespace InfiniterException{
             : std::runtime_error(p_message) {}
     };
 
+    class OutOfRange : public Exception { public:
+        explicit OutOfRange(uint64_t p_got, uint64_t p_min, uint64_t p_max)
+            : Exception("Out of Range: Got value " + std::to_string(p_got) +
+                        ", but range is [" + std::to_string(p_min) +
+                        ", " + std::to_string(p_max) + "]") {}
+    };
+
     class InvalidStringFormat : public Exception { public:
         explicit InvalidStringFormat(const std::string &p_message)
             : Exception("Invalid String Format: " + p_message) {}

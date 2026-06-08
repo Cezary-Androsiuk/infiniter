@@ -1,6 +1,7 @@
 #include "InfiniterCore.hpp"
 
 #include "InfiniterShared.hpp"
+#include "InfiniterException.hpp"
 
 #include <utility> // std::move
 
@@ -100,7 +101,7 @@ void InfiniterCore::reset() noexcept
 
     for(isize_t i=0; i<m_capacity; i++)
     {
-        m_data[i] = ICELL_C(1);
+        m_data[i] = ICELL_C(0);
     }
 }
 
@@ -223,6 +224,70 @@ void InfiniterCore::setNegativeSign() noexcept
     m_bits.sign = 1;
 }
 
+bool InfiniterCore::equal(const InfiniterCore &p_source) const noexcept
+{
+    if(m_bits.sign != p_source.m_bits.sign)
+        return false;
+
+    /// handle possible leading zeros
+    isize_t this_real_size = m_size;
+    while (this_real_size > 0 && p_source.m_data[this_real_size - 1] == ICELL_C(0))
+    {
+        this_real_size--;
+    }
+
+    isize_t source_real_size = p_source.m_size;
+    while (source_real_size > 0 && p_source.m_data[source_real_size - 1] == ICELL_C(0))
+    {
+        source_real_size--;
+    }
+
+    if(this_real_size != source_real_size)
+        return false;
+
+    /// handle data
+    const icell_t *source_data = p_source.m_data;
+    for(isize_t i=0; i<this_real_size; i++)
+    {
+        if(source_data[i] != m_data[i])
+            return false;
+    }
+
+    return true;
+}
+
+bool InfiniterCore::differs(const InfiniterCore &p_source) const noexcept
+{
+    if(m_bits.sign != p_source.m_bits.sign)
+        return true;
+
+    /// handle possible leading zeros
+    isize_t this_real_size = m_size;
+    while (this_real_size > 0 && p_source.m_data[this_real_size - 1] == ICELL_C(0))
+    {
+        this_real_size--;
+    }
+
+    isize_t source_real_size = p_source.m_size;
+    while (source_real_size > 0 && p_source.m_data[source_real_size - 1] == ICELL_C(0))
+    {
+        source_real_size--;
+    }
+
+    if(this_real_size != source_real_size)
+        return true;
+
+    /// handle data
+    const icell_t *source_data = p_source.m_data;
+    for(isize_t i=0; i<this_real_size; i++)
+    {
+        if(source_data[i] != m_data[i])
+            return true;
+    }
+
+    return false;
+}
+
 void InfiniterCore::assign(icell_t p_value, bool p_negative_value) noexcept
 {
     m_data[0] = p_value;
@@ -247,6 +312,32 @@ void InfiniterCore::assign(const icell_t *p_array, isize_t p_size, bool p_negati
 
     m_size = p_size;
     m_bits.sign = p_negative_value;
+}
+
+void InfiniterCore::assign(const InfiniterCore &p_source)
+{
+    if( &p_source != this )
+    {
+        InfiniterMemory::assign(p_source);
+
+        /// entire memory was copied in IM
+
+        m_bits.sign = p_source.m_bits.sign;
+        m_size = p_source.m_size;
+    }
+}
+
+void InfiniterCore::assign(InfiniterCore &&p_source)
+{
+    if( &p_source != this )
+    {
+        InfiniterMemory::assign(std::move(p_source));
+
+        /// entire memory was moved in IM
+
+        m_bits.sign = p_source.m_bits.sign;
+        m_size = p_source.m_size;
+    }
 }
 
 #if IC_ENABLE_DB_PRINT_METHOD
@@ -281,7 +372,7 @@ InfiniterCore &InfiniterCore::operator =(const InfiniterCore &p_source)
 
     if( &p_source != this )
     {
-        InfiniterMemory::operator=(p_source);
+        InfiniterMemory::assign(p_source);
 
         /// entire memory was copied in IM
 
@@ -299,7 +390,7 @@ InfiniterCore &InfiniterCore::operator =(InfiniterCore &&p_source)
 
     if( &p_source != this )
     {
-        InfiniterMemory::operator=(std::move(p_source));
+        InfiniterMemory::assign(std::move(p_source));
 
         /// entire memory was moved in IM
 
@@ -309,6 +400,48 @@ InfiniterCore &InfiniterCore::operator =(InfiniterCore &&p_source)
 
     return *this;
 
+}
+
+bool InfiniterCore::operator ==(const InfiniterCore &p_source) const noexcept
+{
+    return this->equal(p_source);
+}
+
+bool InfiniterCore::operator !=(const InfiniterCore &p_source) const noexcept
+{
+    return this->differs(p_source);
+}
+
+InfiniterCore::operator bool() const noexcept
+{
+    for(isize_t i=0; i<m_size; i++)
+    {
+        if(m_data[i] != ICELL_C(0))
+            return true;
+    }
+
+    return false;
+}
+
+icell_t &InfiniterCore::operator [](isize_t p_cell_index)
+{
+    if(p_cell_index >= this->getSize())
+    {
+        throw InfiniterException::OutOfRange(p_cell_index, 0, m_size-1);
+    }
+
+    return this->getData()[p_cell_index];
+}
+
+
+const icell_t &InfiniterCore::operator [](isize_t p_cell_index) const
+{
+    if(p_cell_index >= this->getSize())
+    {
+        throw InfiniterException::OutOfRange(p_cell_index, 0, m_size-1);
+    }
+
+    return this->getData()[p_cell_index];
 }
 
 

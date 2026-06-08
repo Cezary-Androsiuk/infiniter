@@ -57,8 +57,13 @@ public:
     void setPositiveSign() noexcept;
     void setNegativeSign() noexcept;
 
+    bool equal(const InfiniterCore &p_source) const noexcept;
+    bool differs(const InfiniterCore &p_source) const noexcept;
+
     void assign(icell_t p_value, bool p_negative_value=false) noexcept;
     void assign(const icell_t *p_array, isize_t p_size, bool p_negative_value=false);
+    void assign(const InfiniterCore &p_source);
+    void assign(InfiniterCore &&p_source);
 
 
 public:
@@ -80,6 +85,13 @@ public:
     /// Operators
     InfiniterCore &operator =(const InfiniterCore &p_source);
     InfiniterCore &operator =(InfiniterCore &&p_source);
+
+    bool operator ==(const InfiniterCore &p_source) const noexcept;
+    bool operator !=(const InfiniterCore &p_source) const noexcept;
+    explicit operator bool() const noexcept;
+
+    icell_t& operator [] (isize_t p_cell_index);
+    const icell_t& operator [] (isize_t p_cell_index) const;
 
 private:
     uint64_t m_size;

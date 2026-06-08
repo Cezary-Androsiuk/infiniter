@@ -18,8 +18,6 @@ public:
 
     explicit InfiniterIO(const std::string &p_number, int p_base=10, bool p_negative_value=false); /// throws bad_alloc /// InfiniterException::InvalidStringFormat
     explicit InfiniterIO(const std::vector<uint8_t> &p_number, int p_base=10, bool p_negative_value=false); /// throws bad_alloc
-    explicit InfiniterIO(const std::vector<unsigned int> &p_number, int p_base=10, bool p_negative_value=false); /// throws bad_alloc
-    explicit InfiniterIO(const std::vector<uint64_t> &p_number, int p_base=10, bool p_negative_value=false); /// throws bad_alloc
 
     explicit InfiniterIO(const InfiniterIO &p_source); /// throws bad_alloc
     explicit InfiniterIO(InfiniterIO &&p_source) noexcept;
@@ -52,9 +50,8 @@ protected:
 
 public:
 
-
     using InfiniterCore::assign; /// prevent shadowing
-    void assign(const std::string &p_number, uint8_t p_base=10, bool p_negative_value=false); // throws InfiniterException::CapacityExceeded and CapacityApproximationFailed
+    void assign(const std::string &p_number, uint8_t p_base=10, bool p_negative_value=false);
     void assign(const std::vector<uint8_t> &p_number, uint8_t p_base=10, bool p_negative_value=false);
 
 protected:
@@ -63,9 +60,9 @@ protected:
 
 public:
 
-
     std::string toString(uint8_t p_base) const;
     std::vector<uint8_t> toVector(uint8_t p_base) const;
+
     void print(uint64_t base) const;
 
 protected:
@@ -76,8 +73,6 @@ protected:
 
     void saveToFile(); //////
 
-private:
-    void assign_base64();
 
 public:
 #if IO_ENABLE_DB_PRINT_METHOD
@@ -89,6 +84,7 @@ public:
 
 
     /// Operators
+    using InfiniterCore::operator=;
     InfiniterIO &operator =(const InfiniterIO &p_source);
     InfiniterIO &operator =(InfiniterIO &&p_source);
 

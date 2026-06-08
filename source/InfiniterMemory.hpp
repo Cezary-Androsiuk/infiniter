@@ -22,6 +22,9 @@ protected:
     void extend(isize_t p_additional_capacity); /// throws bad_alloc
     void shrink(isize_t p_target_capacity); /// throws bad_alloc
 
+    void assign(const InfiniterMemory &p_source);
+    void assign(InfiniterMemory &&p_source);
+
 protected:
 #if IM_ENABLE_DB_PRINT_METHOD
 

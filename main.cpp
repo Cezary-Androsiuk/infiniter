@@ -208,6 +208,15 @@ void infiniterCoreTests()
     ic0 = std::move(ic1);
     ic_dbg_print_memory(ic0);
     ic_dbg_print_memory(ic1);
+
+    printf("\n\n\n");
+    ic1.reset();
+    ic_dbg_print_memory(ic1);
+
+    ic1.setSize(2);
+    ic1[0] = 1ull << 60;
+    ic1[1] = 1ull << 60;
+    ic_dbg_print_memory(ic1);
 }
 
 
@@ -307,11 +316,20 @@ void infiniterIOTests()
         io0.pushLSB(0);
         io0.print(10);
         printf("\n%s\n", io0.toString(10).c_str());
-        printf("%s\n", io0.toString(37).c_str());
+        printf("%s\n", io0.toString(36).c_str());
         io0.printBase2();
         printf("\n%s\n", io0.toString(2).c_str());
         printf("\n");
     }
+
+
+    printf("\n\n");
+
+    printf("%s\n", io0.toString(36).c_str());
+    io0.serialize("io0-large.inf");
+    io0.deserialize("io0-large.inf");
+    printf("%s\n", io0.toString(36).c_str());
+
     printf("\n\n");
 
     ic_dbg_print_memory(io0);

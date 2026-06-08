@@ -314,6 +314,63 @@ void InfiniterMemory::shrink(isize_t p_target_capacity)
     }
 }
 
+void InfiniterMemory::assign(const InfiniterMemory &p_source)
+{
+    if( &p_source != this )
+    {
+        icell_t *tmp_data = p_source.m_bits.sbo_active ? m_sbo_buffer : new icell_t[p_source.m_capacity];
+        /// will throw if allocation failed, but object instance, won't be corrupted
+
+        /// dealocate old memory if allocated
+        if(!m_bits.sbo_active)
+        {
+            delete [] m_data;
+        }
+
+        m_data = tmp_data;
+        m_bits.sbo_active = p_source.m_bits.sbo_active;
+        m_capacity = p_source.m_capacity;
+
+        /// copy old data
+        std::copy_n(p_source.m_data, m_capacity, m_data);
+    }
+}
+
+void InfiniterMemory::assign(InfiniterMemory &&p_source)
+{
+    if( &p_source != this )
+    {
+        m_bits.sbo_active = p_source.m_bits.sbo_active;
+        m_capacity = p_source.m_capacity;
+
+        /// ensure speed up for moving heap memory, stack here is already slow
+        if(UNLIKELY( m_bits.sbo_active ))
+        {
+            m_data = m_sbo_buffer;
+
+            /// copy stack memory
+            std::copy_n(p_source.m_data, m_capacity, m_data);
+        }
+        else
+        {
+            /// move already allocated memory from source here
+            m_data = p_source.m_data;
+            p_source.m_data = nullptr;
+        }
+
+#if IM_ENSURE_NEW_OBJECT_AFTER_MOVE
+        /// reset source by hand (to prevent memory deallocation)
+        p_source.m_data = p_source.m_sbo_buffer;
+        p_source.m_capacity = SBO_CAPACITY;
+        p_source.m_bits.sbo_active = true;
+
+#if IM_CLEAR_ALLOCATED_MEMORY
+        std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, ICELL_C(0));
+#endif // IM_CLEAR_ALLOCATED_MEMORY
+#endif // IM_ENSURE_NEW_OBJECT_AFTER_MOVE
+    }
+}
+
 #if IM_ENABLE_DB_PRINT_METHOD
 void InfiniterMemory::dbg_print() const
 {

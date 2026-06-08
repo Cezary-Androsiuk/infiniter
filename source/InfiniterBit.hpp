@@ -24,8 +24,8 @@ public:
 
     // maybe change all uint64_t to cell where context is abaout bits or cells
 
-    bool checkCellPos(isize_t cell_id, uint8_t pos);
-    void checkCellPosTry(isize_t cell_id, uint8_t pos); // throws out_of_range
+    bool checkCellPos(isize_t cell_id, uint8_t pos) const;
+    void checkCellPosTry(isize_t cell_id, uint8_t pos) const; // throws out_of_range
 
 
     /// Returns value of cell with MSB
@@ -96,27 +96,34 @@ public:
 
 
 
-    ibit_t getBit(isize_t cell_id, uint8_t pos); // throws out_of_range
-    void setBit(isize_t cell_id, uint8_t pos); // throws out_of_range
-    void clearBit(isize_t cell_id, uint8_t pos); // throws out_of_range
-    void toggleBit(isize_t cell_id, uint8_t pos); // throws out_of_range
+    ibit_t getBit(isize_t p_cell_index, uint8_t p_pos); // throws out_of_range
+    void setBit(isize_t p_cell_index, uint8_t p_pos); // throws out_of_range
+    void clearBit(isize_t p_cell_index, uint8_t p_pos); // throws out_of_range
+    void toggleBit(isize_t p_cell_index, uint8_t p_pos); // throws out_of_range
 
     // unsafe or unchecked?
-    ibit_t getBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept;
-    void setBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept;
-    void clearBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept;
-    void toggleBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept;
+    ibit_t getBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept;
+    void setBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept;
+    void clearBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept;
+    void toggleBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept;
 
 
-    void shiftLSB(ibit_t lsb=IBIT_FALSE); // Least Significant Bit (<<)
-    void shiftMSB(ibit_t msb=IBIT_FALSE); // Most Significant Bit (>>)
+    void shiftLSB(ibit_t p_lsb=IBIT_FALSE); // Least Significant Bit (<<)
+    void shiftMSB(ibit_t p_msb=IBIT_FALSE); // Most Significant Bit (>>)
 
     void shiftLeft();
     void shiftRight();
 
-    void pushLSB(ibit_t lsb);
-    void pushMSB(ibit_t msb); /// not finished - make it extend if needed
+    void pushLSB(ibit_t p_lsb);
+    void pushMSB(ibit_t p_msb); /// not finished - make it extend if needed
     
+
+public:
+
+    /// Operators
+    using InfiniterCore::operator=;
+    InfiniterBit &operator =(const InfiniterBit &p_source);
+    InfiniterBit &operator =(InfiniterBit &&p_source);
 
 
 };

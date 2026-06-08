@@ -1,6 +1,7 @@
 #include "InfiniterBit.hpp"
 
 #include "InfiniterShared.hpp"
+#include "InfiniterException.hpp"
 
 #include "Infiniter.hpp"
 
@@ -66,21 +67,23 @@ InfiniterBit::~InfiniterBit() noexcept
     /// everything was done in InfiniterMemory
 }
 
-bool InfiniterBit::checkCellPos(isize_t cell_id, uint8_t pos)
+bool InfiniterBit::checkCellPos(isize_t cell_id, uint8_t pos) const
 {
     return cell_id < this->getSize() && pos < 64;
 }
 
-void InfiniterBit::checkCellPosTry(isize_t cell_id, uint8_t pos)
+void InfiniterBit::checkCellPosTry(isize_t cell_id, uint8_t pos) const
 {
     if(cell_id >= this->getSize() || pos >= 64)
     {
-        throw std::out_of_range(
-            "Range error: cell_id " + std::to_string(cell_id) +
-            " (max < " + std::to_string(this->getSize()) +
-            "), pos " + std::to_string(pos) +
-            " (max < 64)"
-        );
+        if(cell_id >= this->getSize())
+        {
+            throw InfiniterException::OutOfRange(cell_id, 0, this->getSize()-1);
+        }
+        else
+        {
+            throw InfiniterException::OutOfRange(pos, 0, 63);
+        }
     }
 }
 
@@ -398,57 +401,57 @@ uint8_t InfiniterBit::getLSBPosCellPos(isize_t &r_cell_pos) const noexcept
 
 
 
-ibit_t InfiniterBit::getBit(isize_t cell_id, uint8_t pos)
+ibit_t InfiniterBit::getBit(isize_t p_cell_index, uint8_t p_pos)
 {
-    this->checkCellPosTry(cell_id, pos);
+    this->checkCellPosTry(p_cell_index, p_pos);
     
-    return this->getData()[cell_id] & (ICELL_C(1) << pos) ? IBIT_TRUE : IBIT_FALSE;
+    return this->getData()[p_cell_index] & (ICELL_C(1) << p_pos) ? IBIT_TRUE : IBIT_FALSE;
 }
 
-void InfiniterBit::setBit(isize_t cell_id, uint8_t pos)
+void InfiniterBit::setBit(isize_t p_cell_index, uint8_t p_pos)
 {
-    this->checkCellPosTry(cell_id, pos);
+    this->checkCellPosTry(p_cell_index, p_pos);
     
-    this->getData()[cell_id] |= (ICELL_C(1) << pos);
+    this->getData()[p_cell_index] |= (ICELL_C(1) << p_pos);
 }
 
-void InfiniterBit::clearBit(isize_t cell_id, uint8_t pos)
+void InfiniterBit::clearBit(isize_t p_cell_index, uint8_t p_pos)
 {
-    this->checkCellPosTry(cell_id, pos);
+    this->checkCellPosTry(p_cell_index, p_pos);
 
-    this->getData()[cell_id] &= ~(ICELL_C(1) << pos);
+    this->getData()[p_cell_index] &= ~(ICELL_C(1) << p_pos);
 }
 
-void InfiniterBit::toggleBit(isize_t cell_id, uint8_t pos)
+void InfiniterBit::toggleBit(isize_t p_cell_index, uint8_t p_pos)
 {
-    this->checkCellPosTry(cell_id, pos);
+    this->checkCellPosTry(p_cell_index, p_pos);
 
-    this->getData()[cell_id] ^= (ICELL_C(1) << pos);
+    this->getData()[p_cell_index] ^= (ICELL_C(1) << p_pos);
 }
 
-ibit_t InfiniterBit::getBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept
+ibit_t InfiniterBit::getBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept
 {
-    return this->getData()[cell_id] & (ICELL_C(1) << pos) ? IBIT_TRUE : IBIT_FALSE;
+    return this->getData()[p_cell_index] & (ICELL_C(1) << p_pos) ? IBIT_TRUE : IBIT_FALSE;
 }
 
-void InfiniterBit::setBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept
+void InfiniterBit::setBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept
 {
-    this->getData()[cell_id] |= (ICELL_C(1) << pos);
+    this->getData()[p_cell_index] |= (ICELL_C(1) << p_pos);
 }
 
-void InfiniterBit::clearBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept
+void InfiniterBit::clearBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept
 {
-    this->getData()[cell_id] &= ~(ICELL_C(1) << pos);
+    this->getData()[p_cell_index] &= ~(ICELL_C(1) << p_pos);
 }
 
-void InfiniterBit::toggleBitUnsafe(uint64_t cell_id, uint8_t pos) noexcept
+void InfiniterBit::toggleBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept
 {
-    this->getData()[cell_id] ^= (ICELL_C(1) << pos);
+    this->getData()[p_cell_index] ^= (ICELL_C(1) << p_pos);
 }
 
-void InfiniterBit::shiftLSB(ibit_t lsb)
+void InfiniterBit::shiftLSB(ibit_t p_lsb)
 {
-    icell_t lsb_mask = !!lsb; /// change 010010...100101 to 000...001
+    icell_t lsb_mask = !!p_lsb; /// change 010010...100101 to 000...001
 
     icell_t *data = this->getData();
     icell_t nextLSB;
@@ -464,9 +467,9 @@ void InfiniterBit::shiftLSB(ibit_t lsb)
     /// overflow possible if that MSB is 1
 }
 
-void InfiniterBit::shiftMSB(ibit_t msb)
+void InfiniterBit::shiftMSB(ibit_t p_msb)
 {
-    icell_t msb_mask = !!msb; /// change 010010...100101 to 00...01
+    icell_t msb_mask = !!p_msb; /// change 010010...100101 to 00...01
 
     msb_mask <<= 63; /// change 000...001 to 100...000
 
@@ -493,7 +496,7 @@ void InfiniterBit::shiftRight()
     this->shiftMSB(IBIT_FALSE);
 }
 
-void InfiniterBit::pushLSB(ibit_t lsb)
+void InfiniterBit::pushLSB(ibit_t p_lsb)
 {
     /// check for possible overflow before shifting left
     const isize_t size = this->getSize();
@@ -503,10 +506,10 @@ void InfiniterBit::pushLSB(ibit_t lsb)
         this->setSizeWithExtend(size +1);
     }
 
-    this->shiftLSB(lsb);
+    this->shiftLSB(p_lsb);
 }
 
-void InfiniterBit::pushMSB(ibit_t msb)
+void InfiniterBit::pushMSB(ibit_t p_msb)
 {
     icell_t *data = this->getData();
     isize_t size = this->getSize();
@@ -518,6 +521,19 @@ void InfiniterBit::pushMSB(ibit_t msb)
 
 
 
-    this->shiftMSB(msb);
+    this->shiftMSB(p_msb);
 }
+
+InfiniterBit &InfiniterBit::operator =(const InfiniterBit &p_source)
+{
+
+
+}
+
+InfiniterBit &InfiniterBit::operator =(InfiniterBit &&p_source)
+{
+
+}
+
+
 

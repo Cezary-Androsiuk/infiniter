@@ -66,36 +66,14 @@ InfiniterIO::InfiniterIO(const std::string &p_number, int p_base, bool p_negativ
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER std::string int bool\n", this);
 
-    if (p_base < 2 || p_base > 36)
-    {
-        throw InfiniterException::InvalidBase(p_base, 2, 36);
-    }
-
-    validateStringNumber(p_number, p_base);
-
-    if(p_base == 2)
-    {
-
-    }
-
-    // size_t number_length = p_number.size();
-    // size_t binary_length = InfiniterIO::maxLengthAfterConversion(number_length, p_base, 2);
-
+    this->assign(p_number, p_base, p_negative_value);
 }
 
 InfiniterIO::InfiniterIO(const std::vector<uint8_t> &p_number, int p_base, bool p_negative_value)
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER std::vector<uint8_t> int bool\n", this);
-}
 
-InfiniterIO::InfiniterIO(const std::vector<unsigned int> &p_number, int p_base, bool p_negative_value)
-{
-    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER std::vector<unsigned int> int bool\n", this);
-}
-
-InfiniterIO::InfiniterIO(const std::vector<uint64_t> &p_number, int p_base, bool p_negative_value)
-{
-    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER std::vector<uint64_t> int bool\n", this);
+    this->assign(p_number, p_base, p_negative_value);
 }
 
 InfiniterIO::InfiniterIO(const InfiniterIO &p_source)
