@@ -477,6 +477,26 @@ bool InfiniterCore::smallerEqual(const InfiniterCore &p_source) const noexcept
     return true;
 }
 
+icell_t &InfiniterCore::getCell(isize_t p_cell_index)
+{
+    if(p_cell_index >= this->getSize())
+    {
+        throw InfiniterException::OutOfRange(p_cell_index, 0, m_size-1);
+    }
+
+    return this->getData()[p_cell_index];
+}
+
+const icell_t &InfiniterCore::getCell(isize_t p_cell_index) const
+{
+    if(p_cell_index >= this->getSize())
+    {
+        throw InfiniterException::OutOfRange(p_cell_index, 0, m_size-1);
+    }
+
+    return this->getData()[p_cell_index];
+}
+
 #if IC_ENABLE_DB_PRINT_METHOD
 void InfiniterCore::dbg_print_data() const
 {
@@ -574,23 +594,12 @@ bool InfiniterCore::operator <=(const InfiniterCore &p_source) const noexcept
 
 icell_t &InfiniterCore::operator [](isize_t p_cell_index)
 {
-    if(p_cell_index >= this->getSize())
-    {
-        throw InfiniterException::OutOfRange(p_cell_index, 0, m_size-1);
-    }
-
-    return this->getData()[p_cell_index];
+    return this->getCell(p_cell_index);
 }
-
 
 const icell_t &InfiniterCore::operator [](isize_t p_cell_index) const
 {
-    if(p_cell_index >= this->getSize())
-    {
-        throw InfiniterException::OutOfRange(p_cell_index, 0, m_size-1);
-    }
-
-    return this->getData()[p_cell_index];
+    return this->getCell(p_cell_index);
 }
 
 

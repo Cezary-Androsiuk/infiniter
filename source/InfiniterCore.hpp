@@ -72,6 +72,8 @@ public:
     bool greaterEqual(const InfiniterCore &p_source) const noexcept;
     bool smallerEqual(const InfiniterCore &p_source) const noexcept;
 
+    icell_t &getCell(isize_t p_cell_index);
+    const icell_t &getCell(isize_t p_cell_index) const;
 
 public:
 #if IC_ENABLE_DB_PRINT_METHOD
