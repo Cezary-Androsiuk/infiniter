@@ -4,6 +4,8 @@
 #include "InfiniterShared.hpp"
 #include "InfiniterBit.hpp"
 
+class Infiniter;
+
 class InfiniterArithmetic : public InfiniterBit
 {
 public:
@@ -19,6 +21,10 @@ public:
     ~InfiniterArithmetic() noexcept;
 
     /// InfiniterBit methods
+
+    Infiniter absoluteValue() const;
+    void absoluteValueAssign();
+
 
 
 };

@@ -225,6 +225,7 @@ void infiniterIOTests()
     printf("==================================================\n");
     InfiniterIO io0(0x1, false);
     io0.dbg_print_memory();
+
     // for(int j=0; j<40; j++)
     // {
     //     io0.assign(1, false);

@@ -27,6 +27,8 @@ protected:
     void clear() noexcept;
     void clearReserved() noexcept;
 
+    isize_t realSize() const noexcept;
+
 public:
     void reserve(isize_t p_new_capacity);
     void reserve(const InfiniterCore &p_source);
@@ -57,13 +59,18 @@ public:
     void setPositiveSign() noexcept;
     void setNegativeSign() noexcept;
 
-    bool equal(const InfiniterCore &p_source) const noexcept;
-    bool differs(const InfiniterCore &p_source) const noexcept;
-
     void assign(icell_t p_value, bool p_negative_value=false) noexcept;
     void assign(const icell_t *p_array, isize_t p_size, bool p_negative_value=false);
     void assign(const InfiniterCore &p_source);
     void assign(InfiniterCore &&p_source);
+
+    bool toBool() const noexcept;
+    bool equal(const InfiniterCore &p_source) const noexcept;
+    bool differs(const InfiniterCore &p_source) const noexcept;
+    bool greater(const InfiniterCore &p_source) const noexcept;
+    bool smaller(const InfiniterCore &p_source) const noexcept;
+    bool greaterEqual(const InfiniterCore &p_source) const noexcept;
+    bool smallerEqual(const InfiniterCore &p_source) const noexcept;
 
 
 public:
@@ -83,15 +90,21 @@ public:
 public:
 
     /// Operators
-    InfiniterCore &operator =(const InfiniterCore &p_source);
-    InfiniterCore &operator =(InfiniterCore &&p_source);
+    InfiniterCore &operator = (const InfiniterCore &p_source);
+    InfiniterCore &operator = (InfiniterCore &&p_source);
 
-    bool operator ==(const InfiniterCore &p_source) const noexcept;
-    bool operator !=(const InfiniterCore &p_source) const noexcept;
-    explicit operator bool() const noexcept;
+    explicit operator bool () const noexcept;
+    bool operator == (const InfiniterCore &p_source) const noexcept;
+    bool operator != (const InfiniterCore &p_source) const noexcept;
+    bool operator > (const InfiniterCore &p_source) const noexcept;
+    bool operator < (const InfiniterCore &p_source) const noexcept;
+    bool operator >= (const InfiniterCore &p_source) const noexcept;
+    bool operator <= (const InfiniterCore &p_source) const noexcept;
 
     icell_t& operator [] (isize_t p_cell_index);
     const icell_t& operator [] (isize_t p_cell_index) const;
+
+
 
 private:
     uint64_t m_size;
