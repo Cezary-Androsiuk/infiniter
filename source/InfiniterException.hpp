@@ -15,17 +15,25 @@ namespace InfiniterException{
             : Exception("Invalid String Format: " + p_message) {}
     };
 
+    class InvalidVectorFormat : public Exception { public:
+        explicit InvalidVectorFormat(const std::string &p_message)
+            : Exception("Invalid Vector Format: " + p_message) {}
+    };
+
     class InvalidBase : public Exception { public:
         explicit InvalidBase(uint8_t p_base, uint8_t p_min_base, uint8_t p_max_base)
             : Exception(
                   "Invalid base " + std::to_string(p_base) +
-                  " must be between " + std::to_string(p_min_base) +
+                  ", must be between " + std::to_string(p_min_base) +
                   " and " + std::to_string(p_min_base)) {}
     };
 
-    class CapacityExceeded : public Exception { public:
-        explicit CapacityExceeded(const std::string &p_message)
-            : Exception("Capacity Exceeded: " + p_message) {}
+    class InputContainerCapacityExceeded : public Exception { public:
+        explicit InputContainerCapacityExceeded(uint64_t p_input_size, uint64_t p_max_size)
+            : Exception(
+                  "Input Container Capacity Exceeded: "
+                  "Max capacity is " + std::to_string(p_max_size) +
+                  " and got container with size " + std::to_string(p_input_size)) {}
     };
 
     class CapacityApproximationFailed : public Exception { public:

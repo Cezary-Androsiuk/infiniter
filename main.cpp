@@ -306,6 +306,10 @@ void infiniterIOTests()
     {
         io0.pushLSB(0);
         io0.print(10);
+        printf("\n%s\n", io0.toString(10).c_str());
+        printf("%s\n", io0.toString(37).c_str());
+        io0.printBase2();
+        printf("\n%s\n", io0.toString(2).c_str());
         printf("\n");
     }
     printf("\n\n");
@@ -330,10 +334,13 @@ void infiniterIOTests()
 
     printf("\n\n");
 
-    const char *binary_str = "11111000011110000111100001111000011110000111100001111000011110000";
+    // const char *binary_str = "111110000111100001111000011110000111100001111000011110000111100000001";
+    const char *binary_str = "11100111";
 
     io0.assignStringBase2(binary_str);
     ic_dbg_print_data(io0);
+
+
 }
 
 

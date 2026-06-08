@@ -34,22 +34,38 @@ public:
 protected:
     static bool isPowerOfTwo(int p_number);
     static double log(double p_base, double p_value) noexcept;
-    static uint64_t maxLengthAfterConversion(uint64_t p_number_length,
-                                             uint8_t p_number_base,
-                                             uint8_t p_target_base) noexcept;
-    static uint64_t estimateCellsByBase(uint64_t p_number_size, uint8_t p_base); // throws InfiniterException::CapacityExceeded and CapacityApproximationFailed
+
+    static uint64_t estimateBitsByBase(uint64_t p_number_size, uint8_t p_base);
+    static uint64_t estimateCellsByBase(uint64_t p_number_size, uint8_t p_base);
+
     static void validateStringNumber(const std::string &p_number, int p_base);
+    static void validateVectorNumber(const std::vector<uint8_t> &p_number, int p_base);
+
 public:
 
 protected:
     void assignStringBase2(const std::string &p_binary_number);
-    void assignString(const std::string &p_number, uint8_t p_base); // throws InfiniterException::CapacityExceeded and CapacityApproximationFailed
+    void assignString(std::string p_number, uint8_t p_base);
+
+    void assignVectorBase2(const std::vector<uint8_t> &p_binary_number);
+    void assignVector(std::vector<uint8_t> p_number, uint8_t p_base);
+
 public:
 
 
     using InfiniterCore::assign; /// prevent shadowing
     void assign(const std::string &p_number, uint8_t p_base=10, bool p_negative_value=false); // throws InfiniterException::CapacityExceeded and CapacityApproximationFailed
+    void assign(const std::vector<uint8_t> &p_number, uint8_t p_base=10, bool p_negative_value=false);
 
+protected:
+    std::string toStringBase2() const;
+    std::vector<uint8_t> toVectorBase2() const;
+
+public:
+
+
+    std::string toString(uint8_t p_base) const;
+    std::vector<uint8_t> toVector(uint8_t p_base) const;
     void print(uint64_t base) const;
 
 protected:
