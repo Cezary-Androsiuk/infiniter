@@ -534,7 +534,8 @@ void InfiniterBit::pushMSB(ibit_t p_msb)
     if(data[size-1] & M100)
     {
         size = this->setSizeWithExtend(size +1);
-        /// !!!! require fix - 'data' could change
+        data = this->getData();
+
         data[size-1] = ICELL_C(1);
         return;
     }
