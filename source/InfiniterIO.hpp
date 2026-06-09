@@ -2,12 +2,12 @@
 #define INFINITERIO_HPP
 
 #include "InfiniterShared.hpp"
-#include "InfiniterUtility.hpp"
+#include "InfiniterArithmetic.hpp"
 
 #include <string>
 #include <vector>
 
-class InfiniterIO : public InfiniterUtility
+class InfiniterIO : public InfiniterArithmetic
 {
 public:
     explicit InfiniterIO() noexcept;
@@ -19,12 +19,21 @@ public:
     explicit InfiniterIO(const std::string &p_number, int p_base=10, bool p_negative_value=false); /// throws bad_alloc /// InfiniterException::InvalidStringFormat
     explicit InfiniterIO(const std::vector<uint8_t> &p_number, int p_base=10, bool p_negative_value=false); /// throws bad_alloc
 
-    explicit InfiniterIO(const InfiniterIO &p_source); /// throws bad_alloc
-    explicit InfiniterIO(InfiniterIO &&p_source) noexcept;
+    InfiniterIO(const InfiniterIO &p_source); /// throws bad_alloc
+    InfiniterIO(InfiniterIO &&p_source) noexcept;
+
+    InfiniterIO(const InfiniterArithmetic &p_source); /// throws bad_alloc
+    InfiniterIO(InfiniterArithmetic &&p_source) noexcept;
+
+    InfiniterIO(const InfiniterBit &p_source); /// throws bad_alloc
+    InfiniterIO(InfiniterBit &&p_source) noexcept;
+
+    InfiniterIO(const InfiniterCore &p_source); /// throws bad_alloc
+    InfiniterIO(InfiniterCore &&p_source) noexcept;
 
     ~InfiniterIO() noexcept;
 
-    /// InfiniterUtility methods
+    /// InfiniterArithmetic methods
 
     void serialize(std::string p_file_path, bool p_ignore_capacity = false) const;
     void deserialize(std::string p_file_path, bool p_ignore_capacity = false);
@@ -50,9 +59,11 @@ protected:
 
 public:
 
-    using InfiniterCore::assign; /// prevent shadowing
+    using InfiniterArithmetic::assign; /// prevent shadowing
     void assign(const std::string &p_number, uint8_t p_base=10, bool p_negative_value=false);
     void assign(const std::vector<uint8_t> &p_number, uint8_t p_base=10, bool p_negative_value=false);
+    void assign(const InfiniterIO &p_source);
+    void assign(InfiniterIO &&p_source);
 
 protected:
     std::string toStringBase2() const;
@@ -84,7 +95,7 @@ public:
 
 
     /// Operators
-    using InfiniterCore::operator=;
+    using InfiniterArithmetic::operator=;
     InfiniterIO &operator =(const InfiniterIO &p_source);
     InfiniterIO &operator =(InfiniterIO &&p_source);
 

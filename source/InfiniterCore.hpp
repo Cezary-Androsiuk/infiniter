@@ -16,8 +16,8 @@ public:
     explicit InfiniterCore(isize_t p_capacity, icell_t p_value, bool p_negative_value=false); /// throws bad_alloc
     explicit InfiniterCore(const icell_t *p_array, isize_t p_size, bool p_negative_value=false); /// throws bad_alloc
 
-    explicit InfiniterCore(const InfiniterCore &p_source); /// throws bad_alloc
-    explicit InfiniterCore(InfiniterCore &&p_source) noexcept;
+    InfiniterCore(const InfiniterCore &p_source); /// throws bad_alloc
+    InfiniterCore(InfiniterCore &&p_source) noexcept;
 
     ~InfiniterCore() noexcept;
 

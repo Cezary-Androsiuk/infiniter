@@ -51,13 +51,25 @@ InfiniterBit::InfiniterBit(const icell_t *p_array, isize_t p_size, bool p_negati
 InfiniterBit::InfiniterBit(const InfiniterBit &p_source)
     : InfiniterCore(p_source)
 {
-    _ib_dbgprintf("--- DEBUG IB %p | Constructed   COPY\n", this);
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed IB COPY\n", this);
 }
 
 InfiniterBit::InfiniterBit(InfiniterBit &&p_source) noexcept
     : InfiniterCore(std::move(p_source))
 {
-    _ib_dbgprintf("--- DEBUG IB %p | Constructed   MOVE\n", this);
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed IB MOVE\n", this);
+}
+
+InfiniterBit::InfiniterBit(const InfiniterCore &p_source)
+    : InfiniterCore(p_source)
+{
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed IC COPY\n", this);
+}
+
+InfiniterBit::InfiniterBit(InfiniterCore &&p_source) noexcept
+    : InfiniterCore(std::move(p_source))
+{
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed IC MOVE\n", this);
 }
 
 InfiniterBit::~InfiniterBit() noexcept
@@ -522,7 +534,7 @@ void InfiniterBit::pushMSB(ibit_t p_msb)
     if(data[size-1] & M100)
     {
         size = this->setSizeWithExtend(size +1);
-
+        /// !!!! require fix - 'data' could change
         data[size-1] = ICELL_C(1);
         return;
     }
@@ -539,15 +551,26 @@ void InfiniterBit::pushMSB(ibit_t p_msb)
     *msb_cell |= (ICELL_C(1) << next_bit_index);
 }
 
+void InfiniterBit::assign(const InfiniterBit &p_source)
+{
+    InfiniterCore::assign(p_source);
+}
+
+void InfiniterBit::assign(InfiniterBit &&p_source)
+{
+    InfiniterCore::assign(std::move(p_source));
+}
+
 InfiniterBit &InfiniterBit::operator =(const InfiniterBit &p_source)
 {
-
-
+    InfiniterCore::assign(p_source);
+    return *this;
 }
 
 InfiniterBit &InfiniterBit::operator =(InfiniterBit &&p_source)
 {
-
+    InfiniterCore::assign(std::move(p_source));
+    return *this;
 }
 
 

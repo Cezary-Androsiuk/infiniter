@@ -1,6 +1,7 @@
 #include "source/InfiniterMemory.hpp"
 #include "source/InfiniterCore.hpp"
 #include "source/InfiniterIO.hpp"
+#include "source/InfiniterUtility.hpp"
 
 #include <cstdio>
 #include <algorithm> // std::copy_n, std::fill_n, std::move
@@ -13,8 +14,8 @@
  * 
  * 
  * Infiniter            I
- * InfiniterIO          IO
  * InfiniterUtility     IU
+ * InfiniterIO          IO
  * InfiniterArithmetic  IA
  * InfiniterBit         IB
  * InfiniterCore        IC
@@ -427,10 +428,8 @@ int main(int argc, char *argv[])
     // infiniterIOTests();
 
     InfiniterIO io0;
-
-    printf("%s\n", io0.toString(36).c_str());
-    io0.serialize("io0-large.inf");
-    io0.deserialize("io0-large.inf");
-    printf("%s\n", io0.toString(36).c_str());
+    InfiniterUtility iu0(io0);
+    InfiniterUtility *iu1 = ++iu0;
+    if()
 
 }

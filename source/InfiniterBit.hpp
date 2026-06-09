@@ -15,8 +15,11 @@ public:
     explicit InfiniterBit(isize_t p_capacity, icell_t p_value, bool p_negative_value=false); /// throws bad_alloc
     explicit InfiniterBit(const icell_t *p_array, isize_t p_size, bool p_negative_value=false); /// throws bad_alloc
 
-    explicit InfiniterBit(const InfiniterBit &p_source); /// throws bad_alloc
-    explicit InfiniterBit(InfiniterBit &&p_source) noexcept;
+    InfiniterBit(const InfiniterBit &p_source); /// throws bad_alloc
+    InfiniterBit(InfiniterBit &&p_source) noexcept;
+
+    InfiniterBit(const InfiniterCore &p_source); /// throws bad_alloc
+    InfiniterBit(InfiniterCore &&p_source) noexcept;
 
     ~InfiniterBit() noexcept;
 
@@ -118,12 +121,16 @@ public:
     void pushMSB(ibit_t p_msb); /// not finished - make it extend if needed
     
 
+    using InfiniterCore::assign;
+    void assign(const InfiniterBit &p_source);
+    void assign(InfiniterBit &&p_source);
+
 public:
 
     /// Operators
-    using InfiniterCore::operator=;
-    InfiniterBit &operator =(const InfiniterBit &p_source);
-    InfiniterBit &operator =(InfiniterBit &&p_source);
+    using InfiniterCore::operator = ;
+    InfiniterBit &operator = (const InfiniterBit &p_source);
+    InfiniterBit &operator = (InfiniterBit &&p_source);
 
 
 };

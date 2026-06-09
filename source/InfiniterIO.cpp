@@ -38,31 +38,31 @@
 
 
 InfiniterIO::InfiniterIO() noexcept
-    : InfiniterUtility()
+    : InfiniterArithmetic()
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   DEFAULT\n", this);
 }
 
 InfiniterIO::InfiniterIO(isize_t p_capacity)
-    : InfiniterUtility(p_capacity)
+    : InfiniterArithmetic(p_capacity)
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER isize_t\n", this);
 }
 
 InfiniterIO::InfiniterIO(isize_t p_capacity, icell_t p_value, bool p_negative_value)
-    : InfiniterUtility(p_capacity, p_value, p_negative_value)
+    : InfiniterArithmetic(p_capacity, p_value, p_negative_value)
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER isize_t icell_t bool\n", this);
 }
 
 InfiniterIO::InfiniterIO(const icell_t *p_array, isize_t p_size, bool p_negative_value)
-    : InfiniterUtility(p_array, p_size, p_negative_value)
+    : InfiniterArithmetic(p_array, p_size, p_negative_value)
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER icell_t* isize_t bool\n", this);
 }
 
 InfiniterIO::InfiniterIO(const std::string &p_number, int p_base, bool p_negative_value)
-    : InfiniterUtility()
+    : InfiniterArithmetic()
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER std::string int bool\n", this);
 
@@ -70,6 +70,7 @@ InfiniterIO::InfiniterIO(const std::string &p_number, int p_base, bool p_negativ
 }
 
 InfiniterIO::InfiniterIO(const std::vector<uint8_t> &p_number, int p_base, bool p_negative_value)
+    : InfiniterArithmetic()
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER std::vector<uint8_t> int bool\n", this);
 
@@ -77,17 +78,51 @@ InfiniterIO::InfiniterIO(const std::vector<uint8_t> &p_number, int p_base, bool 
 }
 
 InfiniterIO::InfiniterIO(const InfiniterIO &p_source)
-    : InfiniterUtility(p_source)
+    : InfiniterArithmetic(p_source)
 {
-    _io_dbgprintf("--- DEBUG IO %p | Constructed   COPY\n", this);
-
+    _io_dbgprintf("--- DEBUG IO %p | Constructed IO COPY\n", this);
 }
 
 InfiniterIO::InfiniterIO(InfiniterIO &&p_source) noexcept
-    : InfiniterUtility(std::move(p_source))
+    : InfiniterArithmetic(std::move(p_source))
 {
-    _io_dbgprintf("--- DEBUG IO %p | Constructed   MOVE\n", this);
+    _io_dbgprintf("--- DEBUG IO %p | Constructed IO MOVE\n", this);
+}
 
+InfiniterIO::InfiniterIO(const InfiniterArithmetic &p_source)
+    : InfiniterArithmetic(p_source)
+{
+    _io_dbgprintf("--- DEBUG IO %p | Constructed IA COPY\n", this);
+}
+
+InfiniterIO::InfiniterIO(InfiniterArithmetic &&p_source) noexcept
+    : InfiniterArithmetic(std::move(p_source))
+{
+    _io_dbgprintf("--- DEBUG IO %p | Constructed IA MOVE\n", this);
+}
+
+InfiniterIO::InfiniterIO(const InfiniterBit &p_source)
+    : InfiniterArithmetic(p_source)
+{
+    _io_dbgprintf("--- DEBUG IO %p | Constructed IB COPY\n", this);
+}
+
+InfiniterIO::InfiniterIO(InfiniterBit &&p_source) noexcept
+    : InfiniterArithmetic(std::move(p_source))
+{
+    _io_dbgprintf("--- DEBUG IO %p | Constructed IB MOVE\n", this);
+}
+
+InfiniterIO::InfiniterIO(const InfiniterCore &p_source)
+    : InfiniterArithmetic(p_source)
+{
+    _io_dbgprintf("--- DEBUG IO %p | Constructed IC COPY\n", this);
+}
+
+InfiniterIO::InfiniterIO(InfiniterCore &&p_source) noexcept
+    : InfiniterArithmetic(std::move(p_source))
+{
+    _io_dbgprintf("--- DEBUG IO %p | Constructed IC MOVE\n", this);
 }
 
 InfiniterIO::~InfiniterIO() noexcept
@@ -528,6 +563,16 @@ void InfiniterIO::assign(const std::vector<uint8_t> &p_number, uint8_t p_base, b
     this->setSign(p_negative_value);
 }
 
+void InfiniterIO::assign(const InfiniterIO &p_source)
+{
+    InfiniterArithmetic::assign(p_source);
+}
+
+void InfiniterIO::assign(InfiniterIO &&p_source)
+{
+    InfiniterArithmetic::assign(std::move(p_source));
+}
+
 std::string InfiniterIO::toStringBase2() const
 {
     isize_t size = this->getSize();
@@ -837,14 +882,14 @@ void InfiniterIO::print(uint64_t base) const{
 
 InfiniterIO &InfiniterIO::operator =(const InfiniterIO &p_source)
 {
-    _io_dbgprintf("--- DEBUG IO %p | Assigned      COPY\n", this);
-
+    InfiniterArithmetic::assign(p_source);
+    return *this;
 }
 
 InfiniterIO &InfiniterIO::operator =(InfiniterIO &&p_source)
 {
-    _io_dbgprintf("--- DEBUG IO %p | Assigned      MOVE\n", this);
-
+    InfiniterArithmetic::assign(std::move(p_source));
+    return *this;
 }
 
 

@@ -10,8 +10,8 @@ protected:
 
     explicit InfiniterMemory(isize_t p_capacity); /// throws bad_alloc
 
-    explicit InfiniterMemory(const InfiniterMemory &p_source); /// throws bad_alloc
-    explicit InfiniterMemory(InfiniterMemory &&p_source) noexcept;
+    InfiniterMemory(const InfiniterMemory &p_source); /// throws bad_alloc
+    InfiniterMemory(InfiniterMemory &&p_source) noexcept;
 
     ~InfiniterMemory() noexcept; /// NOT VIRTUAL
 
