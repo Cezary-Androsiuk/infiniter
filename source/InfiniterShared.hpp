@@ -17,8 +17,10 @@ typedef uint64_t    icell_t;    /// cell capacity
 typedef uint64_t    isize_t;    /// size capacity
 typedef uint8_t     ibit_t;     /// bit capacity
 
-#define IBIT_TRUE UINT8_C(1)
-#define IBIT_FALSE UINT8_C(0)
+#define IBIT_1 UINT8_C(1)
+#define IBIT_0 UINT8_C(0)
+#define IBIT_TRUE IBIT_1
+#define IBIT_FALSE IBIT_0
 
 #define ICELL_C(x) UINT64_C(x)
 #define ISIZE_C(x) UINT64_C(x)

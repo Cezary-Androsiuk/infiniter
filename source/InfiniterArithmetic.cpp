@@ -133,6 +133,40 @@ bool InfiniterArithmetic::isNegative1() const noexcept
     return true;
 }
 
+bool InfiniterArithmetic::isPositive2() const noexcept
+{
+    const icell_t *data = this->getData();
+    if(this->getSign())
+        return false;
+
+    if(data[0] != ICELL_C(2))
+        return false;
+
+    for(isize_t i=1; i<this->getSize(); i++)
+    {
+        if(data[i] != ICELL_C(0))
+            return false;
+    }
+    return true;
+}
+
+bool InfiniterArithmetic::isNegative2() const noexcept
+{
+    const icell_t *data = this->getData();
+    if(!this->getSign())
+        return false;
+
+    if(data[0] != ICELL_C(2))
+        return false;
+
+    for(isize_t i=1; i<this->getSize(); i++)
+    {
+        if(data[i] != ICELL_C(0))
+            return false;
+    }
+    return true;
+}
+
 Infiniter InfiniterArithmetic::absoluteValue() const
 {
     Infiniter i(*this);
@@ -147,6 +181,23 @@ void InfiniterArithmetic::absoluteValueAssign()
 
 void InfiniterArithmetic::increment()
 {
+    /// handle incrementing from negative
+    if(this->getSign())
+    {
+        /// temporary sign modyfication
+        this->setPositiveSign();
+        /// perform operation on absolute value
+        this->decrement();
+
+        /// restore old sign if needed
+        if(!this->is0())
+        {
+            this->setNegativeSign();
+        }
+
+        return;
+    }
+
     icell_t *data = this->getData();
     icell_t size = this->getSize();
 
@@ -190,6 +241,16 @@ void InfiniterArithmetic::decrement()
         return;
     }
 
+    /// handle decrementing from negative
+    if(this->getSign())
+    {
+        this->setPositiveSign();
+        this->increment();
+        this->setNegativeSign();
+        this->trim();
+        return;
+    }
+
     icell_t *data = this->getData();
     icell_t size = this->getSize();
 
@@ -208,6 +269,111 @@ void InfiniterArithmetic::decrement()
     (*cell_ptr)--;
 
     this->trim();
+}
+
+void InfiniterArithmetic::addScalarBasic(icell_t p_value)
+{
+
+}
+
+void InfiniterArithmetic::subtractScalarBasic(icell_t p_value)
+{
+
+}
+
+void InfiniterArithmetic::addScalar(icell_t p_value, bool p_negative_value)
+{
+    /// handle edge cases
+    if(p_value == 0)
+        return;
+    if(p_value == 1)
+    {
+        if(p_negative_value)
+            this->decrement();
+        else
+            this->increment();
+
+        return;
+    }
+
+    /// this is negative
+    if(this->getSign())
+    {
+        /// scalar is negative
+        if(p_negative_value)
+        {
+            this->addScalarBasic(p_value);
+        }
+        /// scalar is positive
+        else
+        {
+            this->setPositiveSign();
+            this->subtractScalar(p_value, false);
+            this->setNegativeSign();
+        }
+    }
+    /// this is positive
+    else
+    {
+        /// scalar is negative
+        if(p_negative_value)
+        {
+            this->subtractScalar(p_value, false);
+        }
+        /// scalar is positive
+        else
+        {
+            this->addScalarBasic(p_value);
+        }
+    }
+}
+
+void InfiniterArithmetic::subtractScalar(icell_t p_value, bool p_negative_value)
+{
+
+}
+
+void InfiniterArithmetic::multiply(const Infiniter &p_number)
+{
+    /// handle edge cases
+    if(this->is0() || p_number.is0())
+    {
+        this->reset();
+        return;
+    }
+    if(this->isPositive1())
+    {
+        this->assign(p_number);
+        return;
+    }
+    if(p_number.isPositive1())
+    {
+        return;
+    }
+    if(this->isNegative1())
+    {
+        this->assign(p_number);
+        this->swapSign();
+        return;
+    }
+    if(p_number.isNegative1())
+    {
+        this->swapSign();
+        return;
+    }
+    if(this->isPositive2())
+    {
+
+    }
+    if(p_value == 2)
+    {
+        if(p_negative_value)
+            this->shiftMSB(IBIT_0);
+        else
+            this->pushLSB(IBIT_0);
+
+        return;
+    }
 }
 
 void InfiniterArithmetic::assign(const InfiniterArithmetic &p_source)

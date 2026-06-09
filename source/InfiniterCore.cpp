@@ -236,6 +236,11 @@ void InfiniterCore::setNegativeSign() noexcept
     m_bits.sign = 1;
 }
 
+void InfiniterCore::swapSign() noexcept
+{
+    m_bits.sign = !m_bits.sign;
+}
+
 void InfiniterCore::assign(icell_t p_value, bool p_negative_value) noexcept
 {
     m_data[0] = p_value;

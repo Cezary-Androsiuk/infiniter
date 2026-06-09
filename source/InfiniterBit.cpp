@@ -500,12 +500,12 @@ void InfiniterBit::shiftMSB(ibit_t p_msb)
 
 void InfiniterBit::shiftLeft()
 {
-    this->shiftLSB(IBIT_FALSE);
+    this->shiftLSB(IBIT_0);
 }
 
 void InfiniterBit::shiftRight()
 {
-    this->shiftMSB(IBIT_FALSE);
+    this->shiftMSB(IBIT_0);
 }
 
 void InfiniterBit::pushLSB(ibit_t p_lsb)

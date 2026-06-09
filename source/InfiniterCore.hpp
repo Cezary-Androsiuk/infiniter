@@ -58,6 +58,7 @@ public:
     void setSign(bool p_new_sign) noexcept;
     void setPositiveSign() noexcept;
     void setNegativeSign() noexcept;
+    void swapSign() noexcept;
 
     void assign(icell_t p_value, bool p_negative_value=false) noexcept;
     void assign(const icell_t *p_array, isize_t p_size, bool p_negative_value=false);

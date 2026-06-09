@@ -31,6 +31,8 @@ public:
     bool is0() const noexcept;
     bool isPositive1() const noexcept;
     bool isNegative1() const noexcept;
+    bool isPositive2() const noexcept;
+    bool isNegative2() const noexcept;
 
     Infiniter absoluteValue() const;
     void absoluteValueAssign();
@@ -38,8 +40,18 @@ public:
     void increment();
     void decrement();
 
-    void addScalar(icell_t p_value);
-    void subtractScalar(icell_t p_value);
+protected:
+    void addScalarBasic(icell_t p_value);
+    void subtractScalarBasic(icell_t p_value);
+
+public:
+    void addScalar(icell_t p_value, bool p_negative_value=false);
+    void subtractScalar(icell_t p_value, bool p_negative_value=false);
+
+    void add(const Infiniter &p_number);
+    void subtract(const Infiniter &p_number);
+
+    void multiply(const Infiniter &p_number);
 
     using InfiniterBit::assign;
     void assign(const InfiniterArithmetic &p_source);
