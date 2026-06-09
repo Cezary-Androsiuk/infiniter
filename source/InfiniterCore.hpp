@@ -106,8 +106,6 @@ public:
     icell_t& operator [] (isize_t p_cell_index);
     const icell_t& operator [] (isize_t p_cell_index) const;
 
-
-
 private:
     uint64_t m_size;
 

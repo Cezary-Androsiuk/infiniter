@@ -179,11 +179,11 @@ void InfiniterIO::deserialize(std::string p_file_path, bool p_ignore_capacity)
     this->setSize(size); /// ignore return value, size <= m_capacity
     this->setSign(sign);
 
-    uint64_t bytes_read = fread(this->getData(), sizeof(icell_t), fsize, file);
+    uint64_t bytes_read = fread(this->getData(), sizeof(icell_t), size, file);
 
-    if (bytes_read != fsize) {
+    if (bytes_read != size) {
         fprintf(stderr, "Warning: Could not read the entire file properly, "
-                        "read %llu from %llu bytes.\n", bytes_read, fsize);
+                        "read %llu from %llu bytes.\n", bytes_read, size);
     }
 
     fclose(file);

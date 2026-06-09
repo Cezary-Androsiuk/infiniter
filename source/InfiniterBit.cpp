@@ -511,17 +511,32 @@ void InfiniterBit::pushLSB(ibit_t p_lsb)
 
 void InfiniterBit::pushMSB(ibit_t p_msb)
 {
+    /// well... adding 0 at the front won't do much
+    if(!p_msb)
+        return;
+
     icell_t *data = this->getData();
     isize_t size = this->getSize();
+
+    /// extend if right now msb is at the left egde
     if(data[size-1] & M100)
     {
         size = this->setSizeWithExtend(size +1);
+
+        data[size-1] = ICELL_C(1);
+        return;
     }
 
+    icell_t *msb_cell = getMSBCellPtr();
+    /// if msb is at the edge use next cell
+    /// but that means number has leading zero cells
+    if(UNLIKELY(*msb_cell & M100))
+    {
+        msb_cell++;
+    }
 
-
-
-    this->shiftMSB(p_msb);
+    int next_bit_index = 64 - __builtin_clzll(*msb_cell);
+    *msb_cell |= (ICELL_C(1) << next_bit_index);
 }
 
 InfiniterBit &InfiniterBit::operator =(const InfiniterBit &p_source)

@@ -323,6 +323,15 @@ void infiniterIOTests()
         printf("\n");
     }
 
+    printf("\n\n");
+
+    io0.assign(2);
+    for(int i=0; i<64*2; i++)
+    {
+        io0.pushMSB(1);
+        printf("%s\n", io0.toString(2).c_str());
+    }
+
 
     printf("\n\n");
 
@@ -411,9 +420,17 @@ int main(int argc, char *argv[])
     // io.dbgPrint();
     // printf("\n");
 
-    infiniterMemoryTests();
+    // infiniterMemoryTests();
 
-    infiniterCoreTests();
+    // infiniterCoreTests();
 
-    infiniterIOTests();
+    // infiniterIOTests();
+
+    InfiniterIO io0;
+
+    printf("%s\n", io0.toString(36).c_str());
+    io0.serialize("io0-large.inf");
+    io0.deserialize("io0-large.inf");
+    printf("%s\n", io0.toString(36).c_str());
+
 }
