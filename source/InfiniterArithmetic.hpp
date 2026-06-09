@@ -41,8 +41,8 @@ public:
     void decrement();
 
 protected:
-    void addScalarBasic(icell_t p_value);
-    void subtractScalarBasic(icell_t p_value);
+    void addScalarABS(icell_t p_value);
+    void subtractScalarABS(icell_t p_value);
 
 public:
     void addScalar(icell_t p_value, bool p_negative_value=false);
@@ -52,6 +52,8 @@ public:
     void subtract(const Infiniter &p_number);
 
     void multiply(const Infiniter &p_number);
+
+    void divde(const Infiniter &p_number);
 
     using InfiniterBit::assign;
     void assign(const InfiniterArithmetic &p_source);

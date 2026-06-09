@@ -271,12 +271,12 @@ void InfiniterArithmetic::decrement()
     this->trim();
 }
 
-void InfiniterArithmetic::addScalarBasic(icell_t p_value)
+void InfiniterArithmetic::addScalarABS(icell_t p_value)
 {
 
 }
 
-void InfiniterArithmetic::subtractScalarBasic(icell_t p_value)
+void InfiniterArithmetic::subtractScalarABS(icell_t p_value)
 {
 
 }
@@ -302,14 +302,12 @@ void InfiniterArithmetic::addScalar(icell_t p_value, bool p_negative_value)
         /// scalar is negative
         if(p_negative_value)
         {
-            this->addScalarBasic(p_value);
+            this->addScalarABS(p_value);
         }
         /// scalar is positive
         else
         {
-            this->setPositiveSign();
-            this->subtractScalar(p_value, false);
-            this->setNegativeSign();
+            this->subtractScalarABS(p_value);
         }
     }
     /// this is positive
@@ -318,36 +316,96 @@ void InfiniterArithmetic::addScalar(icell_t p_value, bool p_negative_value)
         /// scalar is negative
         if(p_negative_value)
         {
-            this->subtractScalar(p_value, false);
+            this->subtractScalarABS(p_value);
         }
         /// scalar is positive
         else
         {
-            this->addScalarBasic(p_value);
+            this->addScalarABS(p_value);
         }
     }
 }
 
 void InfiniterArithmetic::subtractScalar(icell_t p_value, bool p_negative_value)
 {
+    if(p_value == 0)
+        return;
+    if(p_value == 1)
+    {
+        if(p_negative_value)
+            this->increment();
+        else
+            this->decrement();
+
+        return;
+    }
+
+    /// this is negative
+    if(this->getSign())
+    {
+        /// scalar is negative
+        if(p_negative_value)
+        {
+            this->subtractScalarABS(p_value);
+        }
+        /// scalar is positive
+        else
+        {
+            this->addScalarABS(p_value);
+        }
+    }
+    /// this is positive
+    else
+    {
+        /// scalar is negative
+        if(p_negative_value)
+        {
+            this->addScalarABS(p_value);
+        }
+        /// scalar is positive
+        else
+        {
+            this->subtractScalarABS(p_value);
+        }
+    }
 
 }
 
 void InfiniterArithmetic::multiply(const Infiniter &p_number)
 {
-    /// handle edge cases
+    /// handle edge cases 0
     if(this->is0() || p_number.is0())
     {
         this->reset();
         return;
     }
+
+    /// handle edge cases p_number
+    if(p_number.isPositive1())
+    {
+        return;
+    }
+    if(p_number.isNegative1())
+    {
+        this->swapSign();
+        return;
+    }
+    if(p_number.isPositive2())
+    {
+        this->pushLSB(IBIT_0);
+        return;
+    }
+    if(p_number.isNegative2())
+    {
+        this->pushLSB(IBIT_0);
+        this->swapSign();
+        return;
+    }
+
+    /// handle edge cases this
     if(this->isPositive1())
     {
         this->assign(p_number);
-        return;
-    }
-    if(p_number.isPositive1())
-    {
         return;
     }
     if(this->isNegative1())
@@ -356,22 +414,52 @@ void InfiniterArithmetic::multiply(const Infiniter &p_number)
         this->swapSign();
         return;
     }
+    if(this->isPositive2())
+    {
+        this->assign(p_number);
+        this->pushLSB(IBIT_0);
+        return;
+    }
+    if(this->isNegative2())
+    {
+        this->assign(p_number);
+        this->pushLSB(IBIT_0);
+        this->swapSign();
+        return;
+    }
+
+}
+
+void InfiniterArithmetic::divde(const Infiniter &p_number)
+{
+    if(p_number.is0())
+    {
+        /// zero division exception
+    }
+
+    if(this->is0())
+    {
+        return;
+    }
+
+    if(p_number.isPositive1())
+    {
+        return;
+    }
     if(p_number.isNegative1())
     {
         this->swapSign();
         return;
     }
-    if(this->isPositive2())
+    if(p_number.isPositive2())
     {
-
+        this->shiftMSB(IBIT_0);
+        return;
     }
-    if(p_value == 2)
+    if(p_number.isNegative2())
     {
-        if(p_negative_value)
-            this->shiftMSB(IBIT_0);
-        else
-            this->pushLSB(IBIT_0);
-
+        this->shiftMSB(IBIT_0);
+        this->swapSign();
         return;
     }
 }
