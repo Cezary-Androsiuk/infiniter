@@ -373,6 +373,11 @@ void InfiniterArithmetic::subtractScalar(icell_t p_value, bool p_negative_value)
 
 void InfiniterArithmetic::multiply(const Infiniter &p_number)
 {
+    /// handle signs
+    /// reverse sign only if other number is negative case
+    if(p_number.getSign())
+        this->negate();
+
     /// handle edge cases 0
     if(this->is0() || p_number.is0())
     {
@@ -387,7 +392,7 @@ void InfiniterArithmetic::multiply(const Infiniter &p_number)
     }
     if(p_number.isNegative1())
     {
-        this->swapSign();
+        this->negate();
         return;
     }
     if(p_number.isPositive2())
@@ -398,7 +403,7 @@ void InfiniterArithmetic::multiply(const Infiniter &p_number)
     if(p_number.isNegative2())
     {
         this->pushLSB(IBIT_0);
-        this->swapSign();
+        this->negate();
         return;
     }
 
@@ -411,7 +416,7 @@ void InfiniterArithmetic::multiply(const Infiniter &p_number)
     if(this->isNegative1())
     {
         this->assign(p_number);
-        this->swapSign();
+        this->negate();
         return;
     }
     if(this->isPositive2())
@@ -424,7 +429,7 @@ void InfiniterArithmetic::multiply(const Infiniter &p_number)
     {
         this->assign(p_number);
         this->pushLSB(IBIT_0);
-        this->swapSign();
+        this->negate();
         return;
     }
 
@@ -432,6 +437,11 @@ void InfiniterArithmetic::multiply(const Infiniter &p_number)
 
 void InfiniterArithmetic::divde(const Infiniter &p_number)
 {
+    /// handle signs
+    /// reverse sign only if other number is negative case
+    if(p_number.getSign())
+        this->negate();
+
     if(p_number.is0())
     {
         /// zero division exception
@@ -439,16 +449,18 @@ void InfiniterArithmetic::divde(const Infiniter &p_number)
 
     if(this->is0())
     {
+        this->trim();
         return;
     }
 
     if(p_number.isPositive1())
     {
+        this->trim();
         return;
     }
     if(p_number.isNegative1())
     {
-        this->swapSign();
+        this->negate();
         return;
     }
     if(p_number.isPositive2())
@@ -459,9 +471,12 @@ void InfiniterArithmetic::divde(const Infiniter &p_number)
     if(p_number.isNegative2())
     {
         this->shiftMSB(IBIT_0);
-        this->swapSign();
+        this->negate();
         return;
     }
+
+    /// comparison optimization
+    if()
 }
 
 void InfiniterArithmetic::assign(const InfiniterArithmetic &p_source)

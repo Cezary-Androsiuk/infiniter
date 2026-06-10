@@ -254,7 +254,7 @@ void infiniterCoreTests()
 
     ic0.assign(a0_0, 3);
     ic1.assign(a1_0, 3);
-    assert(! ic0.equal(ic1) );
+    assert( ic0.equal(ic1) );
     assert(! ic0.differs(ic1) );
     assert(! ic0.greater(ic1) );
     assert(! ic0.smaller(ic1) );

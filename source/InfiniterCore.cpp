@@ -236,7 +236,7 @@ void InfiniterCore::setNegativeSign() noexcept
     m_bits.sign = 1;
 }
 
-void InfiniterCore::swapSign() noexcept
+void InfiniterCore::negate() noexcept
 {
     m_bits.sign = !m_bits.sign;
 }
