@@ -5,8 +5,9 @@
 
 #include <cstdio>
 #include <algorithm> // std::copy_n, std::fill_n, std::move
+#include <cassert>
 
-#include <x86intrin.h> // GCC/Clang only // for MSVC (Windows) use <intrin.h>
+
 
 /*
  * InfiniterException   IE
@@ -22,6 +23,14 @@
  * InfiniterMemory      IM
  */
 
+
+
+///
+///         COUNT SINGLE CPU STEPS
+///
+
+#include <x86intrin.h> // GCC/Clang only // for MSVC (Windows) use <intrin.h>
+
 inline uint64_t read_tsc_start() {
     _mm_lfence(); // Czeka, aż wszystkie wcześniejsze instrukcje zostaną zakończone
     return __rdtsc();
@@ -34,6 +43,9 @@ inline uint64_t read_tsc_end() {
     _mm_lfence(); // Zapobiega przeskoczeniu późniejszych instrukcji przed rdtscp
     return tsc;
 }
+
+
+
 
 void print_array(uint64_t *array, uint64_t size)
 {
@@ -218,6 +230,92 @@ void infiniterCoreTests()
     ic1[0] = 1ull << 60;
     ic1[1] = 1ull << 60;
     ic_dbg_print_memory(ic1);
+
+    isize_t a0_0[] = { 1, 2, 3 };
+    isize_t a1_0[] = { 1, 2, 3 };
+
+    isize_t a0_1[] = { 2, 2, 3 };
+    isize_t a1_1[] = { 1, 2, 3 };
+
+    isize_t a0_2[] = { 1, 2, 3 };
+    isize_t a1_2[] = { 2, 2, 3 };
+
+    isize_t a0_3[] = { 1, 3, 3 };
+    isize_t a1_3[] = { 1, 2, 3 };
+
+    isize_t a0_4[] = { 1, 2, 3 };
+    isize_t a1_4[] = { 1, 3, 3 };
+
+    isize_t a0_5[] = { 1, 2, 3 };
+    isize_t a1_5[] = { 2, 3 };
+
+    isize_t a0_6[] = { 2, 3 };
+    isize_t a1_6[] = { 1, 2, 3 };
+
+    ic0.assign(a0_0, 3);
+    ic1.assign(a1_0, 3);
+    assert(! ic0.equal(ic1) );
+    assert(! ic0.differs(ic1) );
+    assert(! ic0.greater(ic1) );
+    assert(! ic0.smaller(ic1) );
+    assert( ic0.greaterEqual(ic1) );
+    assert( ic0.smallerEqual(ic1) );
+
+    ic0.assign(a0_1, 3);
+    ic1.assign(a1_1, 3);
+    assert(! ic0.equal(ic1) );
+    assert( ic0.differs(ic1) );
+    assert( ic0.greater(ic1) );
+    assert(! ic0.smaller(ic1) );
+    assert( ic0.greaterEqual(ic1) );
+    assert(! ic0.smallerEqual(ic1) );
+
+    ic0.assign(a0_2, 3);
+    ic1.assign(a1_2, 3);
+    assert(! ic0.equal(ic1) );
+    assert( ic0.differs(ic1) );
+    assert(! ic0.greater(ic1) );
+    assert( ic0.smaller(ic1) );
+    assert(! ic0.greaterEqual(ic1) );
+    assert( ic0.smallerEqual(ic1) );
+
+    ic0.assign(a0_3, 3);
+    ic1.assign(a1_3, 3);
+    assert(! ic0.equal(ic1) );
+    assert( ic0.differs(ic1) );
+    assert( ic0.greater(ic1) );
+    assert(! ic0.smaller(ic1) );
+    assert( ic0.greaterEqual(ic1) );
+    assert(! ic0.smallerEqual(ic1) );
+
+    ic0.assign(a0_4, 3);
+    ic1.assign(a1_4, 3);
+    assert(! ic0.equal(ic1) );
+    assert( ic0.differs(ic1) );
+    assert(! ic0.greater(ic1) );
+    assert( ic0.smaller(ic1) );
+    assert(! ic0.greaterEqual(ic1) );
+    assert( ic0.smallerEqual(ic1) );
+
+    ic0.assign(a0_5, 3);
+    ic1.assign(a1_5, 3);
+    assert(! ic0.equal(ic1) );
+    assert( ic0.differs(ic1) );
+    assert( ic0.greater(ic1) );
+    assert(! ic0.smaller(ic1) );
+    assert( ic0.greaterEqual(ic1) );
+    assert(! ic0.smallerEqual(ic1) );
+
+    ic0.assign(a0_6, 3);
+    ic1.assign(a1_6, 3);
+    assert(! ic0.equal(ic1) );
+    assert( ic0.differs(ic1) );
+    assert(! ic0.greater(ic1) );
+    assert( ic0.smaller(ic1) );
+    assert(! ic0.greaterEqual(ic1) );
+    assert( ic0.smallerEqual(ic1) );
+
+
 }
 
 
@@ -423,13 +521,13 @@ int main(int argc, char *argv[])
 
     // infiniterMemoryTests();
 
-    // infiniterCoreTests();
+    infiniterCoreTests();
 
     // infiniterIOTests();
 
-    InfiniterIO io0;
-    InfiniterUtility iu0(io0);
-    InfiniterUtility *iu1 = ++iu0;
-    if()
+    // InfiniterIO io0;
+    // InfiniterUtility iu0(io0);
+    // InfiniterUtility *iu1 = ++iu0;
+    // if()
 
 }
