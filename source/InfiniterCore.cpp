@@ -376,13 +376,14 @@ bool InfiniterCore::greater(const InfiniterCore &p_source) const noexcept
     if(this_real_size > source_real_size)
         return true;
 
-    /// handle data
+    /// handle data - iterate from MSB
     const icell_t *source_data = p_source.m_data;
     for(isize_t i=0; i<this_real_size; i++)
     {
-        if(m_data[i] != source_data[i])
+        isize_t i_rev = this_real_size - 1 - i;
+        if(m_data[i_rev] != source_data[i_rev])
         {
-            return m_data[i] > source_data[i];
+            return m_data[i_rev] > source_data[i_rev];
         }
     }
 
@@ -407,13 +408,14 @@ bool InfiniterCore::smaller(const InfiniterCore &p_source) const noexcept
     if(this_real_size < source_real_size)
         return true;
 
-    /// handle data
+    /// handle data - iterate from MSB
     const icell_t *source_data = p_source.m_data;
     for(isize_t i=0; i<this_real_size; i++)
     {
-        if(m_data[i] != source_data[i])
+        isize_t i_rev = this_real_size - 1 - i;
+        if(m_data[i_rev] != source_data[i_rev])
         {
-            return m_data[i] < source_data[i];
+            return m_data[i_rev] < source_data[i_rev];
         }
     }
 
@@ -438,13 +440,14 @@ bool InfiniterCore::greaterEqual(const InfiniterCore &p_source) const noexcept
     if(this_real_size > source_real_size)
         return true;
 
-    /// handle data
+    /// handle data - iterate from MSB
     const icell_t *source_data = p_source.m_data;
     for(isize_t i=0; i<this_real_size; i++)
     {
-        if(m_data[i] != source_data[i])
+        isize_t i_rev = this_real_size - 1 - i;
+        if(m_data[i_rev] != source_data[i_rev])
         {
-            return m_data[i] > source_data[i];
+            return m_data[i_rev] > source_data[i_rev];
         }
     }
 
@@ -469,13 +472,14 @@ bool InfiniterCore::smallerEqual(const InfiniterCore &p_source) const noexcept
     if(this_real_size < source_real_size)
         return true;
 
-    /// handle data
+    /// handle data - iterate from MSB
     const icell_t *source_data = p_source.m_data;
     for(isize_t i=0; i<this_real_size; i++)
     {
-        if(m_data[i] != source_data[i])
+        isize_t i_rev = this_real_size - 1 - i;
+        if(m_data[i_rev] != source_data[i_rev])
         {
-            return m_data[i] < source_data[i];
+            return m_data[i_rev] < source_data[i_rev];
         }
     }
 
