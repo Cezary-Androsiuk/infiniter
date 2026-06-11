@@ -88,12 +88,52 @@ InfiniterArithmetic::~InfiniterArithmetic() noexcept
     /// everything was done in InfiniterMemory
 }
 
+bool InfiniterArithmetic::isNumber(icell_t p_scalar, int p_sign) const noexcept
+{
+    // if(p_sign)
+    // {
+    //     /// user wants positive value and sign tells the number is negative
+    //     if(p_sign > 0 && this->getSign()) return false;
+
+    //     /// user wants negative value and sign tells the number is positive
+    //     if(p_sign < 0 && !this->getSign()) return false;
+    // }
+
+    /// shorter and branchless condition
+    if (p_sign != 0 && ((p_sign < 0) != this->getSign()))
+        return false;
+
+    const icell_t *data = this->getData();
+
+    /// check LSB - most common case
+    if(data[0] != p_scalar)
+        return false;
+
+    const isize_t size = this->getSize() - 1; /// -1 excluded from loop
+    /// iterate from MSB to LSB+1
+    for(isize_t i=0; i<size; i++)
+    {
+        const isize_t i_rev = size - i;
+        if(data[i_rev] != ICELL_C(0))
+            return false;
+    }
+    return true;
+}
+
 bool InfiniterArithmetic::is0() const noexcept
 {
     const icell_t *data = this->getData();
-    for(isize_t i=0; i<this->getSize(); i++)
+
+    /// check LSB - most common case
+    if(data[0] != ICELL_C(0))
+        return false;
+
+    const isize_t size = this->getSize() - 1; /// -1 excluded from loop
+    /// iterate from MSB to LSB+1
+    for(isize_t i=0; i<size; i++)
     {
-        if(data[i] != ICELL_C(0))
+        const isize_t i_rev = size - i;
+        if(data[i_rev] != ICELL_C(0))
             return false;
     }
     return true;
@@ -101,70 +141,29 @@ bool InfiniterArithmetic::is0() const noexcept
 
 bool InfiniterArithmetic::isPositive1() const noexcept
 {
-    const icell_t *data = this->getData();
-    if(this->getSign())
-        return false;
-
-    if(data[0] != ICELL_C(1))
-        return false;
-
-    for(isize_t i=1; i<this->getSize(); i++)
-    {
-        if(data[i] != ICELL_C(0))
-            return false;
-    }
-    return true;
+    return isNumber(1, 1);
 }
 
 bool InfiniterArithmetic::isNegative1() const noexcept
 {
-    const icell_t *data = this->getData();
-    if(!this->getSign())
-        return false;
-
-    if(data[0] != ICELL_C(1))
-        return false;
-
-    for(isize_t i=1; i<this->getSize(); i++)
-    {
-        if(data[i] != ICELL_C(0))
-            return false;
-    }
-    return true;
+    return isNumber(1, -1);
 }
 
 bool InfiniterArithmetic::isPositive2() const noexcept
 {
-    const icell_t *data = this->getData();
-    if(this->getSign())
-        return false;
-
-    if(data[0] != ICELL_C(2))
-        return false;
-
-    for(isize_t i=1; i<this->getSize(); i++)
-    {
-        if(data[i] != ICELL_C(0))
-            return false;
-    }
-    return true;
+    return isNumber(2, 1);
 }
 
 bool InfiniterArithmetic::isNegative2() const noexcept
 {
-    const icell_t *data = this->getData();
-    if(!this->getSign())
-        return false;
+    return isNumber(2, -1);
+}
 
-    if(data[0] != ICELL_C(2))
-        return false;
-
-    for(isize_t i=1; i<this->getSize(); i++)
-    {
-        if(data[i] != ICELL_C(0))
-            return false;
-    }
-    return true;
+void InfiniterArithmetic::normalize() noexcept
+{
+    this->trim();
+    if(this->is0())
+        this->setPositiveSign();
 }
 
 Infiniter InfiniterArithmetic::absoluteValue() const
