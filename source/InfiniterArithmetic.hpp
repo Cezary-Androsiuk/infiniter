@@ -28,20 +28,6 @@ public:
 
     /// InfiniterBit methods
 
-    // maybe move to ICore
-    bool isNumber(icell_t p_scalar, int p_sign) const noexcept;
-
-    bool is0() const noexcept;
-    bool isPositive1() const noexcept;
-    bool isNegative1() const noexcept;
-    bool isPositive2() const noexcept;
-    bool isNegative2() const noexcept;
-
-    void normalize() noexcept;
-
-    Infiniter absoluteValue() const;
-    void absoluteValueAssign();
-
 protected:
     void incrementMagnitude();
     void decrementMagnitude();

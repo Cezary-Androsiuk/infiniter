@@ -293,6 +293,106 @@ void InfiniterCore::assign(InfiniterCore &&p_source)
     }
 }
 
+bool InfiniterCore::isNumber(icell_t p_scalar, int p_sign) const noexcept
+{
+    // if(p_sign)
+    // {
+    //     /// user wants positive value and sign tells the number is negative
+    //     if(p_sign > 0 && this->getSign()) return false;
+
+    //     /// user wants negative value and sign tells the number is positive
+    //     if(p_sign < 0 && !this->getSign()) return false;
+    // }
+
+    /// shorter and branchless condition
+    if (p_sign != 0 && ((p_sign < 0) != this->getSign()))
+        return false;
+
+    const icell_t *data = this->getData();
+
+    /// check LSB - most common case
+    if(data[0] != p_scalar)
+        return false;
+
+    const isize_t size = this->getSize() - 1; /// -1 excluded from loop
+    /// iterate from MSB to LSB+1
+    for(isize_t i=0; i<size; i++)
+    {
+        const isize_t i_rev = size - i;
+        if(data[i_rev] != ICELL_C(0))
+            return false;
+    }
+    return true;
+}
+
+bool InfiniterCore::is0() const noexcept
+{
+    const icell_t *data = this->getData();
+
+    /// check LSB - most common case
+    if(data[0] != ICELL_C(0))
+        return false;
+
+    const isize_t size = this->getSize() - 1; /// -1 excluded from loop
+    /// iterate from MSB to LSB+1
+    for(isize_t i=0; i<size; i++)
+    {
+        const isize_t i_rev = size - i;
+        if(data[i_rev] != ICELL_C(0))
+            return false;
+    }
+    return true;
+}
+
+bool InfiniterCore::is1() const noexcept
+{
+    return this->isNumber(1, 0);
+}
+
+bool InfiniterCore::is2() const noexcept
+{
+    return this->isNumber(2, 0);
+}
+
+bool InfiniterCore::isPositive1() const noexcept
+{
+    return this->isNumber(1, 1);
+}
+
+bool InfiniterCore::isNegative1() const noexcept
+{
+    return this->isNumber(1, -1);
+}
+
+bool InfiniterCore::isPositive2() const noexcept
+{
+    return this->isNumber(2, 1);
+}
+
+bool InfiniterCore::isNegative2() const noexcept
+{
+    return this->isNumber(2, -1);
+}
+
+void InfiniterCore::normalize() noexcept
+{
+    this->trim();
+    if(this->is0())
+        this->setPositiveSign();
+}
+
+Infiniter InfiniterCore::absoluteValue() const
+{
+    Infiniter i(*this);
+    i.setPositiveSign();
+    return i;
+}
+
+void InfiniterCore::absoluteValueAssign()
+{
+    this->setPositiveSign();
+}
+
 bool InfiniterCore::toBool() const noexcept
 {
     for(isize_t i=0; i<m_size; i++)

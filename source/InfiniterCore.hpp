@@ -65,6 +65,22 @@ public:
     void assign(const InfiniterCore &p_source);
     void assign(InfiniterCore &&p_source);
 
+
+    bool isNumber(icell_t p_scalar, int p_sign) const noexcept;
+
+    bool is0() const noexcept;
+    bool is1() const noexcept;
+    bool is2() const noexcept;
+    bool isPositive1() const noexcept;
+    bool isNegative1() const noexcept;
+    bool isPositive2() const noexcept;
+    bool isNegative2() const noexcept;
+
+    void normalize() noexcept;
+
+    Infiniter absoluteValue() const;
+    void absoluteValueAssign();
+
     bool toBool() const noexcept;
     bool equal(const InfiniterCore &p_source) const noexcept;
     bool differs(const InfiniterCore &p_source) const noexcept;
