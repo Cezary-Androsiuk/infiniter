@@ -159,12 +159,12 @@ void InfiniterCore::optimize()
     this->shrink();
 }
 
-void InfiniterCore::trim()
+void InfiniterCore::trim() noexcept
 {
     /// iterate from back
     for(isize_t i=0; i<m_size; i++)
     {
-        const isize_t i_rev = m_size - ISIZE_C(1) - i;
+        const isize_t i_rev = m_size - 1 - i;
 
         /// on first non 0 cell stop and reduce m_size by i
         if(m_data[i_rev] != ICELL_C(0))

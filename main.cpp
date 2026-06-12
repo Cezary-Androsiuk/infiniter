@@ -12,6 +12,7 @@
 /*
  * InfiniterException   IE
  * InfiniterShared      IS
+ * InfiniterTests       IT
  * 
  * 
  * Infiniter            I
@@ -21,6 +22,20 @@
  * InfiniterBit         IB
  * InfiniterCore        IC
  * InfiniterMemory      IM
+ */
+/*
+ * InfiniterException   IE
+ * InfiniterShared      IS
+ * InfiniterTests       IT
+ *
+ *
+ * Infiniter : public InfiniterUtility          I
+ * InfiniterUtility : public InfiniterIO        IU
+ * InfiniterIO : public InfiniterArithmetic     IO
+ * InfiniterArithmetic : public InfiniterBit    IA
+ * InfiniterBit : public InfiniterCore          IB
+ * InfiniterCore : private InfiniterMemory      IC
+ * InfiniterMemory                              IM
  */
 
 

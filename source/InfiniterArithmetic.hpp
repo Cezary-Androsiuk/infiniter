@@ -42,16 +42,22 @@ public:
     Infiniter absoluteValue() const;
     void absoluteValueAssign();
 
+protected:
+    void incrementMagnitude();
+    void decrementMagnitude();
+
+    void addMagnitude(icell_t p_value);
+    void subtractMagnitude(icell_t p_value);
+
+    void addMagnitude(const Infiniter &p_number);
+    void subtractMagnitude(const Infiniter &p_number);
+
+public:
     void increment();
     void decrement();
 
-protected:
-    void addScalarABS(icell_t p_value);
-    void subtractScalarABS(icell_t p_value);
-
-public:
-    void addScalar(icell_t p_value, bool p_negative_value=false);
-    void subtractScalar(icell_t p_value, bool p_negative_value=false);
+    void add(icell_t p_value, bool p_negative_value=false);
+    void subtract(icell_t p_value, bool p_negative_value=false);
 
     void add(const Infiniter &p_number);
     void subtract(const Infiniter &p_number);

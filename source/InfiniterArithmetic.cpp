@@ -178,25 +178,8 @@ void InfiniterArithmetic::absoluteValueAssign()
     this->setPositiveSign();
 }
 
-void InfiniterArithmetic::increment()
+void InfiniterArithmetic::incrementMagnitude()
 {
-    /// handle incrementing from negative
-    if(this->getSign())
-    {
-        /// temporary sign modyfication
-        this->setPositiveSign();
-        /// perform operation on absolute value
-        this->decrement();
-
-        /// restore old sign if needed
-        if(!this->is0())
-        {
-            this->setNegativeSign();
-        }
-
-        return;
-    }
-
     icell_t *data = this->getData();
     icell_t size = this->getSize();
 
@@ -229,33 +212,13 @@ void InfiniterArithmetic::increment()
     (*cell_ptr)++;
 }
 
-void InfiniterArithmetic::decrement()
+void InfiniterArithmetic::decrementMagnitude()
 {
-    /// handle decrementing to negative
-    if(this->is0())
-    {
-        this->increment();
-        this->setNegativeSign();
-        this->trim();
-        return;
-    }
-
-    /// handle decrementing from negative
-    if(this->getSign())
-    {
-        this->setPositiveSign();
-        this->increment();
-        this->setNegativeSign();
-        this->trim();
-        return;
-    }
-
     icell_t *data = this->getData();
     icell_t size = this->getSize();
 
     icell_t *cell_ptr = data;
     const icell_t *const last_cell = data + (size-1);
-
 
     /// find non fill cell
     while(*cell_ptr == ICELL_C(0) && cell_ptr != last_cell)
@@ -267,20 +230,66 @@ void InfiniterArithmetic::decrement()
     /// cell_ptr will contain cell that could be modifed
     (*cell_ptr)--;
 
-    this->trim();
+    this->normalize();
 }
 
-void InfiniterArithmetic::addScalarABS(icell_t p_value)
+void InfiniterArithmetic::addMagnitude(icell_t p_value)
 {
 
 }
 
-void InfiniterArithmetic::subtractScalarABS(icell_t p_value)
+void InfiniterArithmetic::subtractMagnitude(icell_t p_value)
 {
 
 }
 
-void InfiniterArithmetic::addScalar(icell_t p_value, bool p_negative_value)
+void InfiniterArithmetic::addMagnitude(const Infiniter &p_number)
+{
+
+}
+
+void InfiniterArithmetic::subtractMagnitude(const Infiniter &p_number)
+{
+
+}
+
+void InfiniterArithmetic::increment()
+{
+    /// handle incrementing from negative
+    if(this->getSign())
+    {
+        /// perform operation on absolute value
+        this->decrementMagnitude();
+        return;
+    }
+
+    this->incrementMagnitude();
+}
+
+void InfiniterArithmetic::decrement()
+{
+    /// handle decrementing from negative
+    if(this->getSign())
+    {
+        /// perform operation on absolute value
+        this->incrementMagnitude();
+        return;
+    }
+
+    /// handle decrementing to negative
+    /// as a second operation, because all negative decrementations
+    /// will have one condition less
+    if(this->is0())
+    {
+        this->increment();
+        this->setNegativeSign();
+        return;
+    }
+
+    this->decrementMagnitude();
+}
+
+void InfiniterArithmetic::add(icell_t p_value, bool p_negative_value)
 {
     /// handle edge cases
     if(p_value == 0)
@@ -301,12 +310,12 @@ void InfiniterArithmetic::addScalar(icell_t p_value, bool p_negative_value)
         /// scalar is negative
         if(p_negative_value)
         {
-            this->addScalarABS(p_value);
+            this->addMagnitude(p_value);
         }
         /// scalar is positive
         else
         {
-            this->subtractScalarABS(p_value);
+            this->subtractMagnitude(p_value);
         }
     }
     /// this is positive
@@ -315,17 +324,17 @@ void InfiniterArithmetic::addScalar(icell_t p_value, bool p_negative_value)
         /// scalar is negative
         if(p_negative_value)
         {
-            this->subtractScalarABS(p_value);
+            this->subtractMagnitude(p_value);
         }
         /// scalar is positive
         else
         {
-            this->addScalarABS(p_value);
+            this->addMagnitude(p_value);
         }
     }
 }
 
-void InfiniterArithmetic::subtractScalar(icell_t p_value, bool p_negative_value)
+void InfiniterArithmetic::subtract(icell_t p_value, bool p_negative_value)
 {
     if(p_value == 0)
         return;
@@ -345,12 +354,12 @@ void InfiniterArithmetic::subtractScalar(icell_t p_value, bool p_negative_value)
         /// scalar is negative
         if(p_negative_value)
         {
-            this->subtractScalarABS(p_value);
+            this->subtractMagnitude(p_value);
         }
         /// scalar is positive
         else
         {
-            this->addScalarABS(p_value);
+            this->addMagnitude(p_value);
         }
     }
     /// this is positive
@@ -359,14 +368,24 @@ void InfiniterArithmetic::subtractScalar(icell_t p_value, bool p_negative_value)
         /// scalar is negative
         if(p_negative_value)
         {
-            this->addScalarABS(p_value);
+            this->addMagnitude(p_value);
         }
         /// scalar is positive
         else
         {
-            this->subtractScalarABS(p_value);
+            this->subtractMagnitude(p_value);
         }
     }
+
+}
+
+void InfiniterArithmetic::add(const Infiniter &p_number)
+{
+
+}
+
+void InfiniterArithmetic::subtract(const Infiniter &p_number)
+{
 
 }
 

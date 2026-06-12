@@ -41,7 +41,7 @@ public:
      * @brief trim
      * reduce size to trim not used zero-cells in front of the number
      */
-    void trim();
+    void trim() noexcept;
 
     icell_t *getData() noexcept;
     const icell_t *getData() const noexcept;
