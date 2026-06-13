@@ -5,17 +5,37 @@ project(Infiniter LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(Infiniter
+set(SOURCES
     main.cpp
+    source/InfiniterMemory.cpp
+    source/InfiniterException.cpp
+)
+
+set(HEADERS
     source/InfiniterShared.hpp
-    source/InfiniterMemory.hpp source/InfiniterMemory.cpp
-    source/InfiniterCore.hpp source/InfiniterCore.cpp
-    source/InfiniterIO.hpp source/InfiniterIO.cpp
-    source/InfiniterBit.hpp source/InfiniterBit.cpp
-    source/InfiniterArithmetic.hpp source/InfiniterArithmetic.cpp
-    source/InfiniterUtility.hpp source/InfiniterUtility.cpp
-    source/Infiniter.hpp source/Infiniter.cpp
-    source/InfiniterException.hpp source/InfiniterException.cpp
+    source/InfiniterException.hpp
+    source/InfiniterMemory.hpp
+    source/InfiniterCore.hpp
+    source/InfiniterBit.hpp
+    source/InfiniterArithmetic.hpp
+    source/InfiniterIO.hpp
+    source/InfiniterUtility.hpp
+    source/Infiniter.hpp
+)
+
+set(TEMPLATES
+    source/InfiniterCore.tpp
+    source/InfiniterBit.tpp
+    source/InfiniterArithmetic.tpp
+    source/InfiniterIO.tpp
+    source/InfiniterUtility.tpp
+    source/Infiniter.tpp
+)
+
+add_executable(Infiniter
+    ${SOURCES}
+    ${HEADERS}
+    ${TEMPLATES}
 )
 
 include(GNUInstallDirs)

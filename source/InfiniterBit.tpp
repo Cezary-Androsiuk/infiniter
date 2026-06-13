@@ -1,9 +1,9 @@
+#pragma once
+
 #include "InfiniterBit.hpp"
 
 #include "InfiniterShared.hpp"
 #include "InfiniterException.hpp"
-
-#include "Infiniter.hpp"
 
 #include <utility> // std::move
 #include <stdexcept> // std::out_of_range
@@ -24,67 +24,64 @@
 #define _ib_dbgprintf(...)
 #endif // IB_DEBUG_EXECUTION_PRINT
 
-InfiniterBit::InfiniterBit() noexcept
-    : InfiniterCore()
+template<typename InfiniterDerived>
+InfiniterBit<InfiniterDerived>::InfiniterBit() noexcept
+    : InfiniterCore<InfiniterDerived>()
 {
     _ib_dbgprintf("--- DEBUG IB %p | Constructed   DEFAULT\n", this);
 }
 
-InfiniterBit::InfiniterBit(isize_t p_capacity)
-    : InfiniterCore(p_capacity)
+template<typename InfiniterDerived>
+InfiniterBit<InfiniterDerived>::InfiniterBit(isize_t p_capacity)
+    : InfiniterCore<InfiniterDerived>(p_capacity)
 {
     _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER isize_t\n", this);
 }
 
-InfiniterBit::InfiniterBit(isize_t p_capacity, icell_t p_value, bool p_negative_value)
-    : InfiniterCore(p_capacity, p_value, p_negative_value)
+template<typename InfiniterDerived>
+InfiniterBit<InfiniterDerived>::InfiniterBit(isize_t p_capacity, icell_t p_value, bool p_negative_value)
+    : InfiniterCore<InfiniterDerived>(p_capacity, p_value, p_negative_value)
 {
     _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER isize_t icell_t bool\n", this);
 }
 
-InfiniterBit::InfiniterBit(const icell_t *p_array, isize_t p_size, bool p_negative_value)
-    : InfiniterCore(p_array, p_size, p_negative_value)
+template<typename InfiniterDerived>
+InfiniterBit<InfiniterDerived>::InfiniterBit(const icell_t *p_array, isize_t p_size, bool p_negative_value)
+    : InfiniterCore<InfiniterDerived>(p_array, p_size, p_negative_value)
 {
     _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER cell_t* isize_t bool\n", this);
 }
 
-InfiniterBit::InfiniterBit(const InfiniterBit &p_source)
-    : InfiniterCore(p_source)
-{
-    _ib_dbgprintf("--- DEBUG IB %p | Constructed IB COPY\n", this);
-}
-
-InfiniterBit::InfiniterBit(InfiniterBit &&p_source) noexcept
-    : InfiniterCore(std::move(p_source))
-{
-    _ib_dbgprintf("--- DEBUG IB %p | Constructed IB MOVE\n", this);
-}
-
-InfiniterBit::InfiniterBit(const InfiniterCore &p_source)
-    : InfiniterCore(p_source)
+template<typename InfiniterDerived>
+InfiniterBit<InfiniterDerived>::InfiniterBit(const InfiniterDerived &p_source)
+    : InfiniterCore<InfiniterDerived>(p_source)
 {
     _ib_dbgprintf("--- DEBUG IB %p | Constructed IC COPY\n", this);
 }
 
-InfiniterBit::InfiniterBit(InfiniterCore &&p_source) noexcept
-    : InfiniterCore(std::move(p_source))
+template<typename InfiniterDerived>
+InfiniterBit<InfiniterDerived>::InfiniterBit(InfiniterDerived &&p_source) noexcept
+    : InfiniterCore<InfiniterDerived>(std::move(p_source))
 {
     _ib_dbgprintf("--- DEBUG IB %p | Constructed IC MOVE\n", this);
 }
 
-InfiniterBit::~InfiniterBit() noexcept
+template<typename InfiniterDerived>
+InfiniterBit<InfiniterDerived>::~InfiniterBit() noexcept
 {
     _ib_dbgprintf("--- DEBUG IB %p | Delete\n", this);
 
     /// everything was done in InfiniterMemory
 }
 
-bool InfiniterBit::checkCellPos(isize_t cell_id, uint8_t pos) const
+template<typename InfiniterDerived>
+bool InfiniterBit<InfiniterDerived>::checkCellPos(isize_t cell_id, uint8_t pos) const
 {
     return cell_id < this->getSize() && pos < 64;
 }
 
-void InfiniterBit::checkCellPosTry(isize_t cell_id, uint8_t pos) const
+template<typename InfiniterDerived>
+void InfiniterBit<InfiniterDerived>::checkCellPosTry(isize_t cell_id, uint8_t pos) const
 {
     if(cell_id >= this->getSize() || pos >= 64)
     {
@@ -99,7 +96,8 @@ void InfiniterBit::checkCellPosTry(isize_t cell_id, uint8_t pos) const
     }
 }
 
-icell_t InfiniterBit::getMSBCell() const noexcept
+template<typename InfiniterDerived>
+icell_t InfiniterBit<InfiniterDerived>::getMSBCell() const noexcept
 {
     const icell_t *const data = this->getData();
     const icell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
@@ -118,7 +116,8 @@ icell_t InfiniterBit::getMSBCell() const noexcept
     return *cellPtr;
 }
 
-const icell_t *InfiniterBit::getMSBCellPtr() const noexcept
+template<typename InfiniterDerived>
+const icell_t *InfiniterBit<InfiniterDerived>::getMSBCellPtr() const noexcept
 {
     const icell_t *const data = this->getData();
     const icell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
@@ -137,7 +136,8 @@ const icell_t *InfiniterBit::getMSBCellPtr() const noexcept
     return cellPtr;
 }
 
-icell_t *InfiniterBit::getMSBCellPtr() noexcept
+template<typename InfiniterDerived>
+icell_t *InfiniterBit<InfiniterDerived>::getMSBCellPtr() noexcept
 {
     icell_t *const data = this->getData();
     icell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
@@ -156,7 +156,8 @@ icell_t *InfiniterBit::getMSBCellPtr() noexcept
     return cellPtr;
 }
 
-isize_t InfiniterBit::getMSBCellPos() const noexcept
+template<typename InfiniterDerived>
+isize_t InfiniterBit<InfiniterDerived>::getMSBCellPos() const noexcept
 {
     isize_t size = this->getSize();
     const icell_t *data = this->getData();
@@ -176,7 +177,8 @@ isize_t InfiniterBit::getMSBCellPos() const noexcept
     return 0;
 }
 
-icell_t InfiniterBit::getMSBCell(uint8_t &r_bit_pos) const noexcept
+template<typename InfiniterDerived>
+icell_t InfiniterBit<InfiniterDerived>::getMSBCell(uint8_t &r_bit_pos) const noexcept
 {
     const icell_t *const data = this->getData();
     const icell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
@@ -203,7 +205,8 @@ icell_t InfiniterBit::getMSBCell(uint8_t &r_bit_pos) const noexcept
     return *cellPtr;
 }
 
-const icell_t *InfiniterBit::getMSBCellPtr(uint8_t &r_bit_pos) const noexcept
+template<typename InfiniterDerived>
+const icell_t *InfiniterBit<InfiniterDerived>::getMSBCellPtr(uint8_t &r_bit_pos) const noexcept
 {
     const icell_t *const data = this->getData();
     const icell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
@@ -230,7 +233,8 @@ const icell_t *InfiniterBit::getMSBCellPtr(uint8_t &r_bit_pos) const noexcept
     return cellPtr;
 }
 
-icell_t *InfiniterBit::getMSBCellPtr(uint8_t &r_bit_pos) noexcept
+template<typename InfiniterDerived>
+icell_t *InfiniterBit<InfiniterDerived>::getMSBCellPtr(uint8_t &r_bit_pos) noexcept
 {
     icell_t *const data = this->getData();
     icell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
@@ -257,7 +261,8 @@ icell_t *InfiniterBit::getMSBCellPtr(uint8_t &r_bit_pos) noexcept
     return cellPtr;
 }
 
-isize_t InfiniterBit::getMSBCellPos(uint8_t &r_bit_pos) const noexcept
+template<typename InfiniterDerived>
+isize_t InfiniterBit<InfiniterDerived>::getMSBCellPos(uint8_t &r_bit_pos) const noexcept
 {
     isize_t size = this->getSize();
     const icell_t *data = this->getData();
@@ -285,7 +290,8 @@ isize_t InfiniterBit::getMSBCellPos(uint8_t &r_bit_pos) const noexcept
     return 0;
 }
 
-uint8_t InfiniterBit::getMSBPos() const noexcept
+template<typename InfiniterDerived>
+uint8_t InfiniterBit<InfiniterDerived>::getMSBPos() const noexcept
 {
     const icell_t *const data = this->getData();
     const icell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
@@ -308,101 +314,33 @@ uint8_t InfiniterBit::getMSBPos() const noexcept
     return 63 - __builtin_clzll(*cellPtr);
 }
 
-isize_t InfiniterBit::getMSBGlobalPosUnsafe() const noexcept // handle edge case
+template<typename InfiniterDerived>
+isize_t InfiniterBit<InfiniterDerived>::getMSBGlobalPosUnsafe() const noexcept // handle edge case
 {
 
 }
 
-Infiniter InfiniterBit::getMSBGlobalPos() const // throws bad_alloc
+template<typename InfiniterDerived>
+InfiniterDerived InfiniterBit<InfiniterDerived>::getMSBGlobalPos() const // throws bad_alloc
+{
+
+    // return std::move();
+}
+
+template<typename InfiniterDerived>
+uint8_t InfiniterBit<InfiniterDerived>::getMSBPos(icell_t &r_cell) const noexcept
 {
 
 }
 
-uint8_t InfiniterBit::getMSBPos(icell_t &r_cell) const noexcept
+template<typename InfiniterDerived>
+uint8_t InfiniterBit<InfiniterDerived>::getMSBPos(icell_t *&r_cell_ptr) const noexcept
 {
 
 }
 
-uint8_t InfiniterBit::getMSBPos(icell_t *&r_cell_ptr) const noexcept
-{
-
-}
-
-uint8_t InfiniterBit::getMSBPosCellPos(isize_t &r_cell_pos) const noexcept
-{
-
-}
-
-
-
-
-
-icell_t InfiniterBit::getLSBCell() const noexcept
-{
-
-}
-
-const icell_t *InfiniterBit::getLSBCellPtr() const noexcept
-{
-
-}
-
-icell_t *InfiniterBit::getLSBCellPtr() noexcept
-{
-
-}
-
-isize_t InfiniterBit::getLSBCellPos() const noexcept
-{
-
-}
-
-icell_t InfiniterBit::getLSBCell(uint8_t &r_bit_pos) const noexcept
-{
-
-}
-
-const icell_t *InfiniterBit::getLSBCellPtr(uint8_t &r_bit_pos) const noexcept
-{
-
-}
-
-icell_t *InfiniterBit::getLSBCellPtr(uint8_t &r_bit_pos) noexcept
-{
-
-}
-
-isize_t InfiniterBit::getLSBCellPos(uint8_t &r_bit_pos) const noexcept
-{
-
-}
-
-uint8_t InfiniterBit::getLSBPos() const noexcept
-{
-
-}
-
-isize_t InfiniterBit::getLSBGlobalPosUnsafe() const noexcept // handle edge case
-{
-
-}
-
-Infiniter InfiniterBit::getLSBGlobalPos() const // throws bad_alloc
-{
-
-}
-
-uint8_t InfiniterBit::getLSBPos(icell_t &r_cell) const noexcept
-{
-
-}
-
-uint8_t InfiniterBit::getLSBPos(icell_t *&r_cell_ptr) const noexcept
-{
-
-}
-
-uint8_t InfiniterBit::getLSBPosCellPos(isize_t &r_cell_pos) const noexcept
+template<typename InfiniterDerived>
+uint8_t InfiniterBit<InfiniterDerived>::getMSBPosCellPos(isize_t &r_cell_pos) const noexcept
 {
 
 }
@@ -413,55 +351,157 @@ uint8_t InfiniterBit::getLSBPosCellPos(isize_t &r_cell_pos) const noexcept
 
 
 
-ibit_t InfiniterBit::getBit(isize_t p_cell_index, uint8_t p_pos)
+
+
+template<typename InfiniterDerived>
+icell_t InfiniterBit<InfiniterDerived>::getLSBCell() const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+const icell_t *InfiniterBit<InfiniterDerived>::getLSBCellPtr() const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+icell_t *InfiniterBit<InfiniterDerived>::getLSBCellPtr() noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+isize_t InfiniterBit<InfiniterDerived>::getLSBCellPos() const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+icell_t InfiniterBit<InfiniterDerived>::getLSBCell(uint8_t &r_bit_pos) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+const icell_t *InfiniterBit<InfiniterDerived>::getLSBCellPtr(uint8_t &r_bit_pos) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+icell_t *InfiniterBit<InfiniterDerived>::getLSBCellPtr(uint8_t &r_bit_pos) noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+isize_t InfiniterBit<InfiniterDerived>::getLSBCellPos(uint8_t &r_bit_pos) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+uint8_t InfiniterBit<InfiniterDerived>::getLSBPos() const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+isize_t InfiniterBit<InfiniterDerived>::getLSBGlobalPosUnsafe() const noexcept // handle edge case
+{
+
+}
+
+template<typename InfiniterDerived>
+InfiniterDerived InfiniterBit<InfiniterDerived>::getLSBGlobalPos() const // throws bad_alloc
+{
+
+    // return std::move();
+}
+
+template<typename InfiniterDerived>
+uint8_t InfiniterBit<InfiniterDerived>::getLSBPos(icell_t &r_cell) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+uint8_t InfiniterBit<InfiniterDerived>::getLSBPos(icell_t *&r_cell_ptr) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+uint8_t InfiniterBit<InfiniterDerived>::getLSBPosCellPos(isize_t &r_cell_pos) const noexcept
+{
+
+}
+
+
+
+
+
+
+
+template<typename InfiniterDerived>
+ibit_t InfiniterBit<InfiniterDerived>::getBit(isize_t p_cell_index, uint8_t p_pos)
 {
     this->checkCellPosTry(p_cell_index, p_pos);
     
     return this->getData()[p_cell_index] & (ICELL_C(1) << p_pos) ? IBIT_TRUE : IBIT_FALSE;
 }
 
-void InfiniterBit::setBit(isize_t p_cell_index, uint8_t p_pos)
+template<typename InfiniterDerived>
+void InfiniterBit<InfiniterDerived>::setBit(isize_t p_cell_index, uint8_t p_pos)
 {
     this->checkCellPosTry(p_cell_index, p_pos);
     
     this->getData()[p_cell_index] |= (ICELL_C(1) << p_pos);
 }
 
-void InfiniterBit::clearBit(isize_t p_cell_index, uint8_t p_pos)
+template<typename InfiniterDerived>
+void InfiniterBit<InfiniterDerived>::clearBit(isize_t p_cell_index, uint8_t p_pos)
 {
     this->checkCellPosTry(p_cell_index, p_pos);
 
     this->getData()[p_cell_index] &= ~(ICELL_C(1) << p_pos);
 }
 
-void InfiniterBit::toggleBit(isize_t p_cell_index, uint8_t p_pos)
+template<typename InfiniterDerived>
+void InfiniterBit<InfiniterDerived>::toggleBit(isize_t p_cell_index, uint8_t p_pos)
 {
     this->checkCellPosTry(p_cell_index, p_pos);
 
     this->getData()[p_cell_index] ^= (ICELL_C(1) << p_pos);
 }
 
-ibit_t InfiniterBit::getBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept
+template<typename InfiniterDerived>
+ibit_t InfiniterBit<InfiniterDerived>::getBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept
 {
     return this->getData()[p_cell_index] & (ICELL_C(1) << p_pos) ? IBIT_TRUE : IBIT_FALSE;
 }
 
-void InfiniterBit::setBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept
+template<typename InfiniterDerived>
+void InfiniterBit<InfiniterDerived>::setBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept
 {
     this->getData()[p_cell_index] |= (ICELL_C(1) << p_pos);
 }
 
-void InfiniterBit::clearBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept
+template<typename InfiniterDerived>
+void InfiniterBit<InfiniterDerived>::clearBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept
 {
     this->getData()[p_cell_index] &= ~(ICELL_C(1) << p_pos);
 }
 
-void InfiniterBit::toggleBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept
+template<typename InfiniterDerived>
+void InfiniterBit<InfiniterDerived>::toggleBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept
 {
     this->getData()[p_cell_index] ^= (ICELL_C(1) << p_pos);
 }
 
-void InfiniterBit::shiftLSB(ibit_t p_lsb)
+template<typename InfiniterDerived>
+void InfiniterBit<InfiniterDerived>::shiftLSB(ibit_t p_lsb)
 {
     icell_t lsb_mask = !!p_lsb; /// change 010010...100101 to 000...001
 
@@ -479,7 +519,8 @@ void InfiniterBit::shiftLSB(ibit_t p_lsb)
     /// overflow possible if that MSB is 1
 }
 
-void InfiniterBit::shiftMSB(ibit_t p_msb)
+template<typename InfiniterDerived>
+void InfiniterBit<InfiniterDerived>::shiftMSB(ibit_t p_msb)
 {
     icell_t msb_mask = !!p_msb; /// change 010010...100101 to 00...01
 
@@ -498,17 +539,20 @@ void InfiniterBit::shiftMSB(ibit_t p_msb)
     /// old LSB is out at this point
 }
 
-void InfiniterBit::shiftLeft()
+template<typename InfiniterDerived>
+void InfiniterBit<InfiniterDerived>::shiftLeft()
 {
     this->shiftLSB(IBIT_0);
 }
 
-void InfiniterBit::shiftRight()
+template<typename InfiniterDerived>
+void InfiniterBit<InfiniterDerived>::shiftRight()
 {
     this->shiftMSB(IBIT_0);
 }
 
-void InfiniterBit::pushLSB(ibit_t p_lsb)
+template<typename InfiniterDerived>
+void InfiniterBit<InfiniterDerived>::pushLSB(ibit_t p_lsb)
 {
     /// check for possible overflow before shifting left
     const isize_t size = this->getSize();
@@ -521,7 +565,8 @@ void InfiniterBit::pushLSB(ibit_t p_lsb)
     this->shiftLSB(p_lsb);
 }
 
-void InfiniterBit::pushMSB(ibit_t p_msb)
+template<typename InfiniterDerived>
+void InfiniterBit<InfiniterDerived>::pushMSB(ibit_t p_msb)
 {
     /// well... adding 0 at the front won't do much
     if(!p_msb)
@@ -550,28 +595,6 @@ void InfiniterBit::pushMSB(ibit_t p_msb)
 
     int next_bit_index = 64 - __builtin_clzll(*msb_cell);
     *msb_cell |= (ICELL_C(1) << next_bit_index);
-}
-
-void InfiniterBit::assign(const InfiniterBit &p_source)
-{
-    InfiniterCore::assign(p_source);
-}
-
-void InfiniterBit::assign(InfiniterBit &&p_source)
-{
-    InfiniterCore::assign(std::move(p_source));
-}
-
-InfiniterBit &InfiniterBit::operator =(const InfiniterBit &p_source)
-{
-    InfiniterCore::assign(p_source);
-    return *this;
-}
-
-InfiniterBit &InfiniterBit::operator =(InfiniterBit &&p_source)
-{
-    InfiniterCore::assign(std::move(p_source));
-    return *this;
 }
 
 

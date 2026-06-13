@@ -1,5 +1,4 @@
-#ifndef INFINITERSHARED_HPP
-#define INFINITERSHARED_HPP
+#pragma once
 
 #include <cstdint>
 
@@ -81,6 +80,11 @@ union BitsUS{ /// bits union struct
 /// Little Endian aproach
 
 
+/// allows to enable highlited syntax  in tpp files
+#define INFINITER_TPP_INCLUDED false
+
+
+
 // ####################### INFINITER MEMORY #######################
 
 /// Infiniter variable should be set to 0 after allocation? or leave it without overwriting old data
@@ -154,5 +158,3 @@ union BitsUS{ /// bits union struct
 
 #define LIKELY(x)       __builtin_expect(!!(x), 1)
 #define UNLIKELY(x)     __builtin_expect(!!(x), 0)
-
-#endif // INFINITERSHARED_HPP

@@ -1,30 +1,22 @@
-#ifndef INFINITERARITHMETIC_HPP
-#define INFINITERARITHMETIC_HPP
+#pragma once
 
 #include "InfiniterShared.hpp"
 #include "InfiniterBit.hpp"
 
-class Infiniter;
-
-class InfiniterArithmetic : public InfiniterBit
+template<typename InfiniterDerived>
+class InfiniterArithmetic : public InfiniterBit<InfiniterDerived>
 {
 public:
-    explicit InfiniterArithmetic() noexcept;
+    inline explicit InfiniterArithmetic() noexcept;
 
-    explicit InfiniterArithmetic(isize_t p_capacity); /// throws bad_alloc
-    explicit InfiniterArithmetic(isize_t p_capacity, icell_t p_value, bool p_negative_value=false); /// throws bad_alloc
-    explicit InfiniterArithmetic(const icell_t *p_array, isize_t p_size, bool p_negative_value=false); /// throws bad_alloc
+    inline explicit InfiniterArithmetic(isize_t p_capacity); /// throws bad_alloc
+    inline explicit InfiniterArithmetic(isize_t p_capacity, icell_t p_value, bool p_negative_value=false); /// throws bad_alloc
+    inline explicit InfiniterArithmetic(const icell_t *p_array, isize_t p_size, bool p_negative_value=false); /// throws bad_alloc
 
-    InfiniterArithmetic(const InfiniterArithmetic &p_source); /// throws bad_alloc
-    InfiniterArithmetic(InfiniterArithmetic &&p_source) noexcept;
+    inline InfiniterArithmetic(const InfiniterDerived &p_source); /// throws bad_alloc
+    inline InfiniterArithmetic(InfiniterDerived &&p_source) noexcept;
 
-    InfiniterArithmetic(const InfiniterBit &p_source); /// throws bad_alloc
-    InfiniterArithmetic(InfiniterBit &&p_source) noexcept;
-
-    InfiniterArithmetic(const InfiniterCore &p_source); /// throws bad_alloc
-    InfiniterArithmetic(InfiniterCore &&p_source) noexcept;
-
-    ~InfiniterArithmetic() noexcept;
+    inline ~InfiniterArithmetic() noexcept;
 
     /// InfiniterBit methods
 
@@ -35,8 +27,8 @@ protected:
     void addMagnitude(icell_t p_value);
     void subtractMagnitude(icell_t p_value);
 
-    void addMagnitude(const Infiniter &p_number);
-    void subtractMagnitude(const Infiniter &p_number);
+    void addMagnitude(const InfiniterDerived &p_number);
+    void subtractMagnitude(const InfiniterDerived &p_number);
 
 public:
     void increment();
@@ -45,29 +37,31 @@ public:
     void add(icell_t p_value, bool p_negative_value=false);
     void subtract(icell_t p_value, bool p_negative_value=false);
 
-    void add(const Infiniter &p_number);
-    void subtract(const Infiniter &p_number);
+    void add(const InfiniterDerived &p_number);
+    void subtract(const InfiniterDerived &p_number);
 
-    void multiply(const Infiniter &p_number);
+    void multiply(const InfiniterDerived &p_number);
 
-    void divde(const Infiniter &p_number);
+    void divde(const InfiniterDerived &p_number);
 
-    using InfiniterBit::assign;
-    void assign(const InfiniterArithmetic &p_source);
-    void assign(InfiniterArithmetic &&p_source);
 
 public:
 
     /// Operators
-    using InfiniterBit::operator = ;
-    InfiniterArithmetic &operator = (const InfiniterArithmetic &p_source);
-    InfiniterArithmetic &operator = (InfiniterArithmetic &&p_source);
-    InfiniterArithmetic &operator ++ ();    /// ++a
-    InfiniterArithmetic operator ++ (int);  /// a++
-    InfiniterArithmetic &operator -- ();    /// --a
-    InfiniterArithmetic operator -- (int);  /// a-- // move to infiniter
+    inline InfiniterDerived &operator ++ ();    /// ++a
+    inline InfiniterDerived operator ++ (int);  /// a++
+    inline InfiniterDerived &operator -- ();    /// --a
+    inline InfiniterDerived operator -- (int);  /// a--
+
+    /// addition
+    /// subraction
+    /// multiplication
+    /// division
+    /// modulo
+    /// exponent
+    /// sqrt
 
 
 };
 
-#endif // INFINITERARITHMETIC_HPP
+#include "InfiniterArithmetic.tpp"

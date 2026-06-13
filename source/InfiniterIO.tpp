@@ -1,3 +1,5 @@
+#pragma once
+
 #include "InfiniterIO.hpp"
 
 #include "InfiniterShared.hpp"
@@ -37,102 +39,76 @@
 #endif // IO_DEBUG_EXECUTION_PRINT
 
 
-InfiniterIO::InfiniterIO() noexcept
-    : InfiniterArithmetic()
+template<typename InfiniterDerived>
+InfiniterIO<InfiniterDerived>::InfiniterIO() noexcept
+    : InfiniterArithmetic<InfiniterDerived>()
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   DEFAULT\n", this);
 }
 
-InfiniterIO::InfiniterIO(isize_t p_capacity)
-    : InfiniterArithmetic(p_capacity)
+template<typename InfiniterDerived>
+InfiniterIO<InfiniterDerived>::InfiniterIO(isize_t p_capacity)
+    : InfiniterArithmetic<InfiniterDerived>(p_capacity)
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER isize_t\n", this);
 }
 
-InfiniterIO::InfiniterIO(isize_t p_capacity, icell_t p_value, bool p_negative_value)
-    : InfiniterArithmetic(p_capacity, p_value, p_negative_value)
+template<typename InfiniterDerived>
+InfiniterIO<InfiniterDerived>::InfiniterIO(isize_t p_capacity, icell_t p_value, bool p_negative_value)
+    : InfiniterArithmetic<InfiniterDerived>(p_capacity, p_value, p_negative_value)
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER isize_t icell_t bool\n", this);
 }
 
-InfiniterIO::InfiniterIO(const icell_t *p_array, isize_t p_size, bool p_negative_value)
-    : InfiniterArithmetic(p_array, p_size, p_negative_value)
+template<typename InfiniterDerived>
+InfiniterIO<InfiniterDerived>::InfiniterIO(const icell_t *p_array, isize_t p_size, bool p_negative_value)
+    : InfiniterArithmetic<InfiniterDerived>(p_array, p_size, p_negative_value)
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER icell_t* isize_t bool\n", this);
 }
 
-InfiniterIO::InfiniterIO(const std::string &p_number, int p_base, bool p_negative_value)
-    : InfiniterArithmetic()
+template<typename InfiniterDerived>
+InfiniterIO<InfiniterDerived>::InfiniterIO(const std::string &p_number, int p_base, bool p_negative_value)
+    : InfiniterArithmetic<InfiniterDerived>()
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER std::string int bool\n", this);
 
     this->assign(p_number, p_base, p_negative_value);
 }
 
-InfiniterIO::InfiniterIO(const std::vector<uint8_t> &p_number, int p_base, bool p_negative_value)
-    : InfiniterArithmetic()
+template<typename InfiniterDerived>
+InfiniterIO<InfiniterDerived>::InfiniterIO(const std::vector<uint8_t> &p_number, int p_base, bool p_negative_value)
+    : InfiniterArithmetic<InfiniterDerived>()
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER std::vector<uint8_t> int bool\n", this);
 
     this->assign(p_number, p_base, p_negative_value);
 }
 
-InfiniterIO::InfiniterIO(const InfiniterIO &p_source)
-    : InfiniterArithmetic(p_source)
+template<typename InfiniterDerived>
+InfiniterIO<InfiniterDerived>::InfiniterIO(const InfiniterDerived &p_source)
+    : InfiniterArithmetic<InfiniterDerived>(p_source)
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed IO COPY\n", this);
 }
 
-InfiniterIO::InfiniterIO(InfiniterIO &&p_source) noexcept
-    : InfiniterArithmetic(std::move(p_source))
+template<typename InfiniterDerived>
+InfiniterIO<InfiniterDerived>::InfiniterIO(InfiniterDerived &&p_source) noexcept
+    : InfiniterArithmetic<InfiniterDerived>(std::move(p_source))
 {
     _io_dbgprintf("--- DEBUG IO %p | Constructed IO MOVE\n", this);
 }
 
-InfiniterIO::InfiniterIO(const InfiniterArithmetic &p_source)
-    : InfiniterArithmetic(p_source)
-{
-    _io_dbgprintf("--- DEBUG IO %p | Constructed IA COPY\n", this);
-}
-
-InfiniterIO::InfiniterIO(InfiniterArithmetic &&p_source) noexcept
-    : InfiniterArithmetic(std::move(p_source))
-{
-    _io_dbgprintf("--- DEBUG IO %p | Constructed IA MOVE\n", this);
-}
-
-InfiniterIO::InfiniterIO(const InfiniterBit &p_source)
-    : InfiniterArithmetic(p_source)
-{
-    _io_dbgprintf("--- DEBUG IO %p | Constructed IB COPY\n", this);
-}
-
-InfiniterIO::InfiniterIO(InfiniterBit &&p_source) noexcept
-    : InfiniterArithmetic(std::move(p_source))
-{
-    _io_dbgprintf("--- DEBUG IO %p | Constructed IB MOVE\n", this);
-}
-
-InfiniterIO::InfiniterIO(const InfiniterCore &p_source)
-    : InfiniterArithmetic(p_source)
-{
-    _io_dbgprintf("--- DEBUG IO %p | Constructed IC COPY\n", this);
-}
-
-InfiniterIO::InfiniterIO(InfiniterCore &&p_source) noexcept
-    : InfiniterArithmetic(std::move(p_source))
-{
-    _io_dbgprintf("--- DEBUG IO %p | Constructed IC MOVE\n", this);
-}
-
-InfiniterIO::~InfiniterIO() noexcept
+template<typename InfiniterDerived>
+InfiniterIO<InfiniterDerived>::~InfiniterIO() noexcept
 {
     _io_dbgprintf("--- DEBUG IO %p | Delete\n", this);
 
     /// everything was done in InfiniterMemory
 }
 
-void InfiniterIO::serialize(std::string p_file_path, bool p_ignore_capacity) const
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::serialize(std::string p_file_path, bool p_ignore_capacity) const
 {
     FILE* file = fopen(p_file_path.c_str(), "wb");
     if(file == NULL)
@@ -159,7 +135,8 @@ void InfiniterIO::serialize(std::string p_file_path, bool p_ignore_capacity) con
     fclose(file);
 }
 
-void InfiniterIO::deserialize(std::string p_file_path, bool p_ignore_capacity)
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::deserialize(std::string p_file_path, bool p_ignore_capacity)
 {
     FILE* file = fopen(p_file_path.c_str(), "rb");
     if(file == NULL)
@@ -224,21 +201,21 @@ void InfiniterIO::deserialize(std::string p_file_path, bool p_ignore_capacity)
     fclose(file);
 }
 
-bool InfiniterIO::isPowerOfTwo(int p_number)
+template<typename InfiniterDerived>
+bool InfiniterIO<InfiniterDerived>::isPowerOfTwo(int p_number)
 {
     /// power of two has always one bit set to 1, and this formula checks that
     return (p_number > 0) && ((p_number & (p_number - 1)) == 0);
 }
 
-double InfiniterIO::log(double p_base, double p_value) noexcept
+template<typename InfiniterDerived>
+double InfiniterIO<InfiniterDerived>::log(double p_base, double p_value) noexcept
 {
-    if(p_base <= 1.0 || p_value <= 0.0)
-        return 0.0;
-
-    return std::log2(p_value) / std::log2(p_base);
+    return (p_base <= 1.0 || p_value <= 0.0) ? 0.0 : (std::log2(p_value) / std::log2(p_base));
 }
 
-uint64_t InfiniterIO::estimateBitsByBase(uint64_t p_number_size, uint8_t p_base)
+template<typename InfiniterDerived>
+uint64_t InfiniterIO<InfiniterDerived>::estimateBitsByBase(uint64_t p_number_size, uint8_t p_base)
 {
     /// limit number_size
     if(p_number_size > IO_MAX_CONTAINER_INPUT_CAPACITY)
@@ -270,7 +247,8 @@ uint64_t InfiniterIO::estimateBitsByBase(uint64_t p_number_size, uint8_t p_base)
     return static_cast<uint64_t>(estimated_bits);
 }
 
-uint64_t InfiniterIO::estimateCellsByBase(uint64_t p_number_size, uint8_t p_base)
+template<typename InfiniterDerived>
+uint64_t InfiniterIO<InfiniterDerived>::estimateCellsByBase(uint64_t p_number_size, uint8_t p_base)
 {
     uint64_t estimated_bits = estimateBitsByBase(p_number_size, p_base);
 
@@ -281,7 +259,8 @@ uint64_t InfiniterIO::estimateCellsByBase(uint64_t p_number_size, uint8_t p_base
     return estimated_cells;
 }
 
-void InfiniterIO::validateStringNumber(const std::string &p_number, int p_base)
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::validateStringNumber(const std::string &p_number, int p_base)
 {
     /// empty string
     if (p_number.empty())
@@ -318,7 +297,8 @@ void InfiniterIO::validateStringNumber(const std::string &p_number, int p_base)
     }
 }
 
-void InfiniterIO::validateVectorNumber(const std::vector<uint8_t> &p_number, int p_base)
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::validateVectorNumber(const std::vector<uint8_t> &p_number, int p_base)
 {
     /// empty string
     if (p_number.empty())
@@ -344,7 +324,8 @@ void InfiniterIO::validateVectorNumber(const std::vector<uint8_t> &p_number, int
     }
 }
 
-void InfiniterIO::assignStringBase2(const std::string &p_binary_number)
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::assignStringBase2(const std::string &p_binary_number)
 {
     /// compute required cells
     uint64_t requiredCells = p_binary_number.size() / BITS_PER_CELL;
@@ -381,7 +362,8 @@ void InfiniterIO::assignStringBase2(const std::string &p_binary_number)
     }
 }
 
-void InfiniterIO::assignString(std::string p_number, uint8_t p_base)
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::assignString(std::string p_number, uint8_t p_base)
 {
     std::string binary_number;
     binary_number.reserve( estimateBitsByBase(p_number.size(), p_base) );
@@ -433,7 +415,8 @@ void InfiniterIO::assignString(std::string p_number, uint8_t p_base)
     this->assignStringBase2(binary_number);
 }
 
-void InfiniterIO::assignVectorBase2(const std::vector<uint8_t> &p_binary_number)
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::assignVectorBase2(const std::vector<uint8_t> &p_binary_number)
 {
     /// compute required cells
     uint64_t requiredCells = p_binary_number.size() / BITS_PER_CELL;
@@ -470,7 +453,8 @@ void InfiniterIO::assignVectorBase2(const std::vector<uint8_t> &p_binary_number)
     }
 }
 
-void InfiniterIO::assignVector(std::vector<uint8_t> p_number, uint8_t p_base)
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::assignVector(std::vector<uint8_t> p_number, uint8_t p_base)
 {
     std::vector<uint8_t> binary_number;
     binary_number.reserve( estimateBitsByBase(p_number.size(), p_base) );
@@ -515,7 +499,8 @@ void InfiniterIO::assignVector(std::vector<uint8_t> p_number, uint8_t p_base)
     this->assignVectorBase2(binary_number);
 }
 
-void InfiniterIO::assign(const std::string &p_number, uint8_t p_base, bool p_negative_value)
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::assign(const std::string &p_number, uint8_t p_base, bool p_negative_value)
 {
     /// handles strings where LSB is p_number[p_number.size()-1] and MSB is p_number[0]
 
@@ -539,7 +524,8 @@ void InfiniterIO::assign(const std::string &p_number, uint8_t p_base, bool p_neg
     this->setSign(p_negative_value);
 }
 
-void InfiniterIO::assign(const std::vector<uint8_t> &p_number, uint8_t p_base, bool p_negative_value)
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::assign(const std::vector<uint8_t> &p_number, uint8_t p_base, bool p_negative_value)
 {
     /// handles vectors where LSB is p_number[p_number.size()-1] and MSB is p_number[0]
 
@@ -563,17 +549,8 @@ void InfiniterIO::assign(const std::vector<uint8_t> &p_number, uint8_t p_base, b
     this->setSign(p_negative_value);
 }
 
-void InfiniterIO::assign(const InfiniterIO &p_source)
-{
-    InfiniterArithmetic::assign(p_source);
-}
-
-void InfiniterIO::assign(InfiniterIO &&p_source)
-{
-    InfiniterArithmetic::assign(std::move(p_source));
-}
-
-std::string InfiniterIO::toStringBase2() const
+template<typename InfiniterDerived>
+std::string InfiniterIO<InfiniterDerived>::toStringBase2() const
 {
     isize_t size = this->getSize();
     const icell_t *data = this->getData();
@@ -618,7 +595,8 @@ std::string InfiniterIO::toStringBase2() const
     return binary_number;
 }
 
-std::vector<uint8_t> InfiniterIO::toVectorBase2() const
+template<typename InfiniterDerived>
+std::vector<uint8_t> InfiniterIO<InfiniterDerived>::toVectorBase2() const
 {
     isize_t size = this->getSize();
     const icell_t *data = this->getData();
@@ -663,7 +641,8 @@ std::vector<uint8_t> InfiniterIO::toVectorBase2() const
     return binary_number;
 }
 
-std::string InfiniterIO::toString(uint8_t p_base) const
+template<typename InfiniterDerived>
+std::string InfiniterIO<InfiniterDerived>::toString(uint8_t p_base) const
 {
     /// limit base
     if (p_base < 2 || p_base > 36)
@@ -715,7 +694,8 @@ std::string InfiniterIO::toString(uint8_t p_base) const
     return number;
 }
 
-std::vector<uint8_t> InfiniterIO::toVector(uint8_t p_base) const
+template<typename InfiniterDerived>
+std::vector<uint8_t> InfiniterIO<InfiniterDerived>::toVector(uint8_t p_base) const
 {
     /// limit base
     if (p_base < 2 || p_base > 36)
@@ -766,7 +746,8 @@ std::vector<uint8_t> InfiniterIO::toVector(uint8_t p_base) const
     return number;
 }
 
-// void InfiniterIO::print(uint64_t p_base) const
+// template<typename InfiniterDerived>
+// void InfiniterIO<InfiniterDerived>::print(uint64_t p_base) const
 // {
 //     if(p_base < 2 || 16  < p_base)
 //         printf("No valid base (2-16)\n");
@@ -782,7 +763,8 @@ std::vector<uint8_t> InfiniterIO::toVector(uint8_t p_base) const
 
 // }
 
-void InfiniterIO::printBase2() const
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::printBase2() const
 {
     const icell_t *data = this->getData();
     const isize_t size = this->getSize();
@@ -816,22 +798,26 @@ void InfiniterIO::printBase2() const
         printf("0");
 }
 
-void InfiniterIO::printBase4() const
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::printBase4() const
 {
 
 }
 
-void InfiniterIO::printBase8() const
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::printBase8() const
 {
 
 }
 
-void InfiniterIO::printBase16() const
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::printBase16() const
 {
 
 }
 
-void InfiniterIO::print(uint64_t base) const{
+template<typename InfiniterDerived>
+void InfiniterIO<InfiniterDerived>::print(uint64_t base) const{
     if (base < 2) {
         std::cout << "Error: Base must be >= 2";
     }
@@ -879,18 +865,3 @@ void InfiniterIO::print(uint64_t base) const{
 
     std::cout<< result;
 }
-
-InfiniterIO &InfiniterIO::operator =(const InfiniterIO &p_source)
-{
-    InfiniterArithmetic::assign(p_source);
-    return *this;
-}
-
-InfiniterIO &InfiniterIO::operator =(InfiniterIO &&p_source)
-{
-    InfiniterArithmetic::assign(std::move(p_source));
-    return *this;
-}
-
-
-

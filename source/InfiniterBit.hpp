@@ -1,33 +1,30 @@
-#ifndef INFINITERBIT_HPP
-#define INFINITERBIT_HPP
+#pragma once
 
 #include "InfiniterShared.hpp"
 #include "InfiniterCore.hpp"
 
 class Infiniter;
 
-class InfiniterBit : public InfiniterCore
+template <typename InfiniterDerived>
+class InfiniterBit : public InfiniterCore<InfiniterDerived>
 {
 public:
-    explicit InfiniterBit() noexcept;
+    inline explicit InfiniterBit() noexcept;
 
-    explicit InfiniterBit(isize_t p_capacity); /// throws bad_alloc
-    explicit InfiniterBit(isize_t p_capacity, icell_t p_value, bool p_negative_value=false); /// throws bad_alloc
-    explicit InfiniterBit(const icell_t *p_array, isize_t p_size, bool p_negative_value=false); /// throws bad_alloc
+    inline explicit InfiniterBit(isize_t p_capacity); /// throws bad_alloc
+    inline explicit InfiniterBit(isize_t p_capacity, icell_t p_value, bool p_negative_value=false); /// throws bad_alloc
+    inline explicit InfiniterBit(const icell_t *p_array, isize_t p_size, bool p_negative_value=false); /// throws bad_alloc
 
-    InfiniterBit(const InfiniterBit &p_source); /// throws bad_alloc
-    InfiniterBit(InfiniterBit &&p_source) noexcept;
+    inline InfiniterBit(const InfiniterDerived &p_source); /// throws bad_alloc
+    inline InfiniterBit(InfiniterDerived &&p_source) noexcept;
 
-    InfiniterBit(const InfiniterCore &p_source); /// throws bad_alloc
-    InfiniterBit(InfiniterCore &&p_source) noexcept;
-
-    ~InfiniterBit() noexcept;
+    inline ~InfiniterBit() noexcept;
 
     /// InfiniterCore methods
 
     // maybe change all uint64_t to cell where context is abaout bits or cells
 
-    bool checkCellPos(isize_t cell_id, uint8_t pos) const;
+    inline bool checkCellPos(isize_t cell_id, uint8_t pos) const;
     void checkCellPosTry(isize_t cell_id, uint8_t pos) const; // throws out_of_range
 
 
@@ -54,7 +51,7 @@ public:
     /// Returns MSB global position in cell  (could fail for large numbers)
     isize_t getMSBGlobalPosUnsafe() const noexcept; // handle edge case
     /// Returns MSB global position in cell
-    Infiniter getMSBGlobalPos() const; // throws bad_alloc
+    InfiniterDerived getMSBGlobalPos() const; // throws bad_alloc
 
     /// Returns MSB position in cell and get MSB cell value
     uint8_t getMSBPos(icell_t &r_cell) const noexcept;
@@ -88,7 +85,7 @@ public:
     /// Returns LSB global position in cell  (could fail for large numbers)
     isize_t getLSBGlobalPosUnsafe() const noexcept; // handle edge case
     /// Returns LSB global position in cell
-    Infiniter getLSBGlobalPos() const; // throws bad_alloc
+    InfiniterDerived getLSBGlobalPos() const; // throws bad_alloc
 
     /// Returns LSB position in cell and get LSB cell value
     uint8_t getLSBPos(icell_t &r_cell) const noexcept;
@@ -99,40 +96,30 @@ public:
 
 
 
-    ibit_t getBit(isize_t p_cell_index, uint8_t p_pos); // throws out_of_range
-    void setBit(isize_t p_cell_index, uint8_t p_pos); // throws out_of_range
-    void clearBit(isize_t p_cell_index, uint8_t p_pos); // throws out_of_range
-    void toggleBit(isize_t p_cell_index, uint8_t p_pos); // throws out_of_range
+    inline ibit_t getBit(isize_t p_cell_index, uint8_t p_pos); // throws out_of_range
+    inline void setBit(isize_t p_cell_index, uint8_t p_pos); // throws out_of_range
+    inline void clearBit(isize_t p_cell_index, uint8_t p_pos); // throws out_of_range
+    inline void toggleBit(isize_t p_cell_index, uint8_t p_pos); // throws out_of_range
 
     // unsafe or unchecked?
-    ibit_t getBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept;
-    void setBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept;
-    void clearBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept;
-    void toggleBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept;
+    inline ibit_t getBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept;
+    inline void setBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept;
+    inline void clearBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept;
+    inline void toggleBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept;
 
 
     void shiftLSB(ibit_t p_lsb=IBIT_FALSE); // Least Significant Bit (<<)
     void shiftMSB(ibit_t p_msb=IBIT_FALSE); // Most Significant Bit (>>)
 
-    void shiftLeft();
-    void shiftRight();
+    inline void shiftLeft();
+    inline void shiftRight();
 
     void pushLSB(ibit_t p_lsb);
-    void pushMSB(ibit_t p_msb); /// not finished - make it extend if needed
-    
+    void pushMSB(ibit_t p_msb);
 
-    using InfiniterCore::assign;
-    void assign(const InfiniterBit &p_source);
-    void assign(InfiniterBit &&p_source);
 
-public:
-
-    /// Operators
-    using InfiniterCore::operator = ;
-    InfiniterBit &operator = (const InfiniterBit &p_source);
-    InfiniterBit &operator = (InfiniterBit &&p_source);
 
 
 };
 
-#endif // INFINITERBIT_HPP
+#include "InfiniterBit.tpp"

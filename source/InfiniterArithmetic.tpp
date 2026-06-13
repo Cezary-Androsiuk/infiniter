@@ -1,8 +1,8 @@
+#pragma once
+
 #include "InfiniterArithmetic.hpp"
 
 #include "InfiniterShared.hpp"
-
-#include "Infiniter.hpp"
 
 #include <utility> // std::move
 
@@ -21,74 +21,58 @@
 #define _ia_dbgprintf(...)
 #endif // IA_DEBUG_EXECUTION_PRINT
 
-InfiniterArithmetic::InfiniterArithmetic() noexcept
-    : InfiniterBit()
+template<typename InfiniterDerived>
+InfiniterArithmetic<InfiniterDerived>::InfiniterArithmetic() noexcept
+    : InfiniterBit<InfiniterDerived>()
 {
     _ia_dbgprintf("--- DEBUG IA %p | Constructed   DEFAULT\n", this);
 }
 
-InfiniterArithmetic::InfiniterArithmetic(isize_t p_capacity)
-    : InfiniterBit(p_capacity)
+template<typename InfiniterDerived>
+InfiniterArithmetic<InfiniterDerived>::InfiniterArithmetic(isize_t p_capacity)
+    : InfiniterBit<InfiniterDerived>(p_capacity)
 {
     _ia_dbgprintf("--- DEBUG IA %p | Constructed   PARAMETER isize_t\n", this);
 }
 
-InfiniterArithmetic::InfiniterArithmetic(isize_t p_capacity, icell_t p_value, bool p_negative_value)
-    : InfiniterBit(p_capacity, p_value, p_negative_value)
+template<typename InfiniterDerived>
+InfiniterArithmetic<InfiniterDerived>::InfiniterArithmetic(isize_t p_capacity, icell_t p_value, bool p_negative_value)
+    : InfiniterBit<InfiniterDerived>(p_capacity, p_value, p_negative_value)
 {
     _ia_dbgprintf("--- DEBUG IA %p | Constructed   PARAMETER isize_t icell_t bool\n", this);
 }
 
-InfiniterArithmetic::InfiniterArithmetic(const icell_t *p_array, isize_t p_size, bool p_negative_value)
-    : InfiniterBit(p_array, p_size, p_negative_value)
+template<typename InfiniterDerived>
+InfiniterArithmetic<InfiniterDerived>::InfiniterArithmetic(const icell_t *p_array, isize_t p_size, bool p_negative_value)
+    : InfiniterBit<InfiniterDerived>(p_array, p_size, p_negative_value)
 {
     _ia_dbgprintf("--- DEBUG IA %p | Constructed   PARAMETER icell_t* isize_t bool\n", this);
 }
 
-InfiniterArithmetic::InfiniterArithmetic(const InfiniterArithmetic &p_source)
-    : InfiniterBit(p_source)
+template<typename InfiniterDerived>
+InfiniterArithmetic<InfiniterDerived>::InfiniterArithmetic(const InfiniterDerived &p_source)
+    : InfiniterBit<InfiniterDerived>(p_source)
 {
     _ia_dbgprintf("--- DEBUG IA %p | Constructed IA COPY\n", this);
 }
 
-InfiniterArithmetic::InfiniterArithmetic(InfiniterArithmetic &&p_source) noexcept
-    : InfiniterBit(std::move(p_source))
+template<typename InfiniterDerived>
+InfiniterArithmetic<InfiniterDerived>::InfiniterArithmetic(InfiniterDerived &&p_source) noexcept
+    : InfiniterBit<InfiniterDerived>(std::move(p_source))
 {
     _ia_dbgprintf("--- DEBUG IA %p | Constructed IA MOVE\n", this);
 }
 
-InfiniterArithmetic::InfiniterArithmetic(const InfiniterBit &p_source)
-    : InfiniterBit(p_source)
-{
-    _ia_dbgprintf("--- DEBUG IA %p | Constructed IB COPY\n", this);
-}
-
-InfiniterArithmetic::InfiniterArithmetic(InfiniterBit &&p_source) noexcept
-    : InfiniterBit(std::move(p_source))
-{
-    _ia_dbgprintf("--- DEBUG IA %p | Constructed IB MOVE\n", this);
-}
-
-InfiniterArithmetic::InfiniterArithmetic(const InfiniterCore &p_source)
-    : InfiniterBit(p_source)
-{
-    _ia_dbgprintf("--- DEBUG IA %p | Constructed IC COPY\n", this);
-}
-
-InfiniterArithmetic::InfiniterArithmetic(InfiniterCore &&p_source) noexcept
-    : InfiniterBit(std::move(p_source))
-{
-    _ia_dbgprintf("--- DEBUG IA %p | Constructed IC MOVE\n", this);
-}
-
-InfiniterArithmetic::~InfiniterArithmetic() noexcept
+template<typename InfiniterDerived>
+InfiniterArithmetic<InfiniterDerived>::~InfiniterArithmetic() noexcept
 {
     _ia_dbgprintf("--- DEBUG IA %p | Delete\n", this);
 
     /// everything was done in InfiniterMemory
 }
 
-void InfiniterArithmetic::incrementMagnitude()
+template<typename InfiniterDerived>
+void InfiniterArithmetic<InfiniterDerived>::incrementMagnitude()
 {
     icell_t *data = this->getData();
     icell_t size = this->getSize();
@@ -122,7 +106,8 @@ void InfiniterArithmetic::incrementMagnitude()
     (*cell_ptr)++;
 }
 
-void InfiniterArithmetic::decrementMagnitude()
+template<typename InfiniterDerived>
+void InfiniterArithmetic<InfiniterDerived>::decrementMagnitude()
 {
     icell_t *data = this->getData();
     icell_t size = this->getSize();
@@ -143,7 +128,8 @@ void InfiniterArithmetic::decrementMagnitude()
     this->normalize();
 }
 
-void InfiniterArithmetic::addMagnitude(icell_t p_value)
+template<typename InfiniterDerived>
+void InfiniterArithmetic<InfiniterDerived>::addMagnitude(icell_t p_value)
 {
     icell_t *data = this->getData();
     isize_t size = this->getSize();
@@ -164,7 +150,8 @@ void InfiniterArithmetic::addMagnitude(icell_t p_value)
     }
 }
 
-void InfiniterArithmetic::subtractMagnitude(icell_t p_value)
+template<typename InfiniterDerived>
+void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(icell_t p_value)
 {
     icell_t *data = this->getData();
     isize_t size = this->getSize();
@@ -184,17 +171,20 @@ void InfiniterArithmetic::subtractMagnitude(icell_t p_value)
     }
 }
 
-void InfiniterArithmetic::addMagnitude(const Infiniter &p_number)
+template<typename InfiniterDerived>
+void InfiniterArithmetic<InfiniterDerived>::addMagnitude(const InfiniterDerived &p_number)
 {
 
 }
 
-void InfiniterArithmetic::subtractMagnitude(const Infiniter &p_number)
+template<typename InfiniterDerived>
+void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(const InfiniterDerived &p_number)
 {
 
 }
 
-void InfiniterArithmetic::increment()
+template<typename InfiniterDerived>
+void InfiniterArithmetic<InfiniterDerived>::increment()
 {
     /// handle incrementing from negative
     if(this->getSign())
@@ -207,7 +197,8 @@ void InfiniterArithmetic::increment()
     this->incrementMagnitude();
 }
 
-void InfiniterArithmetic::decrement()
+template<typename InfiniterDerived>
+void InfiniterArithmetic<InfiniterDerived>::decrement()
 {
     /// handle decrementing from negative
     if(this->getSign())
@@ -230,7 +221,8 @@ void InfiniterArithmetic::decrement()
     this->decrementMagnitude();
 }
 
-void InfiniterArithmetic::add(icell_t p_value, bool p_negative_value)
+template<typename InfiniterDerived>
+void InfiniterArithmetic<InfiniterDerived>::add(icell_t p_value, bool p_negative_value)
 {
     /// handle edge cases
     if(p_value == 0)
@@ -275,7 +267,8 @@ void InfiniterArithmetic::add(icell_t p_value, bool p_negative_value)
     }
 }
 
-void InfiniterArithmetic::subtract(icell_t p_value, bool p_negative_value)
+template<typename InfiniterDerived>
+void InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_value, bool p_negative_value)
 {
     if(p_value == 0)
         return;
@@ -320,7 +313,8 @@ void InfiniterArithmetic::subtract(icell_t p_value, bool p_negative_value)
 
 }
 
-void InfiniterArithmetic::add(const Infiniter &p_number)
+template<typename InfiniterDerived>
+void InfiniterArithmetic<InfiniterDerived>::add(const InfiniterDerived &p_number)
 {
     // if(this->is0())
     // {
@@ -340,12 +334,14 @@ void InfiniterArithmetic::add(const Infiniter &p_number)
     }
 }
 
-void InfiniterArithmetic::subtract(const Infiniter &p_number)
+template<typename InfiniterDerived>
+void InfiniterArithmetic<InfiniterDerived>::subtract(const InfiniterDerived &p_number)
 {
 
 }
 
-void InfiniterArithmetic::multiply(const Infiniter &p_number)
+template<typename InfiniterDerived>
+void InfiniterArithmetic<InfiniterDerived>::multiply(const InfiniterDerived &p_number)
 {
     /// handle signs
     /// reverse sign only if other number is negative case
@@ -409,7 +405,8 @@ void InfiniterArithmetic::multiply(const Infiniter &p_number)
 
 }
 
-void InfiniterArithmetic::divde(const Infiniter &p_number)
+template<typename InfiniterDerived>
+void InfiniterArithmetic<InfiniterDerived>::divde(const InfiniterDerived &p_number)
 {
     /// handle signs
     /// reverse sign only if other number is negative case
@@ -450,50 +447,37 @@ void InfiniterArithmetic::divde(const Infiniter &p_number)
     }
 
     /// comparison optimization
-    if()
+    // if()
 }
 
-void InfiniterArithmetic::assign(const InfiniterArithmetic &p_source)
-{
-    InfiniterBit::assign(p_source);
-}
-
-void InfiniterArithmetic::assign(InfiniterArithmetic &&p_source)
-{
-    InfiniterBit::assign(std::move(p_source));
-}
-
-InfiniterArithmetic &InfiniterArithmetic::operator =(const InfiniterArithmetic &p_source)
-{
-    InfiniterBit::assign(p_source);
-    return *this;
-}
-
-InfiniterArithmetic &InfiniterArithmetic::operator ++()
+template<typename InfiniterDerived>
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::operator ++()
 {
     this->increment();
-    return *this;
+    return static_cast<InfiniterDerived&>(*this);
 }
 
-InfiniterArithmetic InfiniterArithmetic::operator ++(int)
+template<typename InfiniterDerived>
+InfiniterDerived InfiniterArithmetic<InfiniterDerived>::operator ++(int)
 {
-
+    InfiniterDerived number(*this); /// static cast needed?
+    this->increment();
+    return std::move(number);
 }
 
-InfiniterArithmetic &InfiniterArithmetic::operator --()
+template<typename InfiniterDerived>
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::operator --()
 {
-
+    this->increment();
+    return static_cast<InfiniterDerived&>(*this);
 }
 
-InfiniterArithmetic InfiniterArithmetic::operator --(int)
+template<typename InfiniterDerived>
+InfiniterDerived InfiniterArithmetic<InfiniterDerived>::operator --(int)
 {
-
-}
-
-InfiniterArithmetic &InfiniterArithmetic::operator =(InfiniterArithmetic &&p_source)
-{
-    InfiniterBit::assign(std::move(p_source));
-    return *this;
+    InfiniterDerived number(*this); /// static cast needed?
+    this->decrement();
+    return std::move(number);
 }
 
 

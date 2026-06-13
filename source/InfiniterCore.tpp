@@ -1,7 +1,11 @@
+#pragma once
+
 #include "InfiniterCore.hpp"
 
 #include "InfiniterShared.hpp"
 #include "InfiniterException.hpp"
+
+#include "Infiniter.hpp"
 
 #include <utility> // std::move
 
@@ -20,7 +24,9 @@
 #define _ic_dbgprintf(...)
 #endif // IC_DEBUG_EXECUTION_PRINT
 
-InfiniterCore::InfiniterCore() noexcept
+
+template<typename InfiniterDerived>
+InfiniterCore<InfiniterDerived>::InfiniterCore() noexcept
     : InfiniterMemory()
 {
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   DEFAULT\n", this);
@@ -29,7 +35,8 @@ InfiniterCore::InfiniterCore() noexcept
     m_size = ISIZE_C(1);
 }
 
-InfiniterCore::InfiniterCore(isize_t p_capacity)
+template<typename InfiniterDerived>
+InfiniterCore<InfiniterDerived>::InfiniterCore(isize_t p_capacity)
     : InfiniterMemory(p_capacity) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER 1\n", this);
@@ -38,7 +45,8 @@ InfiniterCore::InfiniterCore(isize_t p_capacity)
     m_size = ISIZE_C(1);
 }
 
-InfiniterCore::InfiniterCore(isize_t p_capacity, icell_t p_value, bool p_negative_value)
+template<typename InfiniterDerived>
+InfiniterCore<InfiniterDerived>::InfiniterCore(isize_t p_capacity, icell_t p_value, bool p_negative_value)
     : InfiniterMemory(p_capacity) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER 2\n", this);
@@ -50,7 +58,8 @@ InfiniterCore::InfiniterCore(isize_t p_capacity, icell_t p_value, bool p_negativ
     m_data[0] = p_value;
 }
 
-InfiniterCore::InfiniterCore(const icell_t *p_array, isize_t p_size, bool p_negative_value)
+template<typename InfiniterDerived>
+InfiniterCore<InfiniterDerived>::InfiniterCore(const icell_t *p_array, isize_t p_size, bool p_negative_value)
     : InfiniterMemory(p_size) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER 3\n", this);
@@ -64,7 +73,8 @@ InfiniterCore::InfiniterCore(const icell_t *p_array, isize_t p_size, bool p_nega
     m_size = p_size;
 }
 
-InfiniterCore::InfiniterCore(const InfiniterCore &p_source)
+template<typename InfiniterDerived>
+InfiniterCore<InfiniterDerived>::InfiniterCore(const InfiniterDerived &p_source)
     : InfiniterMemory(p_source)
 {
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   COPY\n", this);
@@ -75,7 +85,8 @@ InfiniterCore::InfiniterCore(const InfiniterCore &p_source)
     m_size = p_source.m_size;
 }
 
-InfiniterCore::InfiniterCore(InfiniterCore &&p_source) noexcept
+template<typename InfiniterDerived>
+InfiniterCore<InfiniterDerived>::InfiniterCore(InfiniterDerived &&p_source) noexcept
     : InfiniterMemory(std::move(p_source))
 {
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   MOVE\n", this);
@@ -86,14 +97,16 @@ InfiniterCore::InfiniterCore(InfiniterCore &&p_source) noexcept
     m_size = p_source.m_size;
 }
 
-InfiniterCore::~InfiniterCore() noexcept
+template<typename InfiniterDerived>
+InfiniterCore<InfiniterDerived>::~InfiniterCore() noexcept
 {
     _ic_dbgprintf("--- DEBUG IC %p | Delete\n", this);
 
     /// everything was done in InfiniterMemory
 }
 
-void InfiniterCore::reset() noexcept
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::reset() noexcept
 {
     InfiniterMemory::reset(); /// makes m_capacity == SBO_CAPACITY
     m_bits.sign = false;
@@ -105,7 +118,8 @@ void InfiniterCore::reset() noexcept
     }
 }
 
-void InfiniterCore::clear() noexcept
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::clear() noexcept
 {
     m_bits.sign = false;
     for(isize_t i=0; i<m_size; i++)
@@ -114,7 +128,8 @@ void InfiniterCore::clear() noexcept
     }
 }
 
-void InfiniterCore::clearReserved() noexcept
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::clearReserved() noexcept
 {
     m_bits.sign = false;
     for(isize_t i=0; i<m_capacity; i++)
@@ -123,7 +138,8 @@ void InfiniterCore::clearReserved() noexcept
     }
 }
 
-isize_t InfiniterCore::realSize() const noexcept
+template<typename InfiniterDerived>
+isize_t InfiniterCore<InfiniterDerived>::realSize() const noexcept
 {
     isize_t real_size = m_size;
     while (real_size > 0 && m_data[real_size - 1] == ICELL_C(0))
@@ -133,33 +149,39 @@ isize_t InfiniterCore::realSize() const noexcept
     return real_size;
 }
 
-void InfiniterCore::reserve(isize_t p_new_capacity)
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::reserve(isize_t p_new_capacity)
 {
     InfiniterMemory::reserve(p_new_capacity);
 }
 
-void InfiniterCore::reserve(const InfiniterCore &p_source)
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::reserve(const InfiniterDerived &p_source)
 {
     InfiniterMemory::reserve(p_source);
 }
 
-void InfiniterCore::extend(isize_t p_additional_capacity)
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::extend(isize_t p_additional_capacity)
 {
     InfiniterMemory::extend(p_additional_capacity);
 }
 
-void InfiniterCore::shrink()
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::shrink()
 {
     /// shrink to m_size
     InfiniterMemory::shrink(m_size);
 }
 
-void InfiniterCore::optimize()
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::optimize()
 {
     this->shrink();
 }
 
-void InfiniterCore::trim() noexcept
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::trim() noexcept
 {
     /// iterate from back
     for(isize_t i=0; i<m_size; i++)
@@ -178,39 +200,52 @@ void InfiniterCore::trim() noexcept
     }
 }
 
-icell_t *InfiniterCore::getData() noexcept
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::normalize() noexcept
+{
+    this->trim();
+    if(this->is0())
+        this->setPositiveSign();
+}
+
+template<typename InfiniterDerived>
+icell_t *InfiniterCore<InfiniterDerived>::getData() noexcept
 {
     return m_data;
 }
 
-const icell_t *InfiniterCore::getData() const noexcept
+template<typename InfiniterDerived>
+const icell_t *InfiniterCore<InfiniterDerived>::getData() const noexcept
 {
     return m_data;
 }
 
-isize_t InfiniterCore::getSize() const noexcept
+template<typename InfiniterDerived>
+isize_t InfiniterCore<InfiniterDerived>::getSize() const noexcept
 {
     return m_size;
 }
 
-isize_t InfiniterCore::getCapacity() const noexcept
+template<typename InfiniterDerived>
+isize_t InfiniterCore<InfiniterDerived>::getCapacity() const noexcept
 {
     return m_capacity;
 }
 
-ibit_t InfiniterCore::getSign() const noexcept
+template<typename InfiniterDerived>
+ibit_t InfiniterCore<InfiniterDerived>::getSign() const noexcept
 {
     return m_bits.sign;
 }
 
-isize_t InfiniterCore::setSize(isize_t p_new_size) noexcept
+template<typename InfiniterDerived>
+isize_t InfiniterCore<InfiniterDerived>::setSize(isize_t p_new_size) noexcept
 {
-    m_size = p_new_size > m_capacity ? m_capacity : p_new_size;
-
-    return m_size;
+    return m_size = std::min(p_new_size, m_capacity);
 }
 
-isize_t InfiniterCore::setSizeWithExtend(isize_t p_new_size)
+template<typename InfiniterDerived>
+isize_t InfiniterCore<InfiniterDerived>::setSizeWithExtend(isize_t p_new_size)
 {
     if(p_new_size > m_capacity)
     {
@@ -221,27 +256,46 @@ isize_t InfiniterCore::setSizeWithExtend(isize_t p_new_size)
     return m_size;
 }
 
-void InfiniterCore::setSign(bool p_new_sign) noexcept
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::setSign(bool p_new_sign) noexcept
 {
     m_bits.sign = p_new_sign;
 }
 
-void InfiniterCore::setPositiveSign() noexcept
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::setPositiveSign() noexcept
 {
     m_bits.sign = 0;
 }
 
-void InfiniterCore::setNegativeSign() noexcept
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::setNegativeSign() noexcept
 {
     m_bits.sign = 1;
 }
 
-void InfiniterCore::negate() noexcept
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::negate() noexcept
 {
     m_bits.sign = !m_bits.sign;
 }
 
-void InfiniterCore::assign(icell_t p_value, bool p_negative_value) noexcept
+template<typename InfiniterDerived>
+InfiniterDerived InfiniterCore<InfiniterDerived>::absoluteValue() const
+{
+    InfiniterDerived i(*this);
+    i.setPositiveSign();
+    return std::move(i);
+}
+
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::absoluteValueAssign()
+{
+    this->setPositiveSign();
+}
+
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::assign(icell_t p_value, bool p_negative_value) noexcept
 {
     m_data[0] = p_value;
 
@@ -249,7 +303,8 @@ void InfiniterCore::assign(icell_t p_value, bool p_negative_value) noexcept
     m_size = ISIZE_C(1);
 }
 
-void InfiniterCore::assign(const icell_t *p_array, isize_t p_size, bool p_negative_value)
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::assign(const icell_t *p_array, isize_t p_size, bool p_negative_value)
 {
     /// reserve more if needed
     /// UNLIKELY to speed up operations where memory isn't realocated
@@ -267,7 +322,8 @@ void InfiniterCore::assign(const icell_t *p_array, isize_t p_size, bool p_negati
     m_bits.sign = p_negative_value;
 }
 
-void InfiniterCore::assign(const InfiniterCore &p_source)
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::assign(const InfiniterDerived &p_source)
 {
     if( &p_source != this )
     {
@@ -280,7 +336,8 @@ void InfiniterCore::assign(const InfiniterCore &p_source)
     }
 }
 
-void InfiniterCore::assign(InfiniterCore &&p_source)
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::assign(InfiniterDerived &&p_source)
 {
     if( &p_source != this )
     {
@@ -293,7 +350,8 @@ void InfiniterCore::assign(InfiniterCore &&p_source)
     }
 }
 
-bool InfiniterCore::isNumber(icell_t p_scalar, int p_sign) const noexcept
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::equal(icell_t p_scalar, int p_sign) const noexcept
 {
     // if(p_sign)
     // {
@@ -305,106 +363,56 @@ bool InfiniterCore::isNumber(icell_t p_scalar, int p_sign) const noexcept
     // }
 
     /// shorter and branchless condition
-    if (p_sign != 0 && ((p_sign < 0) != this->getSign()))
+    if (p_sign != 0 && ((p_sign < 0) != m_bits.sign))
         return false;
-
-    const icell_t *data = this->getData();
 
     /// check LSB - most common case
-    if(data[0] != p_scalar)
+    if(m_data[0] != p_scalar)
         return false;
 
-    const isize_t size = this->getSize() - 1; /// -1 excluded from loop
+    const isize_t size = m_size - 1; /// -1 excluded from loop
     /// iterate from MSB to LSB+1
     for(isize_t i=0; i<size; i++)
     {
         const isize_t i_rev = size - i;
-        if(data[i_rev] != ICELL_C(0))
+        if(m_data[i_rev] != ICELL_C(0))
             return false;
     }
     return true;
 }
 
-bool InfiniterCore::is0() const noexcept
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::differs(icell_t p_scalar, int p_sign) const noexcept
 {
-    const icell_t *data = this->getData();
 
-    /// check LSB - most common case
-    if(data[0] != ICELL_C(0))
-        return false;
-
-    const isize_t size = this->getSize() - 1; /// -1 excluded from loop
-    /// iterate from MSB to LSB+1
-    for(isize_t i=0; i<size; i++)
-    {
-        const isize_t i_rev = size - i;
-        if(data[i_rev] != ICELL_C(0))
-            return false;
-    }
-    return true;
 }
 
-bool InfiniterCore::is1() const noexcept
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::greater(icell_t p_scalar, int p_sign) const noexcept
 {
-    return this->isNumber(1, 0);
+
 }
 
-bool InfiniterCore::is2() const noexcept
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::smaller(icell_t p_scalar, int p_sign) const noexcept
 {
-    return this->isNumber(2, 0);
+
 }
 
-bool InfiniterCore::isPositive1() const noexcept
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::greaterEqual(icell_t p_scalar, int p_sign) const noexcept
 {
-    return this->isNumber(1, 1);
+
 }
 
-bool InfiniterCore::isNegative1() const noexcept
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::smallerEqual(icell_t p_scalar, int p_sign) const noexcept
 {
-    return this->isNumber(1, -1);
+
 }
 
-bool InfiniterCore::isPositive2() const noexcept
-{
-    return this->isNumber(2, 1);
-}
-
-bool InfiniterCore::isNegative2() const noexcept
-{
-    return this->isNumber(2, -1);
-}
-
-void InfiniterCore::normalize() noexcept
-{
-    this->trim();
-    if(this->is0())
-        this->setPositiveSign();
-}
-
-Infiniter InfiniterCore::absoluteValue() const
-{
-    Infiniter i(*this);
-    i.setPositiveSign();
-    return i;
-}
-
-void InfiniterCore::absoluteValueAssign()
-{
-    this->setPositiveSign();
-}
-
-bool InfiniterCore::toBool() const noexcept
-{
-    for(isize_t i=0; i<m_size; i++)
-    {
-        if(m_data[i] != ICELL_C(0))
-            return true;
-    }
-
-    return false;
-}
-
-bool InfiniterCore::equal(const InfiniterCore &p_source) const noexcept
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::equal(const InfiniterDerived &p_source) const noexcept
 {
     if(this == &p_source)
         return true;
@@ -431,7 +439,8 @@ bool InfiniterCore::equal(const InfiniterCore &p_source) const noexcept
     return true;
 }
 
-bool InfiniterCore::differs(const InfiniterCore &p_source) const noexcept
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::differs(const InfiniterDerived &p_source) const noexcept
 {
     if(this == &p_source)
         return false;
@@ -458,7 +467,8 @@ bool InfiniterCore::differs(const InfiniterCore &p_source) const noexcept
     return false;
 }
 
-bool InfiniterCore::greater(const InfiniterCore &p_source) const noexcept
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::greater(const InfiniterDerived &p_source) const noexcept
 {
     if(this == &p_source)
         return false;
@@ -490,7 +500,8 @@ bool InfiniterCore::greater(const InfiniterCore &p_source) const noexcept
     return false;
 }
 
-bool InfiniterCore::smaller(const InfiniterCore &p_source) const noexcept
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::smaller(const InfiniterDerived &p_source) const noexcept
 {
     if(this == &p_source)
         return false;
@@ -522,7 +533,8 @@ bool InfiniterCore::smaller(const InfiniterCore &p_source) const noexcept
     return false;
 }
 
-bool InfiniterCore::greaterEqual(const InfiniterCore &p_source) const noexcept
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::greaterEqual(const InfiniterDerived &p_source) const noexcept
 {
     if(this == &p_source)
         return true;
@@ -554,7 +566,8 @@ bool InfiniterCore::greaterEqual(const InfiniterCore &p_source) const noexcept
     return true;
 }
 
-bool InfiniterCore::smallerEqual(const InfiniterCore &p_source) const noexcept
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::smallerEqual(const InfiniterDerived &p_source) const noexcept
 {
     if(this == &p_source)
         return true;
@@ -586,9 +599,82 @@ bool InfiniterCore::smallerEqual(const InfiniterCore &p_source) const noexcept
     return true;
 }
 
-icell_t &InfiniterCore::getCell(isize_t p_cell_index)
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::is0() const noexcept
 {
-    if(p_cell_index >= this->getSize())
+    /// check LSB - most common case
+    if(m_data[0] != ICELL_C(0))
+        return false;
+
+    const isize_t size = m_size - 1; /// -1 excluded from loop
+    /// iterate from MSB to LSB+1
+    for(isize_t i=0; i<size; i++)
+    {
+        const isize_t i_rev = size - i;
+        if(m_data[i_rev] != ICELL_C(0))
+            return false;
+    }
+    return true;
+}
+
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::is1() const noexcept
+{
+    return this->equal(1, 0);
+}
+
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::is2() const noexcept
+{
+    return this->equal(2, 0);
+}
+
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::isPositive1() const noexcept
+{
+    return this->equal(1, 1);
+}
+
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::isNegative1() const noexcept
+{
+    return this->equal(1, -1);
+}
+
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::isPositive2() const noexcept
+{
+    return this->equal(2, 1);
+}
+
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::isNegative2() const noexcept
+{
+    return this->equal(2, -1);
+}
+
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::toBool() const noexcept
+{
+    /// check LSB - most common case
+    if(m_data[0] != ICELL_C(0))
+        return false;
+
+    const isize_t size = m_size - 1; /// -1 excluded from loop
+    /// iterate from MSB to LSB+1
+    for(isize_t i=0; i<size; i++)
+    {
+        const isize_t i_rev = size - i;
+        if(m_data[i_rev] != ICELL_C(0))
+            return true;
+    }
+    return false;
+}
+
+template<typename InfiniterDerived>
+icell_t &InfiniterCore<InfiniterDerived>::getCell(isize_t p_cell_index)
+{
+    if(p_cell_index >= m_size)
     {
         throw InfiniterException::OutOfRange(p_cell_index, 0, m_size-1);
     }
@@ -596,18 +682,32 @@ icell_t &InfiniterCore::getCell(isize_t p_cell_index)
     return this->getData()[p_cell_index];
 }
 
-const icell_t &InfiniterCore::getCell(isize_t p_cell_index) const
+template<typename InfiniterDerived>
+const icell_t &InfiniterCore<InfiniterDerived>::getCell(isize_t p_cell_index) const
 {
-    if(p_cell_index >= this->getSize())
+    if(p_cell_index >= m_size)
     {
         throw InfiniterException::OutOfRange(p_cell_index, 0, m_size-1);
     }
 
+    return this->getData()[p_cell_index];
+}
+
+template<typename InfiniterDerived>
+icell_t &InfiniterCore<InfiniterDerived>::getCellUnsafe(isize_t p_cell_index) noexcept
+{
+    return this->getData()[p_cell_index];
+}
+
+template<typename InfiniterDerived>
+const icell_t &InfiniterCore<InfiniterDerived>::getCellUnsafe(isize_t p_cell_index) const noexcept
+{
     return this->getData()[p_cell_index];
 }
 
 #if IC_ENABLE_DB_PRINT_METHOD
-void InfiniterCore::dbg_print_data() const
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::dbg_print_data() const
 {
     printf("--- DEBUG IC obj: %p, capacity: %llu, size: %llu, sbo: %d, sign: %d\n",
            this, m_capacity, m_size,
@@ -619,7 +719,8 @@ void InfiniterCore::dbg_print_data() const
     printf("\n");
 }
 
-void InfiniterCore::dbg_print_memory() const
+template<typename InfiniterDerived>
+void InfiniterCore<InfiniterDerived>::dbg_print_memory() const
 {
     printf("--- DEBUG IC obj: %p, capacity: %llu, size: %llu, sbo: %d, sign: %d\n",
            this, m_capacity, m_size,
@@ -632,7 +733,8 @@ void InfiniterCore::dbg_print_memory() const
 }
 #endif // IC_ENABLE_DB_PRINT_METHOD
 
-InfiniterCore &InfiniterCore::operator =(const InfiniterCore &p_source)
+template<typename InfiniterDerived>
+InfiniterDerived &InfiniterCore<InfiniterDerived>::operator =(const InfiniterDerived &p_source)
 {
     _ic_dbgprintf("--- DEBUG IC %p | Assigned      COPY\n", this);
 
@@ -646,10 +748,11 @@ InfiniterCore &InfiniterCore::operator =(const InfiniterCore &p_source)
         m_size = p_source.m_size;
     }
 
-    return *this;
+    return static_cast<InfiniterDerived&>(*this);
 }
 
-InfiniterCore &InfiniterCore::operator =(InfiniterCore &&p_source)
+template<typename InfiniterDerived>
+InfiniterDerived &InfiniterCore<InfiniterDerived>::operator =(InfiniterDerived &&p_source)
 {
     _ic_dbgprintf("--- DEBUG IC %p | Assigned      MOVE\n", this);
 
@@ -663,52 +766,68 @@ InfiniterCore &InfiniterCore::operator =(InfiniterCore &&p_source)
         m_size = p_source.m_size;
     }
 
-    return *this;
+    return static_cast<InfiniterDerived&>(*this);
 }
 
-InfiniterCore::operator bool() const noexcept
+template<typename InfiniterDerived>
+InfiniterCore<InfiniterDerived>::operator bool() const noexcept
 {
     return this->toBool();
 }
 
-bool InfiniterCore::operator ==(const InfiniterCore &p_source) const noexcept
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterCore<InfiniterDerived>::operator ~() const noexcept
+{
+    InfiniterDerived number(*this);
+    number.negate();
+    return std::move(number);
+}
+
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::operator ==(const InfiniterDerived &p_source) const noexcept
 {
     return this->equal(p_source);
 }
 
-bool InfiniterCore::operator !=(const InfiniterCore &p_source) const noexcept
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::operator !=(const InfiniterDerived &p_source) const noexcept
 {
     return this->differs(p_source);
 }
 
-bool InfiniterCore::operator >(const InfiniterCore &p_source) const noexcept
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::operator >(const InfiniterDerived &p_source) const noexcept
 {
     return this->greater(p_source);
 }
 
-bool InfiniterCore::operator <(const InfiniterCore &p_source) const noexcept
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::operator <(const InfiniterDerived &p_source) const noexcept
 {
     return this->smaller(p_source);
 }
 
-bool InfiniterCore::operator >=(const InfiniterCore &p_source) const noexcept
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::operator >=(const InfiniterDerived &p_source) const noexcept
 {
     return this->greaterEqual(p_source);
 }
 
-bool InfiniterCore::operator <=(const InfiniterCore &p_source) const noexcept
+template<typename InfiniterDerived>
+bool InfiniterCore<InfiniterDerived>::operator <=(const InfiniterDerived &p_source) const noexcept
 {
     return this->smallerEqual(p_source);
 }
 
-icell_t &InfiniterCore::operator [](isize_t p_cell_index)
+template<typename InfiniterDerived>
+icell_t &InfiniterCore<InfiniterDerived>::operator [](isize_t p_cell_index)
 {
     return this->getCell(p_cell_index);
 }
 
-const icell_t &InfiniterCore::operator [](isize_t p_cell_index) const
+template<typename InfiniterDerived>
+const icell_t &InfiniterCore<InfiniterDerived>::operator [](isize_t p_cell_index) const
 {
     return this->getCell(p_cell_index);
 }
-
 

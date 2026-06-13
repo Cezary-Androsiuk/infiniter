@@ -1,7 +1,8 @@
 #include "source/InfiniterMemory.hpp"
 #include "source/InfiniterCore.hpp"
-#include "source/InfiniterIO.hpp"
-#include "source/InfiniterUtility.hpp"
+// #include "source/InfiniterIO.hpp"
+// #include "source/InfiniterUtility.hpp"
+#include "source/Infiniter.hpp"
 
 #include <cstdio>
 #include <algorithm> // std::copy_n, std::fill_n, std::move
@@ -13,8 +14,9 @@
  * InfiniterException   IE
  * InfiniterShared      IS
  * InfiniterTests       IT
- * 
- * 
+ * InfiniterDerived     ID - template
+ *
+ *
  * Infiniter            I
  * InfiniterUtility     IU
  * InfiniterIO          IO
@@ -196,12 +198,12 @@ void infiniterMemoryTests()
 void infiniterCoreTests()
 {
     printf("==================================================\n");
-    InfiniterCore ic0;
+    Infiniter ic0;
     ic_dbg_print_memory(ic0);
     ic0.assign(0xABCDEF, false);
     ic_dbg_print_memory(ic0);
 
-    InfiniterCore ic1(20, 0x1234, true);
+    Infiniter ic1(20, 0x1234, true);
     ic_dbg_print_memory(ic1);
     ic1.getData()[1] = 123;
     ic_dbg_print_memory(ic1);
@@ -230,6 +232,7 @@ void infiniterCoreTests()
     ic_dbg_print_memory(ic1);
 
     ic1 = ic0;
+    ic1.operator=(ic0);
     ic_dbg_print_memory(ic1);
     ic1.getData()[1] = 0x12345;
     ic_dbg_print_memory(ic1);
@@ -334,160 +337,161 @@ void infiniterCoreTests()
 }
 
 
-void infiniterIOTests()
-{
-    printf("==================================================\n");
-    InfiniterIO io0(0x1, false);
-    io0.dbg_print_memory();
+// void infiniterIOTests()
+// {
+//     printf("==================================================\n");
+//     InfiniterIO io0(0x1, false);
+//     io0.dbg_print_memory();
 
-    // for(int j=0; j<40; j++)
-    // {
-    //     io0.assign(1, false);
+//     // for(int j=0; j<40; j++)
+//     // {
+//     //     io0.assign(1, false);
 
-    //     uint64_t warm1_start = read_tsc_start();
-    //     uint64_t warm1_end = read_tsc_end();
-    //     uint64_t warm2_start = read_tsc_start();
-    //     uint64_t warm2_end = read_tsc_end();
+//     //     uint64_t warm1_start = read_tsc_start();
+//     //     uint64_t warm1_end = read_tsc_end();
+//     //     uint64_t warm2_start = read_tsc_start();
+//     //     uint64_t warm2_end = read_tsc_end();
 
-    //     uint64_t start = read_tsc_start();
+//     //     uint64_t start = read_tsc_start();
 
-    //     for(int i=0; i<64*10*j; i++)
-    //     {
-    //         io0.pushLSB(1);
-    //     }
+//     //     for(int i=0; i<64*10*j; i++)
+//     //     {
+//     //         io0.pushLSB(1);
+//     //     }
 
-    //     uint64_t end = read_tsc_end();
+//     //     uint64_t end = read_tsc_end();
 
-    //     // printf("Warm 1 time: %llu\n", warm1_end - warm1_start);
-    //     // printf("Warm 2 time: %llu\n", warm2_end - warm2_start);
-    //     printf("Iterations: %d\n", j*10);
-    //     printf("Clock cycles: %llu\n", end - start);
-    // }
+//     //     // printf("Warm 1 time: %llu\n", warm1_end - warm1_start);
+//     //     // printf("Warm 2 time: %llu\n", warm2_end - warm2_start);
+//     //     printf("Iterations: %d\n", j*10);
+//     //     printf("Clock cycles: %llu\n", end - start);
+//     // }
 
-    // {
-    //     uint64_t warm1_start = read_tsc_start();
-    //     uint64_t warm1_end = read_tsc_end();
-    //     uint64_t warm2_start = read_tsc_start();
-    //     uint64_t warm2_end = read_tsc_end();
+//     // {
+//     //     uint64_t warm1_start = read_tsc_start();
+//     //     uint64_t warm1_end = read_tsc_end();
+//     //     uint64_t warm2_start = read_tsc_start();
+//     //     uint64_t warm2_end = read_tsc_end();
 
-    //     uint64_t start = read_tsc_start();
+//     //     uint64_t start = read_tsc_start();
 
-    //     for(int i=0; i<64*100; i++)
-    //     {
-    //         io0.pushLSB(1);
-    //     }
+//     //     for(int i=0; i<64*100; i++)
+//     //     {
+//     //         io0.pushLSB(1);
+//     //     }
 
-    //     uint64_t end = read_tsc_end();
+//     //     uint64_t end = read_tsc_end();
 
-    //     printf("Warm 1 time: %llu\n", warm1_end - warm1_start);
-    //     printf("Warm 2 time: %llu\n", warm2_end - warm2_start);
-    //     printf("Clock cycles: %llu\n", end - start);
-    // }
-    // {
-    //     uint64_t warm1_start = read_tsc_start();
-    //     uint64_t warm1_end = read_tsc_end();
-    //     uint64_t warm2_start = read_tsc_start();
-    //     uint64_t warm2_end = read_tsc_end();
+//     //     printf("Warm 1 time: %llu\n", warm1_end - warm1_start);
+//     //     printf("Warm 2 time: %llu\n", warm2_end - warm2_start);
+//     //     printf("Clock cycles: %llu\n", end - start);
+//     // }
+//     // {
+//     //     uint64_t warm1_start = read_tsc_start();
+//     //     uint64_t warm1_end = read_tsc_end();
+//     //     uint64_t warm2_start = read_tsc_start();
+//     //     uint64_t warm2_end = read_tsc_end();
 
-    //     uint64_t start = read_tsc_start();
+//     //     uint64_t start = read_tsc_start();
 
-    //     for(int i=0; i<64*1'000; i++)
-    //     {
-    //         io0.pushLSB(1);
-    //     }
+//     //     for(int i=0; i<64*1'000; i++)
+//     //     {
+//     //         io0.pushLSB(1);
+//     //     }
 
-    //     uint64_t end = read_tsc_end();
+//     //     uint64_t end = read_tsc_end();
 
-    //     printf("Warm 1 time: %llu\n", warm1_end - warm1_start);
-    //     printf("Warm 2 time: %llu\n", warm2_end - warm2_start);
-    //     printf("Clock cycles: %llu\n", end - start);
-    // }
-    // {
-    //     uint64_t warm1_start = read_tsc_start();
-    //     uint64_t warm1_end = read_tsc_end();
-    //     uint64_t warm2_start = read_tsc_start();
-    //     uint64_t warm2_end = read_tsc_end();
+//     //     printf("Warm 1 time: %llu\n", warm1_end - warm1_start);
+//     //     printf("Warm 2 time: %llu\n", warm2_end - warm2_start);
+//     //     printf("Clock cycles: %llu\n", end - start);
+//     // }
+//     // {
+//     //     uint64_t warm1_start = read_tsc_start();
+//     //     uint64_t warm1_end = read_tsc_end();
+//     //     uint64_t warm2_start = read_tsc_start();
+//     //     uint64_t warm2_end = read_tsc_end();
 
-    //     uint64_t start = read_tsc_start();
+//     //     uint64_t start = read_tsc_start();
 
-    //     for(int i=0; i<64*100'000; i++)
-    //     {
-    //         io0.pushLSB(1);
-    //     }
+//     //     for(int i=0; i<64*100'000; i++)
+//     //     {
+//     //         io0.pushLSB(1);
+//     //     }
 
-    //     uint64_t end = read_tsc_end();
+//     //     uint64_t end = read_tsc_end();
 
-    //     printf("Warm 1 time: %llu\n", warm1_end - warm1_start);
-    //     printf("Warm 2 time: %llu\n", warm2_end - warm2_start);
-    //     printf("Clock cycles: %llu\n", end - start);
-    // }
-    // io0.dbg_print_memory();
-
-
-
-    io0.assign(0x1);
-    for(int i=0; i<64*3; i++)
-    {
-        io0.pushLSB(0);
-        io0.print(10);
-        printf("\n%s\n", io0.toString(10).c_str());
-        printf("%s\n", io0.toString(36).c_str());
-        io0.printBase2();
-        printf("\n%s\n", io0.toString(2).c_str());
-        printf("\n");
-    }
-
-    printf("\n\n");
-
-    io0.assign(2);
-    for(int i=0; i<64*2; i++)
-    {
-        io0.pushMSB(1);
-        printf("%s\n", io0.toString(2).c_str());
-    }
+//     //     printf("Warm 1 time: %llu\n", warm1_end - warm1_start);
+//     //     printf("Warm 2 time: %llu\n", warm2_end - warm2_start);
+//     //     printf("Clock cycles: %llu\n", end - start);
+//     // }
+//     // io0.dbg_print_memory();
 
 
-    printf("\n\n");
 
-    printf("%s\n", io0.toString(36).c_str());
-    io0.serialize("io0-large.inf");
-    io0.deserialize("io0-large.inf");
-    printf("%s\n", io0.toString(36).c_str());
+//     io0.assign(0x1);
+//     for(int i=0; i<64*3; i++)
+//     {
+//         io0.pushLSB(0);
+//         io0.print(10);
+//         printf("\n%s\n", io0.toString(10).c_str());
+//         printf("%s\n", io0.toString(36).c_str());
+//         io0.printBase2();
+//         printf("\n%s\n", io0.toString(2).c_str());
+//         printf("\n");
+//     }
 
-    printf("\n\n");
+//     printf("\n\n");
 
-    ic_dbg_print_memory(io0);
-    ic_dbg_print_data(io0);
-
-    io0.clear();
-
-    ic_dbg_print_memory(io0);
-    ic_dbg_print_data(io0);
-
-    io0.assign(0);
-
-    ic_dbg_print_memory(io0);
-    ic_dbg_print_data(io0);
-
-    io0.reset();
-
-    ic_dbg_print_memory(io0);
-    ic_dbg_print_data(io0);
-
-    printf("\n\n");
-
-    // const char *binary_str = "111110000111100001111000011110000111100001111000011110000111100000001";
-    const char *binary_str = "11100111";
-
-    io0.assignStringBase2(binary_str);
-    ic_dbg_print_data(io0);
+//     io0.assign(2);
+//     for(int i=0; i<64*2; i++)
+//     {
+//         io0.pushMSB(1);
+//         printf("%s\n", io0.toString(2).c_str());
+//     }
 
 
-}
+//     printf("\n\n");
+
+//     printf("%s\n", io0.toString(36).c_str());
+//     io0.serialize("io0-large.inf");
+//     io0.deserialize("io0-large.inf");
+//     printf("%s\n", io0.toString(36).c_str());
+
+//     printf("\n\n");
+
+//     ic_dbg_print_memory(io0);
+//     ic_dbg_print_data(io0);
+
+//     io0.clear();
+
+//     ic_dbg_print_memory(io0);
+//     ic_dbg_print_data(io0);
+
+//     io0.assign(0);
+
+//     ic_dbg_print_memory(io0);
+//     ic_dbg_print_data(io0);
+
+//     io0.reset();
+
+//     ic_dbg_print_memory(io0);
+//     ic_dbg_print_data(io0);
+
+//     printf("\n\n");
+
+//     // const char *binary_str = "111110000111100001111000011110000111100001111000011110000111100000001";
+//     const char *binary_str = "11100111";
+
+//     io0.assignStringBase2(binary_str);
+//     ic_dbg_print_data(io0);
+
+
+// }
 
 
 int main(int argc, char *argv[])
 {
+
     // InfiniterIO icp;
     // icp.dbgPrint(); printf("\n");
 

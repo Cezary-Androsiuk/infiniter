@@ -1,5 +1,4 @@
-#ifndef INFINITEREXCEPTION_HPP
-#define INFINITEREXCEPTION_HPP
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -8,6 +7,7 @@ namespace InfiniterException{
     class Exception : public std::runtime_error { public:
         explicit Exception(const std::string &p_message)
             : std::runtime_error(p_message) {}
+        virtual ~Exception() noexcept;
     };
 
     class OutOfRange : public Exception { public:
@@ -49,5 +49,3 @@ namespace InfiniterException{
     };
 }
 
-
-#endif // INFINITEREXCEPTION_HPP
