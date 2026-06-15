@@ -492,6 +492,22 @@ void infiniterCoreTests()
 int main(int argc, char *argv[])
 {
 
+    Infiniter infiniter1("12");
+    printf("\n");
+    Infiniter infiniter2("48");
+    printf("\n");
+
+    infiniter1.print(10);
+    printf("\n");
+    infiniter2.print(10);
+    printf("\n");
+
+    infiniter1.add(infiniter2);
+    printf("\n");
+
+    infiniter1.print(10);
+    printf("\n");
+
     // InfiniterIO icp;
     // icp.dbgPrint(); printf("\n");
 
@@ -540,7 +556,7 @@ int main(int argc, char *argv[])
 
     // infiniterMemoryTests();
 
-    infiniterCoreTests();
+    // infiniterCoreTests();
 
     // infiniterIOTests();
 

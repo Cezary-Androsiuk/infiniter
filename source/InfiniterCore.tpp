@@ -111,11 +111,6 @@ void InfiniterCore<InfiniterDerived>::reset() noexcept
     InfiniterMemory::reset(); /// makes m_capacity == SBO_CAPACITY
     m_bits.sign = false;
     m_size = ISIZE_C(1);
-
-    for(isize_t i=0; i<m_capacity; i++)
-    {
-        m_data[i] = ICELL_C(0);
-    }
 }
 
 template<typename InfiniterDerived>
@@ -136,17 +131,6 @@ void InfiniterCore<InfiniterDerived>::clearReserved() noexcept
     {
         m_data[i] = ICELL_C(0);
     }
-}
-
-template<typename InfiniterDerived>
-isize_t InfiniterCore<InfiniterDerived>::realSize() const noexcept
-{
-    isize_t real_size = m_size;
-    while (real_size > 0 && m_data[real_size - 1] == ICELL_C(0))
-    {
-        real_size--;
-    }
-    return real_size;
 }
 
 template<typename InfiniterDerived>
@@ -236,6 +220,17 @@ template<typename InfiniterDerived>
 ibit_t InfiniterCore<InfiniterDerived>::getSign() const noexcept
 {
     return m_bits.sign;
+}
+
+template<typename InfiniterDerived>
+isize_t InfiniterCore<InfiniterDerived>::getRealSize() const noexcept
+{
+    isize_t real_size = m_size;
+    while (real_size > 1 && m_data[real_size - 1] == ICELL_C(0))
+    {
+        real_size--;
+    }
+    return real_size;
 }
 
 template<typename InfiniterDerived>
@@ -412,27 +407,27 @@ inline bool InfiniterCore<InfiniterDerived>::smallerEqual(icell_t p_scalar, int 
 }
 
 template<typename InfiniterDerived>
-bool InfiniterCore<InfiniterDerived>::equal(const InfiniterDerived &p_source) const noexcept
+bool InfiniterCore<InfiniterDerived>::equal(const InfiniterDerived &p_right) const noexcept
 {
-    if(this == &p_source)
+    if(this == &p_right)
         return true;
 
     /// handle signs
-    if(m_bits.sign != p_source.m_bits.sign)
+    if(m_bits.sign != p_right.m_bits.sign)
         return false;
 
     /// handle different sizes
-    isize_t this_real_size = this->realSize();
-    isize_t source_real_size = p_source.realSize();
+    isize_t left_size = this->getRealSize();
+    isize_t right_size = p_right.getRealSize();
 
-    if(this_real_size != source_real_size)
+    if(left_size != right_size)
         return false;
 
     /// handle data
-    const icell_t *source_data = p_source.m_data;
-    for(isize_t i=0; i<this_real_size; i++)
+    const icell_t *right_data = p_right.m_data;
+    for(isize_t i=0; i<left_size; i++)
     {
-        if(m_data[i] != source_data[i])
+        if(m_data[i] != right_data[i])
             return false;
     }
 
@@ -440,27 +435,27 @@ bool InfiniterCore<InfiniterDerived>::equal(const InfiniterDerived &p_source) co
 }
 
 template<typename InfiniterDerived>
-bool InfiniterCore<InfiniterDerived>::differs(const InfiniterDerived &p_source) const noexcept
+bool InfiniterCore<InfiniterDerived>::differs(const InfiniterDerived &p_right) const noexcept
 {
-    if(this == &p_source)
+    if(this == &p_right)
         return false;
 
     /// handle signs
-    if(m_bits.sign != p_source.m_bits.sign)
+    if(m_bits.sign != p_right.m_bits.sign)
         return true;
 
     /// handle different sizes
-    isize_t this_real_size = this->realSize();
-    isize_t source_real_size = p_source.realSize();
+    isize_t left_size = this->getRealSize();
+    isize_t right_size = p_right.getRealSize();
 
-    if(this_real_size != source_real_size)
+    if(left_size != right_size)
         return true;
 
     /// handle data
-    const icell_t *source_data = p_source.m_data;
-    for(isize_t i=0; i<this_real_size; i++)
+    const icell_t *right_data = p_right.m_data;
+    for(isize_t i=0; i<left_size; i++)
     {
-        if(m_data[i] != source_data[i])
+        if(m_data[i] != right_data[i])
             return true;
     }
 
@@ -468,32 +463,32 @@ bool InfiniterCore<InfiniterDerived>::differs(const InfiniterDerived &p_source) 
 }
 
 template<typename InfiniterDerived>
-bool InfiniterCore<InfiniterDerived>::greater(const InfiniterDerived &p_source) const noexcept
+bool InfiniterCore<InfiniterDerived>::greater(const InfiniterDerived &p_right) const noexcept
 {
-    if(this == &p_source)
+    if(this == &p_right)
         return false;
 
     /// handle signs
-    if(m_bits.sign != p_source.m_bits.sign)
+    if(m_bits.sign != p_right.m_bits.sign)
     {
         return m_bits.sign;
     }
 
     /// handle different sizes
-    isize_t this_real_size = this->realSize();
-    isize_t source_real_size = p_source.realSize();
+    isize_t left_size = this->getRealSize();
+    isize_t right_size = p_right.getRealSize();
 
-    if(this_real_size > source_real_size)
+    if(left_size > right_size)
         return true;
 
     /// handle data - iterate from MSB
-    const icell_t *source_data = p_source.m_data;
-    for(isize_t i=0; i<this_real_size; i++)
+    const icell_t *right_data = p_right.m_data;
+    for(isize_t i=0; i<left_size; i++)
     {
-        isize_t i_rev = this_real_size - 1 - i;
-        if(m_data[i_rev] != source_data[i_rev])
+        isize_t i_rev = left_size - 1 - i;
+        if(m_data[i_rev] != right_data[i_rev])
         {
-            return m_data[i_rev] > source_data[i_rev];
+            return m_data[i_rev] > right_data[i_rev];
         }
     }
 
@@ -501,32 +496,32 @@ bool InfiniterCore<InfiniterDerived>::greater(const InfiniterDerived &p_source) 
 }
 
 template<typename InfiniterDerived>
-bool InfiniterCore<InfiniterDerived>::smaller(const InfiniterDerived &p_source) const noexcept
+bool InfiniterCore<InfiniterDerived>::smaller(const InfiniterDerived &p_right) const noexcept
 {
-    if(this == &p_source)
+    if(this == &p_right)
         return false;
 
     /// handle signs
-    if(m_bits.sign != p_source.m_bits.sign)
+    if(m_bits.sign != p_right.m_bits.sign)
     {
         return !m_bits.sign;
     }
 
     /// handle different sizes
-    isize_t this_real_size = this->realSize();
-    isize_t source_real_size = p_source.realSize();
+    isize_t left_size = this->getRealSize();
+    isize_t right_size = p_right.getRealSize();
 
-    if(this_real_size < source_real_size)
+    if(left_size < right_size)
         return true;
 
     /// handle data - iterate from MSB
-    const icell_t *source_data = p_source.m_data;
-    for(isize_t i=0; i<this_real_size; i++)
+    const icell_t *right_data = p_right.m_data;
+    for(isize_t i=0; i<left_size; i++)
     {
-        isize_t i_rev = this_real_size - 1 - i;
-        if(m_data[i_rev] != source_data[i_rev])
+        isize_t i_rev = left_size - 1 - i;
+        if(m_data[i_rev] != right_data[i_rev])
         {
-            return m_data[i_rev] < source_data[i_rev];
+            return m_data[i_rev] < right_data[i_rev];
         }
     }
 
@@ -534,32 +529,32 @@ bool InfiniterCore<InfiniterDerived>::smaller(const InfiniterDerived &p_source) 
 }
 
 template<typename InfiniterDerived>
-bool InfiniterCore<InfiniterDerived>::greaterEqual(const InfiniterDerived &p_source) const noexcept
+bool InfiniterCore<InfiniterDerived>::greaterEqual(const InfiniterDerived &p_right) const noexcept
 {
-    if(this == &p_source)
+    if(this == &p_right)
         return true;
 
     /// handle signs
-    if(m_bits.sign != p_source.m_bits.sign)
+    if(m_bits.sign != p_right.m_bits.sign)
     {
         return m_bits.sign;
     }
 
     /// handle different sizes
-    isize_t this_real_size = this->realSize();
-    isize_t source_real_size = p_source.realSize();
+    isize_t left_size = this->getRealSize();
+    isize_t right_size = p_right.getRealSize();
 
-    if(this_real_size > source_real_size)
+    if(left_size > right_size)
         return true;
 
     /// handle data - iterate from MSB
-    const icell_t *source_data = p_source.m_data;
-    for(isize_t i=0; i<this_real_size; i++)
+    const icell_t *right_data = p_right.m_data;
+    for(isize_t i=0; i<left_size; i++)
     {
-        isize_t i_rev = this_real_size - 1 - i;
-        if(m_data[i_rev] != source_data[i_rev])
+        isize_t i_rev = left_size - 1 - i;
+        if(m_data[i_rev] != right_data[i_rev])
         {
-            return m_data[i_rev] > source_data[i_rev];
+            return m_data[i_rev] > right_data[i_rev];
         }
     }
 
@@ -567,32 +562,32 @@ bool InfiniterCore<InfiniterDerived>::greaterEqual(const InfiniterDerived &p_sou
 }
 
 template<typename InfiniterDerived>
-bool InfiniterCore<InfiniterDerived>::smallerEqual(const InfiniterDerived &p_source) const noexcept
+bool InfiniterCore<InfiniterDerived>::smallerEqual(const InfiniterDerived &p_right) const noexcept
 {
-    if(this == &p_source)
+    if(this == &p_right)
         return true;
 
     /// handle signs
-    if(m_bits.sign != p_source.m_bits.sign)
+    if(m_bits.sign != p_right.m_bits.sign)
     {
         return !m_bits.sign;
     }
 
     /// handle different sizes
-    isize_t this_real_size = this->realSize();
-    isize_t source_real_size = p_source.realSize();
+    isize_t left_size = this->getRealSize();
+    isize_t right_size = p_right.getRealSize();
 
-    if(this_real_size < source_real_size)
+    if(left_size < right_size)
         return true;
 
     /// handle data - iterate from MSB
-    const icell_t *source_data = p_source.m_data;
-    for(isize_t i=0; i<this_real_size; i++)
+    const icell_t *right_data = p_right.m_data;
+    for(isize_t i=0; i<left_size; i++)
     {
-        isize_t i_rev = this_real_size - 1 - i;
-        if(m_data[i_rev] != source_data[i_rev])
+        isize_t i_rev = left_size - 1 - i;
+        if(m_data[i_rev] != right_data[i_rev])
         {
-            return m_data[i_rev] < source_data[i_rev];
+            return m_data[i_rev] < right_data[i_rev];
         }
     }
 

@@ -75,7 +75,7 @@ template<typename InfiniterDerived>
 void InfiniterArithmetic<InfiniterDerived>::incrementMagnitude()
 {
     icell_t *data = this->getData();
-    icell_t size = this->getSize();
+    icell_t size = this->getRealSize();
 
     icell_t *cell_ptr = data;
     const icell_t *const last_cell = data + (size-1);
@@ -104,13 +104,15 @@ void InfiniterArithmetic<InfiniterDerived>::incrementMagnitude()
 
     /// cell_ptr will contain cell that could be modifed
     (*cell_ptr)++;
+
+    this->normalize();
 }
 
 template<typename InfiniterDerived>
 void InfiniterArithmetic<InfiniterDerived>::decrementMagnitude()
 {
     icell_t *data = this->getData();
-    icell_t size = this->getSize();
+    icell_t size = this->getRealSize();
 
     icell_t *cell_ptr = data;
     const icell_t *const last_cell = data + (size-1);
@@ -132,7 +134,7 @@ template<typename InfiniterDerived>
 void InfiniterArithmetic<InfiniterDerived>::addMagnitude(icell_t p_value)
 {
     icell_t *data = this->getData();
-    isize_t size = this->getSize();
+    isize_t size = this->getRealSize();
 
     icell_t carry = p_value;
     for(isize_t i=0; i<size && carry; i++)
@@ -148,20 +150,22 @@ void InfiniterArithmetic<InfiniterDerived>::addMagnitude(icell_t p_value)
         size = this->setSizeWithExtend(size+1);
         this->getData()[size-1] = carry;
     }
+
+    this->normalize();
 }
 
 template<typename InfiniterDerived>
 void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(icell_t p_value)
 {
     icell_t *data = this->getData();
-    isize_t size = this->getSize();
+    isize_t size = this->getRealSize();
 
     icell_t carry = p_value;
     for(isize_t i=0; i<size && carry; i++)
     {
         __uint128_t sum = (__uint128_t)data[i] + carry;
         data[i] = (icell_t)sum;
-        carry = (icell_t)(sum >> 64);
+        carry = (icell_t)(sum >> BITS_PER_CELL);
     }
 
     if(carry)
@@ -169,18 +173,64 @@ void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(icell_t p_value)
         size = this->setSizeWithExtend(size+1);
         this->getData()[size-1] = carry;
     }
+
+    this->normalize();
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::addMagnitude(const InfiniterDerived &p_number)
+void InfiniterArithmetic<InfiniterDerived>::addMagnitude(const InfiniterDerived &p_right)
 {
+    /// block to approximate result size
+    {
+        isize_t lsize = this->getRealSize();
+        isize_t rsize = p_right.getRealSize();
 
+        isize_t larger_size = lsize >= rsize ? lsize : rsize;
+        const icell_t *larger_data = lsize >= rsize ? this->getData() : p_right.getData();
+
+        isize_t extra_cell = !!(larger_data[larger_size-1] & M100);  /// +1 if needed
+        isize_t out_size = larger_size + extra_cell;
+
+        this->setSizeWithExtend(out_size);
+    }
+
+    /// at this point left number has greater or equal size to right number
+
+    icell_t *ldata = this->getData();
+    const icell_t *rdata = p_right.getData();
+
+    isize_t lsize = this->getSize();
+    isize_t rsize = p_right.getSize();
+
+    icell_t carry = ICELL_C(0);
+
+    /// add common part
+    for(isize_t i=0; i<rsize; i++)
+    {
+        __uint128_t sum = static_cast<__uint128_t>(ldata[i]) + rdata[i] + carry;
+        ldata[i] = static_cast<icell_t>(ldata[i]);
+        carry = static_cast<icell_t>(sum >> BITS_PER_CELL);
+    }
+
+    /// move the rest (with carry)
+    for(isize_t i=rsize; i<lsize && carry; i++)
+    {
+        __uint128_t sum = static_cast<__uint128_t>(ldata[i]) + carry;
+        ldata[i] = static_cast<icell_t>(ldata[i]);
+        carry = static_cast<icell_t>(sum >> BITS_PER_CELL);
+    }
+
+
+    this->normalize();
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(const InfiniterDerived &p_number)
+void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(const InfiniterDerived &p_right)
 {
 
+
+
+    this->normalize();
 }
 
 template<typename InfiniterDerived>
@@ -190,11 +240,11 @@ void InfiniterArithmetic<InfiniterDerived>::increment()
     if(this->getSign())
     {
         /// perform operation on absolute value
-        this->decrementMagnitude();
+        this->decrementMagnitude();  /// has normalize
         return;
     }
 
-    this->incrementMagnitude();
+    this->incrementMagnitude();  /// has normalize
 }
 
 template<typename InfiniterDerived>
@@ -204,7 +254,7 @@ void InfiniterArithmetic<InfiniterDerived>::decrement()
     if(this->getSign())
     {
         /// perform operation on absolute value
-        this->incrementMagnitude();
+        this->incrementMagnitude();  /// has normalize
         return;
     }
 
@@ -218,7 +268,7 @@ void InfiniterArithmetic<InfiniterDerived>::decrement()
         return;
     }
 
-    this->decrementMagnitude();
+    this->decrementMagnitude();  /// has normalize
 }
 
 template<typename InfiniterDerived>
@@ -230,25 +280,26 @@ void InfiniterArithmetic<InfiniterDerived>::add(icell_t p_value, bool p_negative
     if(p_value == 1)
     {
         if(p_negative_value)
-            this->decrement();
+            this->decrement();  /// has normalize
         else
-            this->increment();
+            this->increment();  /// has normalize
 
         return;
     }
 
+    /// addition:
     /// this is negative
     if(this->getSign())
     {
         /// scalar is negative
         if(p_negative_value)
         {
-            this->addMagnitude(p_value);
+            this->addMagnitude(p_value);  /// has normalize
         }
         /// scalar is positive
         else
         {
-            this->subtractMagnitude(p_value);
+            this->subtractMagnitude(p_value);  /// has normalize
         }
     }
     /// this is positive
@@ -257,43 +308,49 @@ void InfiniterArithmetic<InfiniterDerived>::add(icell_t p_value, bool p_negative
         /// scalar is negative
         if(p_negative_value)
         {
-            this->subtractMagnitude(p_value);
+            this->subtractMagnitude(p_value);  /// has normalize
         }
         /// scalar is positive
         else
         {
-            this->addMagnitude(p_value);
+            this->addMagnitude(p_value);  /// has normalize
         }
     }
+
+
 }
 
 template<typename InfiniterDerived>
 void InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_value, bool p_negative_value)
 {
     if(p_value == 0)
+    {
+        this->normalize();
         return;
+    }
     if(p_value == 1)
     {
         if(p_negative_value)
-            this->increment();
+            this->increment();  /// has normalize
         else
-            this->decrement();
+            this->decrement();  /// has normalize
 
         return;
     }
 
+    /// subtraction:
     /// this is negative
     if(this->getSign())
     {
         /// scalar is negative
         if(p_negative_value)
         {
-            this->subtractMagnitude(p_value);
+            this->subtractMagnitude(p_value);  /// has normalize
         }
         /// scalar is positive
         else
         {
-            this->addMagnitude(p_value);
+            this->addMagnitude(p_value);  /// has normalize
         }
     }
     /// this is positive
@@ -302,144 +359,257 @@ void InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_value, bool p_neg
         /// scalar is negative
         if(p_negative_value)
         {
-            this->addMagnitude(p_value);
+            this->addMagnitude(p_value);  /// has normalize
         }
         /// scalar is positive
         else
         {
-            this->subtractMagnitude(p_value);
+            this->subtractMagnitude(p_value);  /// has normalize
         }
     }
 
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::add(const InfiniterDerived &p_number)
+void InfiniterArithmetic<InfiniterDerived>::add(const InfiniterDerived &p_right)
 {
-    // if(this->is0())
-    // {
-    //     this->assign(p_number);
-    //     return;
-    // }
-    if(p_number.is0())
+    if(this->is0())
     {
+        this->assign(p_right);
+        this->normalize();
         return;
     }
-    if(p_number.is1())
+    if(this->is1())
     {
-        if(p_number.getSign())
-            this->decrement();
+        this->assign(p_right);
+        if(p_right.getSign())
+            this->decrement();  /// has normalize
         else
-            this->increment();
+            this->increment();  /// has normalize
+
+        return;
+    }
+    if(p_right.getRealSize() == 1)
+    {
+        if(p_right.is0())
+        {
+            this->normalize();
+            return;
+        }
+        if(p_right.is1())
+        {
+            if(p_right.getSign())
+                this->decrement();  /// has normalize
+            else
+                this->increment();  /// has normalize
+
+            return;
+        }
+        if(p_right.getSign())
+            this->subtract(p_right.getData()[0]);  /// has normalize
+        else
+            this->add(p_right.getData()[0]);  /// has normalize
+
+        return;
+    }
+
+    /// addition:
+    /// this is negative
+    if(this->getSign())
+    {
+        /// scalar is negative
+        if(p_right.getSign())
+        {
+            this->addMagnitude(p_right);  /// has normalize
+        }
+        /// scalar is positive
+        else
+        {
+            this->subtractMagnitude(p_right);  /// has normalize
+        }
+    }
+    /// this is positive
+    else
+    {
+        /// scalar is negative
+        if(p_right.getSign())
+        {
+            this->subtractMagnitude(p_right);  /// has normalize
+        }
+        /// scalar is positive
+        else
+        {
+            this->addMagnitude(p_right);  /// has normalize
+        }
     }
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::subtract(const InfiniterDerived &p_number)
+void InfiniterArithmetic<InfiniterDerived>::subtract(const InfiniterDerived &p_right)
 {
+    if(this->is0())
+    {
+        this->assign(p_right);
+        this->normalize();
+        return;
+    }
+    if(this->is1())
+    {
+        this->assign(p_right);
+        if(p_right.getSign())
+            this->increment();  /// has normalize
+        else
+            this->decrement();  /// has normalize
 
+        return;
+    }
+    if(p_right.getRealSize() == 1)
+    {
+        if(p_right.is0())
+        {
+            this->normalize();
+            return;
+        }
+        if(p_right.is1())
+        {
+            if(p_right.getSign())
+                this->increment();  /// has normalize
+            else
+                this->decrement();  /// has normalize
+
+            return;
+        }
+        if(p_right.getSign())
+            this->subtract(p_right.getData()[0]);  /// has normalize
+        else
+            this->add(p_right.getData()[0]);  /// has normalize
+
+        return;
+    }
+
+    /// subtraction:
+    /// this is negative
+    if(this->getSign())
+    {
+        /// scalar is negative
+        if(p_right.getSign())
+        {
+            this->subtractMagnitude(p_right);  /// has normalize
+        }
+        /// scalar is positive
+        else
+        {
+            this->addMagnitude(p_right);  /// has normalize
+        }
+    }
+    /// this is positive
+    else
+    {
+        /// scalar is negative
+        if(p_right.getSign())
+        {
+            this->addMagnitude(p_right);  /// has normalize
+        }
+        /// scalar is positive
+        else
+        {
+            this->subtractMagnitude(p_right);  /// has normalize
+        }
+    }
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::multiply(const InfiniterDerived &p_number)
+void InfiniterArithmetic<InfiniterDerived>::multiply(const InfiniterDerived &p_right)
 {
     /// handle signs
     /// reverse sign only if other number is negative case
-    if(p_number.getSign())
+    if(p_right.getSign())
         this->negate();
 
-    /// handle edge cases 0
-    if(this->is0() || p_number.is0())
+    if(p_right.getRealSize() == 1)
     {
-        this->reset();
-        return;
+        /// handle edge cases p_right
+        if(p_right.is0())
+        {
+            this->reset();
+            return;
+        }
+        if(p_right.is1())
+        {
+            this->normalize();
+            return;
+        }
+        if(p_right.is2())
+        {
+            this->pushLSB(IBIT_0);
+            this->normalize();
+            return;
+        }
+    }
+    if(this->getRealSize() == 1)
+    {
+        /// handle edge cases this
+        if(this->is0())
+        {
+            this->reset();
+            return;
+        }
+        if(this->is1())
+        {
+            this->assign(p_right);
+            this->normalize();
+            return;
+        }
+        if(this->is2())
+        {
+            this->assign(p_right);
+            this->pushLSB(IBIT_0);
+            this->normalize();
+            return;
+        }
     }
 
-    /// handle edge cases p_number
-    if(p_number.isPositive1())
-    {
-        return;
-    }
-    if(p_number.isNegative1())
-    {
-        this->negate();
-        return;
-    }
-    if(p_number.isPositive2())
-    {
-        this->pushLSB(IBIT_0);
-        return;
-    }
-    if(p_number.isNegative2())
-    {
-        this->pushLSB(IBIT_0);
-        this->negate();
-        return;
-    }
 
-    /// handle edge cases this
-    if(this->isPositive1())
-    {
-        this->assign(p_number);
-        return;
-    }
-    if(this->isNegative1())
-    {
-        this->assign(p_number);
-        this->negate();
-        return;
-    }
-    if(this->isPositive2())
-    {
-        this->assign(p_number);
-        this->pushLSB(IBIT_0);
-        return;
-    }
-    if(this->isNegative2())
-    {
-        this->assign(p_number);
-        this->pushLSB(IBIT_0);
-        this->negate();
-        return;
-    }
+    /// multiplication:
+
 
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::divde(const InfiniterDerived &p_number)
+void InfiniterArithmetic<InfiniterDerived>::divde(const InfiniterDerived &p_right)
 {
     /// handle signs
     /// reverse sign only if other number is negative case
-    if(p_number.getSign())
+    if(p_right.getSign())
         this->negate();
 
-    if(p_number.is0())
+    if(p_right.is0())
     {
         /// zero division exception
     }
 
     if(this->is0())
     {
-        this->trim();
+        this->reset();
         return;
     }
 
-    if(p_number.isPositive1())
+    if(p_right.isPositive1())
     {
         this->trim();
         return;
     }
-    if(p_number.isNegative1())
+    if(p_right.isNegative1())
     {
         this->negate();
         return;
     }
-    if(p_number.isPositive2())
+    if(p_right.isPositive2())
     {
         this->shiftMSB(IBIT_0);
         return;
     }
-    if(p_number.isNegative2())
+    if(p_right.isNegative2())
     {
         this->shiftMSB(IBIT_0);
         this->negate();
@@ -448,6 +618,8 @@ void InfiniterArithmetic<InfiniterDerived>::divde(const InfiniterDerived &p_numb
 
     /// comparison optimization
     // if()
+
+    /// division:
 }
 
 template<typename InfiniterDerived>

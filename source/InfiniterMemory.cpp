@@ -144,9 +144,7 @@ void InfiniterMemory::reset() noexcept
     m_capacity = SBO_CAPACITY;
     m_bits.sbo_active = true;
 
-#if IM_CLEAR_ALLOCATED_MEMORY
     std::fill_n(m_sbo_buffer, SBO_CAPACITY, ICELL_C(0));
-#endif // IM_CLEAR_ALLOCATED_MEMORY
 }
 
 void InfiniterMemory::reserve(isize_t p_new_capacity)

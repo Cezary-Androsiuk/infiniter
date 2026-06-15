@@ -27,8 +27,6 @@ protected:
     void clear() noexcept;
     void clearReserved() noexcept;
 
-    isize_t realSize() const noexcept;
-
 public:
     inline void reserve(isize_t p_new_capacity);
     inline void reserve(const InfiniterDerived &p_source);
@@ -46,6 +44,7 @@ public:
     inline isize_t getSize() const noexcept;
     inline isize_t getCapacity() const noexcept;
     inline ibit_t getSign() const noexcept;
+    isize_t getRealSize() const noexcept;
 
     /// returns what size was set
     /// if p_new_size > m_capacity, then size will be set to m_capacity
@@ -72,12 +71,12 @@ public:
     bool greaterEqual(icell_t p_scalar, int p_sign) const noexcept;
     bool smallerEqual(icell_t p_scalar, int p_sign) const noexcept;
 
-    bool equal(const InfiniterDerived &p_source) const noexcept;
-    bool differs(const InfiniterDerived &p_source) const noexcept;
-    bool greater(const InfiniterDerived &p_source) const noexcept;
-    bool smaller(const InfiniterDerived &p_source) const noexcept;
-    bool greaterEqual(const InfiniterDerived &p_source) const noexcept;
-    bool smallerEqual(const InfiniterDerived &p_source) const noexcept;
+    bool equal(const InfiniterDerived &p_right) const noexcept;
+    bool differs(const InfiniterDerived &p_right) const noexcept;
+    bool greater(const InfiniterDerived &p_right) const noexcept;
+    bool smaller(const InfiniterDerived &p_right) const noexcept;
+    bool greaterEqual(const InfiniterDerived &p_right) const noexcept;
+    bool smallerEqual(const InfiniterDerived &p_right) const noexcept;
 
     bool is0() const noexcept;
     inline bool is1() const noexcept;

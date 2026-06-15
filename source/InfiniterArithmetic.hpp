@@ -27,8 +27,8 @@ protected:
     void addMagnitude(icell_t p_value);
     void subtractMagnitude(icell_t p_value);
 
-    void addMagnitude(const InfiniterDerived &p_number);
-    void subtractMagnitude(const InfiniterDerived &p_number);
+    void addMagnitude(const InfiniterDerived &p_right);
+    void subtractMagnitude(const InfiniterDerived &p_right);
 
 public:
     void increment();
@@ -37,12 +37,12 @@ public:
     void add(icell_t p_value, bool p_negative_value=false);
     void subtract(icell_t p_value, bool p_negative_value=false);
 
-    void add(const InfiniterDerived &p_number);
-    void subtract(const InfiniterDerived &p_number);
+    void add(const InfiniterDerived &p_right);
+    void subtract(const InfiniterDerived &p_right);
 
-    void multiply(const InfiniterDerived &p_number);
+    void multiply(const InfiniterDerived &p_right);
 
-    void divde(const InfiniterDerived &p_number);
+    void divde(const InfiniterDerived &p_right);
 
 
 public:
