@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <climits> // CHAR_BIT
 
 // masks
 #define M000 (0b00000000'00000000'00000000'00000000'00000000'00000000'00000000'00000000)
@@ -28,11 +29,18 @@ typedef uint8_t     ibit_t;     /// bit capacity
 #define ICELL_MAX UINT64_MAX
 #define ISIZE_MAX UINT64_MAX
 
-#define BITS_PER_BYTE   8
-#define BYTES_PER_CELL  8
-#define BITS_PER_CELL   64
+inline constexpr std::size_t icell_bits = sizeof(icell_t) * CHAR_BIT;
+inline constexpr std::size_t isize_bits = sizeof(isize_t) * CHAR_BIT;
 
-
+/// WARNING: providing 0 value will couse undefined behaviour
+/// clzll stands for "Count Leading Zeros Long Long"
+#define ICELL_MSB_POS(CELL) ((icell_bits-1) - __builtin_clzll(CELL))
+/// clzll stands for "Count Trailing Zeros Long Long"
+#define ICELL_LSB_POS(CELL) (__builtin_ctzll(CELL))
+/// clzll stands for "Count Leading Zeros Long Long"
+#define ICELL_SAFE_MSB_POS(CELL) (CELL ? ((icell_bits-1) - __builtin_clzll(CELL)) : ICELL_C(0))
+/// clzll stands for "Count Trailing Zeros Long Long"
+#define ICELL_SAFE_LSB_POS(CELL) (CELL ? (__builtin_ctzll(CELL)) : ICELL_C(0))
 
 
 /// Can't be less than 1

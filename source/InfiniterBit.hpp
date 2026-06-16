@@ -49,7 +49,7 @@ public:
     /// Returns MSB position in cell
     uint8_t getMSBPos() const noexcept;/////////////////////////////////////////////////// done here
     /// Returns MSB global position in cell  (could fail for large numbers)
-    isize_t getMSBGlobalPosUnsafe(bool *const overflow = nullptr) const noexcept;
+    isize_t getMSBGlobalPos(isize_t *const overflow = nullptr) const noexcept;
     /// Returns MSB global position in cell
     InfiniterDerived getMSBGlobalPos() const; // throws bad_alloc
 
@@ -76,7 +76,7 @@ public:
     /// Returns LSB position in cell
     uint8_t getLSBPos() const noexcept;
     /// Returns LSB global position in cell  (could fail for large numbers)
-    isize_t getLSBGlobalPosUnsafe(bool *const overflow = nullptr) const noexcept; // handle edge case
+    isize_t getLSBGlobalPos(isize_t *const overflow = nullptr) const noexcept; // handle edge case
     /// Returns LSB global position in cell
     InfiniterDerived getLSBGlobalPos() const; // throws bad_alloc
 

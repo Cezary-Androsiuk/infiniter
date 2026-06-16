@@ -163,9 +163,9 @@ void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(icell_t p_value)
     icell_t carry = p_value;
     for(isize_t i=0; i<size && carry; i++)
     {
-        __uint128_t sum = (__uint128_t)data[i] + carry;
-        data[i] = (icell_t)sum;
-        carry = (icell_t)(sum >> BITS_PER_CELL);
+        __uint128_t sum = static_cast<__uint128_t>(data[i]) + carry;
+        data[i] = static_cast<icell_t>(sum);
+        carry = static_cast<icell_t>(sum >> BITS_PER_CELL);
     }
 
     if(carry)

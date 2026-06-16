@@ -189,8 +189,7 @@ icell_t InfiniterBit<InfiniterDerived>::getMSBCell(uint8_t &r_bit_pos) const noe
         if(*(--cellPtr) != ICELL_C(0))
         {
             /// find MSB in cell
-            /// clzll stands for "Count Leading Zeros Long Long"
-            r_bit_pos = 63 - __builtin_clzll(*cellPtr);
+            r_bit_pos = ICELL_MSB_POS(*cellPtr);
 
             return *cellPtr;
         }
@@ -199,8 +198,7 @@ icell_t InfiniterBit<InfiniterDerived>::getMSBCell(uint8_t &r_bit_pos) const noe
 
     /// in any case (0 or non 0 value) return least significant cell value
     /// but first find MSB in cell
-    /// clzll stands for "Count Leading Zeros Long Long"
-    r_bit_pos = 63 - __builtin_clzll(*cellPtr);
+    r_bit_pos = ICELL_SAFE_MSB_POS(*cellPtr);
 
     return *cellPtr;
 }
@@ -217,8 +215,7 @@ const icell_t *InfiniterBit<InfiniterDerived>::getMSBCellPtr(uint8_t &r_bit_pos)
         if(*(--cellPtr) != ICELL_C(0))
         {
             /// find MSB in cell
-            /// clzll stands for "Count Leading Zeros Long Long"
-            r_bit_pos = 63 - __builtin_clzll(*cellPtr);
+            r_bit_pos = ICELL_MSB_POS(*cellPtr);
 
             return cellPtr;
         }
@@ -227,8 +224,7 @@ const icell_t *InfiniterBit<InfiniterDerived>::getMSBCellPtr(uint8_t &r_bit_pos)
 
     /// in any case (0 or non 0 value) return least significant cell value
     /// but first find MSB in cell
-    /// clzll stands for "Count Leading Zeros Long Long"
-    r_bit_pos = 63 - __builtin_clzll(*cellPtr);
+    r_bit_pos = ICELL_SAFE_MSB_POS(*cellPtr);
 
     return cellPtr;
 }
@@ -245,8 +241,7 @@ icell_t *InfiniterBit<InfiniterDerived>::getMSBCellPtr(uint8_t &r_bit_pos) noexc
         if(*(--cellPtr) != ICELL_C(0))
         {
             /// find MSB in cell
-            /// clzll stands for "Count Leading Zeros Long Long"
-            r_bit_pos = 63 - __builtin_clzll(*cellPtr);
+            r_bit_pos = ICELL_MSB_POS(*cellPtr);
 
             return cellPtr;
         }
@@ -255,8 +250,7 @@ icell_t *InfiniterBit<InfiniterDerived>::getMSBCellPtr(uint8_t &r_bit_pos) noexc
 
     /// in any case (0 or non 0 value) return least significant cell value
     /// but first find MSB in cell
-    /// clzll stands for "Count Leading Zeros Long Long"
-    r_bit_pos = 63 - __builtin_clzll(*cellPtr);
+    r_bit_pos = ICELL_SAFE_MSB_POS(*cellPtr);
 
     return cellPtr;
 }
@@ -275,8 +269,7 @@ isize_t InfiniterBit<InfiniterDerived>::getMSBCellPos(uint8_t &r_bit_pos) const 
         if(data[pos] != ICELL_C(0))
         {
             /// find MSB in cell
-            /// clzll stands for "Count Leading Zeros Long Long"
-            r_bit_pos = 63 - __builtin_clzll(data[pos]);
+            r_bit_pos = ICELL_MSB_POS(data[pos]);
 
             return pos;
         }
@@ -284,8 +277,7 @@ isize_t InfiniterBit<InfiniterDerived>::getMSBCellPos(uint8_t &r_bit_pos) const 
 
     /// in any case (0 or non 0 value) return least significant cell index
     /// find MSB in cell
-    /// clzll stands for "Count Leading Zeros Long Long"
-    r_bit_pos = 63 - __builtin_clzll(data[0]);
+    r_bit_pos = ICELL_SAFE_MSB_POS(data[0]);
 
     return 0;
 }
@@ -302,20 +294,18 @@ uint8_t InfiniterBit<InfiniterDerived>::getMSBPos() const noexcept
         if(*(--cellPtr) != ICELL_C(0))
         {
             /// find MSB in cell
-            /// clzll stands for "Count Leading Zeros Long Long"
-            return 63 - __builtin_clzll(*cellPtr);
+            return ICELL_MSB_POS(*cellPtr);
         }
     }
     while(cellPtr != data);
 
     /// in any case (0 or non 0 value) return least significant cell value
     /// find MSB in that cell
-    /// clzll stands for "Count Leading Zeros Long Long"
-    return 63 - __builtin_clzll(*cellPtr);
+    return ICELL_SAFE_MSB_POS(*cellPtr);
 }
 
 template<typename InfiniterDerived>
-isize_t InfiniterBit<InfiniterDerived>::getMSBGlobalPosUnsafe(bool *const overflow) const noexcept
+isize_t InfiniterBit<InfiniterDerived>::getMSBGlobalPos(isize_t *const overflow) const noexcept
 {
     const icell_t *const data = this->getData();
     const icell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
@@ -326,24 +316,49 @@ isize_t InfiniterBit<InfiniterDerived>::getMSBGlobalPosUnsafe(bool *const overfl
         if(*(--cellPtr) != ICELL_C(0))
         {
             /// find MSB in cell
-            /// clzll stands for "Count Leading Zeros Long Long"
-            uint8_t bit_pos = 63 - __builtin_clzll(*cellPtr);
-            /// multiply with overflow//////////////////////////////////////////////////////////////////
+            isize_t msb_pos = ICELL_MSB_POS(*cellPtr)
+
+            /// multiply cell position, cell size and add msb bit position
+            /// max value that can occur fit in 70 bits variable (int70_t could be just fine)
+            __int128_t result128 = static_cast<__int128_t>(cellPtr - data) * isize_bits + msb_pos;
+            isize_t result = static_cast<isize_t>(result128);
+            if(overflow)
+                overflow = static_cast<isize_t>(result128 >> isize_bits);
+            return result;
         }
     }
     while(cellPtr != data);
 
     /// in any case (0 or non 0 value) return least significant cell value
     /// find MSB in that cell
-    /// clzll stands for "Count Leading Zeros Long Long"
-    return 63 - __builtin_clzll(*cellPtr);
+    if(overflow) overflow = ISIZE_C(0);
+    return ICELL_SAFE_MSB_POS(*cellPtr);
 }
 
 template<typename InfiniterDerived>
 InfiniterDerived InfiniterBit<InfiniterDerived>::getMSBGlobalPos() const // throws bad_alloc
 {
+    const icell_t *const data = this->getData();
+    const icell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
 
-    // return std::move();
+    /// iterate from most significant cell, to least significant
+    /// until non 0 cell found, then return its value
+    do{
+        if(*(--cellPtr) != ICELL_C(0))
+        {
+            /// find MSB in cell
+            isize_t msb_pos = ICELL_MSB_POS(*cellPtr)
+
+            InfiniterDerived result(2, cellPtr - data); // 2 cells is max that can be emplaced, size require 70bits
+            result.multiply(isize_bits).add(msb_pos);
+            return result;
+        }
+    }
+    while(cellPtr != data);
+
+    /// in any case (0 or non 0 value) return least significant cell value
+    /// find MSB in that cell
+    return std::move(Infiniter(1, ICELL_SAFE_MSB_POS(*cellPtr)));
 }
 
 
@@ -409,7 +424,7 @@ uint8_t InfiniterBit<InfiniterDerived>::getLSBPos() const noexcept
 }
 
 template<typename InfiniterDerived>
-isize_t InfiniterBit<InfiniterDerived>::getLSBGlobalPosUnsafe(bool *const overflow) const noexcept // handle edge case
+isize_t InfiniterBit<InfiniterDerived>::getLSBGlobalPos(isize_t *const overflow) const noexcept // handle edge case
 {
 
 }
