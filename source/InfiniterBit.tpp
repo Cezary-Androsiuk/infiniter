@@ -372,25 +372,85 @@ InfiniterDerived InfiniterBit<InfiniterDerived>::getMSBGlobalPos() const // thro
 template<typename InfiniterDerived>
 icell_t InfiniterBit<InfiniterDerived>::getLSBCell() const noexcept
 {
+    const icell_t *cellPtr = this->getData();
+    const icell_t *const end = cellPtr + this->getSize() - 1;
 
+    /// iterate from least significant cell, to most significant
+    /// until non 0 cell found, then return its value
+    while(cellPtr < end)
+    {
+        if(*cellPtr != ICELL_C(0))
+        {
+            return *cellPtr;
+        }
+        ++cellPtr;
+    }
+
+    /// in any case (0 or non 0 value) return most significant cell value
+    return *cellPtr;
 }
 
 template<typename InfiniterDerived>
 const icell_t *InfiniterBit<InfiniterDerived>::getLSBCellPtr() const noexcept
 {
+    const icell_t *cellPtr = this->getData();
+    const icell_t *const end = cellPtr + this->getSize() - 1;
 
+    /// iterate from least significant cell, to most significant
+    /// until non 0 cell found, then return its value
+    while(cellPtr < end)
+    {
+        if(*cellPtr != ICELL_C(0))
+        {
+            return cellPtr;
+        }
+        ++cellPtr;
+    }
+
+    /// in any case (0 or non 0 value) return most significant cell value
+    return cellPtr;
 }
 
 template<typename InfiniterDerived>
 icell_t *InfiniterBit<InfiniterDerived>::getLSBCellPtr() noexcept
 {
+    icell_t *cellPtr = this->getData();
+    const icell_t *const end = cellPtr + this->getSize() - 1;
 
+    /// iterate from least significant cell, to most significant
+    /// until non 0 cell found, then return its value
+    while(cellPtr < end)
+    {
+        if(*cellPtr != ICELL_C(0))
+        {
+            return cellPtr;
+        }
+        ++cellPtr;
+    }
+
+    /// in any case (0 or non 0 value) return most significant cell value
+    return cellPtr;
 }
 
 template<typename InfiniterDerived>
 isize_t InfiniterBit<InfiniterDerived>::getLSBCellPos() const noexcept
 {
+    icell_t *cellPtr = this->getData();
+    const icell_t *const end = cellPtr + this->getSize() - 1;
 
+    /// iterate from least significant cell, to most significant
+    /// until non 0 cell found, then return its value
+    while(cellPtr < end)
+    {
+        if(*cellPtr != ICELL_C(0))
+        {
+            return cellPtr;
+        }
+        ++cellPtr;
+    }
+
+    /// in any case (0 or non 0 value) return most significant cell value
+    return cellPtr;
 }
 
 template<typename InfiniterDerived>
