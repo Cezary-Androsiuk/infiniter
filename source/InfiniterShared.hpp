@@ -138,15 +138,6 @@ union BitsUS{ /// bits union struct
 
 
 
-// ####################### INFINITER UTILITY #######################
-
-/// prints what is happening - what constructors are executed
-#define IU_DEBUG_EXECUTION_PRINT true
-
-// ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER UTILITY ^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
 // ####################### INFINITER IO #######################
 
 /// prints what is happening - what constructors are executed
@@ -154,7 +145,16 @@ union BitsUS{ /// bits union struct
 
 #define IO_MAX_CONTAINER_INPUT_CAPACITY static_cast<size_t>(ICELL_MAX >> 16)
 
-// ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER CORE ^^^^^^^^^^^^^^^^^^^^^^^
+// ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER IO ^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+// ####################### INFINITER UTILITY #######################
+
+/// prints what is happening - what constructors are executed
+#define IU_DEBUG_EXECUTION_PRINT true
+
+// ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER UTILITY ^^^^^^^^^^^^^^^^^^^^^^^
 
 #define LIKELY(x)       __builtin_expect(!!(x), 1)
 #define UNLIKELY(x)     __builtin_expect(!!(x), 0)

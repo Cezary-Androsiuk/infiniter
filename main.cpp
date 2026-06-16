@@ -29,6 +29,7 @@
  * InfiniterException   IE
  * InfiniterShared      IS
  * InfiniterTests       IT
+ * InfiniterDerived     ID - template
  *
  *
  * Infiniter : public InfiniterUtility          I
