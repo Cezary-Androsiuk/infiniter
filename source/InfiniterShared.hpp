@@ -29,8 +29,8 @@ typedef uint8_t     ibit_t;     /// bit capacity
 #define ICELL_MAX UINT64_MAX
 #define ISIZE_MAX UINT64_MAX
 
-inline constexpr std::size_t icell_bits = sizeof(icell_t) * CHAR_BIT;
-inline constexpr std::size_t isize_bits = sizeof(isize_t) * CHAR_BIT;
+inline constexpr size_t icell_bits = sizeof(icell_t) * CHAR_BIT;
+inline constexpr size_t isize_bits = sizeof(isize_t) * CHAR_BIT;
 
 /// WARNING: providing 0 value will couse undefined behaviour
 /// clzll stands for "Count Leading Zeros Long Long"

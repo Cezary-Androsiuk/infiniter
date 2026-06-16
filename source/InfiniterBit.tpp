@@ -316,14 +316,14 @@ isize_t InfiniterBit<InfiniterDerived>::getMSBGlobalPos(isize_t *const overflow)
         if(*(--cellPtr) != ICELL_C(0))
         {
             /// find MSB in cell
-            isize_t msb_pos = ICELL_MSB_POS(*cellPtr)
+            isize_t msb_pos = ICELL_MSB_POS(*cellPtr);
 
             /// multiply cell position, cell size and add msb bit position
             /// max value that can occur fit in 70 bits variable (int70_t could be just fine)
             __int128_t result128 = static_cast<__int128_t>(cellPtr - data) * isize_bits + msb_pos;
             isize_t result = static_cast<isize_t>(result128);
             if(overflow)
-                overflow = static_cast<isize_t>(result128 >> isize_bits);
+                *overflow = static_cast<isize_t>(result128 >> isize_bits);
             return result;
         }
     }
@@ -331,7 +331,7 @@ isize_t InfiniterBit<InfiniterDerived>::getMSBGlobalPos(isize_t *const overflow)
 
     /// in any case (0 or non 0 value) return least significant cell value
     /// find MSB in that cell
-    if(overflow) overflow = ISIZE_C(0);
+    if(overflow) *overflow = ISIZE_C(0);
     return ICELL_SAFE_MSB_POS(*cellPtr);
 }
 
@@ -347,7 +347,7 @@ InfiniterDerived InfiniterBit<InfiniterDerived>::getMSBGlobalPos() const // thro
         if(*(--cellPtr) != ICELL_C(0))
         {
             /// find MSB in cell
-            isize_t msb_pos = ICELL_MSB_POS(*cellPtr)
+            isize_t msb_pos = ICELL_MSB_POS(*cellPtr);
 
             InfiniterDerived result(2, cellPtr - data); // 2 cells is max that can be emplaced, size require 70bits
             result.multiply(isize_bits).add(msb_pos);
@@ -358,7 +358,7 @@ InfiniterDerived InfiniterBit<InfiniterDerived>::getMSBGlobalPos() const // thro
 
     /// in any case (0 or non 0 value) return least significant cell value
     /// find MSB in that cell
-    return std::move(Infiniter(1, ICELL_SAFE_MSB_POS(*cellPtr)));
+    return std::move(InfiniterDerived(1, ICELL_SAFE_MSB_POS(*cellPtr)));
 }
 
 

@@ -252,8 +252,8 @@ uint64_t InfiniterIO<InfiniterDerived>::estimateCellsByBase(uint64_t p_number_si
 {
     uint64_t estimated_bits = estimateBitsByBase(p_number_size, p_base);
 
-    uint64_t estimated_cells = estimated_bits / BITS_PER_CELL;
-    if(estimated_bits % BITS_PER_CELL)
+    uint64_t estimated_cells = estimated_bits / icell_bits;
+    if(estimated_bits % icell_bits)
         estimated_cells++;
 
     return estimated_cells;
@@ -328,8 +328,8 @@ template<typename InfiniterDerived>
 void InfiniterIO<InfiniterDerived>::assignStringBase2(const std::string &p_binary_number)
 {
     /// compute required cells
-    uint64_t requiredCells = p_binary_number.size() / BITS_PER_CELL;
-    if(p_binary_number.size() % BITS_PER_CELL)
+    uint64_t requiredCells = p_binary_number.size() / icell_bits;
+    if(p_binary_number.size() % icell_bits)
         requiredCells++;
 
     /// prepare data
@@ -341,7 +341,7 @@ void InfiniterIO<InfiniterDerived>::assignStringBase2(const std::string &p_binar
     size_t size = p_binary_number.size();
     while(size != 0)
     {
-        size_t part = std::min(static_cast<size_t>(BITS_PER_CELL), size);
+        size_t part = std::min(static_cast<size_t>(icell_bits), size);
         icell_t tmp_cell = 0;
 
         /// for each bit in cell emplace bit from string
@@ -419,8 +419,8 @@ template<typename InfiniterDerived>
 void InfiniterIO<InfiniterDerived>::assignVectorBase2(const std::vector<uint8_t> &p_binary_number)
 {
     /// compute required cells
-    uint64_t requiredCells = p_binary_number.size() / BITS_PER_CELL;
-    if(p_binary_number.size() % BITS_PER_CELL)
+    uint64_t requiredCells = p_binary_number.size() / icell_bits;
+    if(p_binary_number.size() % icell_bits)
         requiredCells++;
 
     /// prepare data
@@ -432,7 +432,7 @@ void InfiniterIO<InfiniterDerived>::assignVectorBase2(const std::vector<uint8_t>
     size_t size = p_binary_number.size();
     while(size != 0)
     {
-        size_t part = std::min(static_cast<size_t>(BITS_PER_CELL), size);
+        size_t part = std::min(static_cast<size_t>(icell_bits), size);
         icell_t tmp_cell = 0;
 
         /// for each bit in cell emplace bit from string
@@ -556,7 +556,7 @@ std::string InfiniterIO<InfiniterDerived>::toStringBase2() const
     const icell_t *data = this->getData();
 
     std::string binary_number;
-    binary_number.reserve(size * BITS_PER_CELL);
+    binary_number.reserve(size * icell_bits);
 
     bool found_non_zero_cell = false;
 
@@ -571,9 +571,9 @@ std::string InfiniterIO<InfiniterDerived>::toStringBase2() const
 
         found_non_zero_cell = true;
 
-        for(int i=0; i<BITS_PER_CELL; i++)
+        for(int i=0; i<icell_bits; i++)
         {
-            icell_t bit_mask = ICELL_C(1) << (BITS_PER_CELL -1 -i);
+            icell_t bit_mask = ICELL_C(1) << (icell_bits -1 -i);
             icell_t bit_masked = cell & bit_mask;
             binary_number.push_back(bit_masked ? '1' : '0');
         }
@@ -602,7 +602,7 @@ std::vector<uint8_t> InfiniterIO<InfiniterDerived>::toVectorBase2() const
     const icell_t *data = this->getData();
 
     std::vector<uint8_t> binary_number;
-    binary_number.reserve(size * BITS_PER_CELL);
+    binary_number.reserve(size * icell_bits);
 
     bool found_non_zero_cell = false;
 
@@ -617,9 +617,9 @@ std::vector<uint8_t> InfiniterIO<InfiniterDerived>::toVectorBase2() const
 
         found_non_zero_cell = true;
 
-        for(int i=0; i<BITS_PER_CELL; i++)
+        for(int i=0; i<icell_bits; i++)
         {
-            icell_t bit_mask = ICELL_C(1) << (BITS_PER_CELL -1 -i);
+            icell_t bit_mask = ICELL_C(1) << (icell_bits -1 -i);
             icell_t bit_masked = cell & bit_mask;
             binary_number.push_back(bit_masked ? '1' : '0');
         }

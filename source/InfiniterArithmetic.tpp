@@ -165,7 +165,7 @@ void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(icell_t p_value)
     {
         __uint128_t sum = static_cast<__uint128_t>(data[i]) + carry;
         data[i] = static_cast<icell_t>(sum);
-        carry = static_cast<icell_t>(sum >> BITS_PER_CELL);
+        carry = static_cast<icell_t>(sum >> icell_bits);
     }
 
     if(carry)
@@ -209,7 +209,7 @@ void InfiniterArithmetic<InfiniterDerived>::addMagnitude(const InfiniterDerived 
     {
         __uint128_t sum = static_cast<__uint128_t>(ldata[i]) + rdata[i] + carry;
         ldata[i] = static_cast<icell_t>(ldata[i]);
-        carry = static_cast<icell_t>(sum >> BITS_PER_CELL);
+        carry = static_cast<icell_t>(sum >> icell_bits);
     }
 
     /// move the rest (with carry)
@@ -217,7 +217,7 @@ void InfiniterArithmetic<InfiniterDerived>::addMagnitude(const InfiniterDerived 
     {
         __uint128_t sum = static_cast<__uint128_t>(ldata[i]) + carry;
         ldata[i] = static_cast<icell_t>(ldata[i]);
-        carry = static_cast<icell_t>(sum >> BITS_PER_CELL);
+        carry = static_cast<icell_t>(sum >> icell_bits);
     }
 
 
