@@ -370,6 +370,7 @@ void InfiniterMemory::assign(InfiniterMemory &&p_source)
 }
 
 #if IM_ENABLE_DB_PRINT_METHOD
+#include <cstdio>
 void InfiniterMemory::dbg_print() const
 {
     printf("IM obj: %p, capacity: %llu, sbo: %c\n", this, m_capacity, m_bits.sbo_active + '0');

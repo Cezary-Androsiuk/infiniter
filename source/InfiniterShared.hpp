@@ -103,7 +103,7 @@ union BitsUS{ /// bits union struct
 #define IM_ENSURE_NEW_OBJECT_AFTER_MOVE true
 
 /// prints what is happening - what constructors are executed
-#define IM_DEBUG_EXECUTION_PRINT true
+#define IM_DEBUG_EXECUTION_PRINT false
 
 /// declares method that can be used by friendly functions to display raw memory in hex
 #define IM_ENABLE_DB_PRINT_METHOD true
