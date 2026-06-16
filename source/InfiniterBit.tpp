@@ -315,9 +315,28 @@ uint8_t InfiniterBit<InfiniterDerived>::getMSBPos() const noexcept
 }
 
 template<typename InfiniterDerived>
-isize_t InfiniterBit<InfiniterDerived>::getMSBGlobalPosUnsafe() const noexcept // handle edge case
+isize_t InfiniterBit<InfiniterDerived>::getMSBGlobalPosUnsafe(bool *const overflow) const noexcept
 {
+    const icell_t *const data = this->getData();
+    const icell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
 
+    /// iterate from most significant cell, to least significant
+    /// until non 0 cell found, then return its value
+    do{
+        if(*(--cellPtr) != ICELL_C(0))
+        {
+            /// find MSB in cell
+            /// clzll stands for "Count Leading Zeros Long Long"
+            uint8_t bit_pos = 63 - __builtin_clzll(*cellPtr);
+            /// multiply with overflow//////////////////////////////////////////////////////////////////
+        }
+    }
+    while(cellPtr != data);
+
+    /// in any case (0 or non 0 value) return least significant cell value
+    /// find MSB in that cell
+    /// clzll stands for "Count Leading Zeros Long Long"
+    return 63 - __builtin_clzll(*cellPtr);
 }
 
 template<typename InfiniterDerived>
@@ -325,24 +344,6 @@ InfiniterDerived InfiniterBit<InfiniterDerived>::getMSBGlobalPos() const // thro
 {
 
     // return std::move();
-}
-
-template<typename InfiniterDerived>
-uint8_t InfiniterBit<InfiniterDerived>::getMSBPos(icell_t &r_cell) const noexcept
-{
-
-}
-
-template<typename InfiniterDerived>
-uint8_t InfiniterBit<InfiniterDerived>::getMSBPos(icell_t *&r_cell_ptr) const noexcept
-{
-
-}
-
-template<typename InfiniterDerived>
-uint8_t InfiniterBit<InfiniterDerived>::getMSBPosCellPos(isize_t &r_cell_pos) const noexcept
-{
-
 }
 
 
@@ -408,7 +409,7 @@ uint8_t InfiniterBit<InfiniterDerived>::getLSBPos() const noexcept
 }
 
 template<typename InfiniterDerived>
-isize_t InfiniterBit<InfiniterDerived>::getLSBGlobalPosUnsafe() const noexcept // handle edge case
+isize_t InfiniterBit<InfiniterDerived>::getLSBGlobalPosUnsafe(bool *const overflow) const noexcept // handle edge case
 {
 
 }
@@ -419,25 +420,6 @@ InfiniterDerived InfiniterBit<InfiniterDerived>::getLSBGlobalPos() const // thro
 
     // return std::move();
 }
-
-template<typename InfiniterDerived>
-uint8_t InfiniterBit<InfiniterDerived>::getLSBPos(icell_t &r_cell) const noexcept
-{
-
-}
-
-template<typename InfiniterDerived>
-uint8_t InfiniterBit<InfiniterDerived>::getLSBPos(icell_t *&r_cell_ptr) const noexcept
-{
-
-}
-
-template<typename InfiniterDerived>
-uint8_t InfiniterBit<InfiniterDerived>::getLSBPosCellPos(isize_t &r_cell_pos) const noexcept
-{
-
-}
-
 
 
 
