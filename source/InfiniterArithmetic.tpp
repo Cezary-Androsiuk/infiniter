@@ -208,7 +208,8 @@ void InfiniterArithmetic<InfiniterDerived>::addMagnitude(const InfiniterDerived 
     for(isize_t i=0; i<rsize; i++)
     {
         __uint128_t sum = static_cast<__uint128_t>(ldata[i]) + rdata[i] + carry;
-        ldata[i] = static_cast<icell_t>(ldata[i]);
+
+        ldata[i] = static_cast<icell_t>(sum);
         carry = static_cast<icell_t>(sum >> icell_bits);
     }
 
@@ -216,7 +217,8 @@ void InfiniterArithmetic<InfiniterDerived>::addMagnitude(const InfiniterDerived 
     for(isize_t i=rsize; i<lsize && carry; i++)
     {
         __uint128_t sum = static_cast<__uint128_t>(ldata[i]) + carry;
-        ldata[i] = static_cast<icell_t>(ldata[i]);
+
+        ldata[i] = static_cast<icell_t>(sum);
         carry = static_cast<icell_t>(sum >> icell_bits);
     }
 
@@ -227,8 +229,36 @@ void InfiniterArithmetic<InfiniterDerived>::addMagnitude(const InfiniterDerived 
 template<typename InfiniterDerived>
 void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(const InfiniterDerived &p_right)
 {
+    // Zakładamy, że |this| >= |p_right|.
+    // Wynik na pewno zmieści się w aktualnym buforze 'this'.
+    ///
 
+    icell_t *ldata = this->getData();
+    const icell_t *rdata = p_right.getData();
 
+    isize_t lsize = this->getSize();
+    isize_t rsize = p_right.getSize();
+
+    icell_t borrow = ICELL_C(0);
+
+    /// subtract common part
+    for(isize_t i = 0; i < rsize; i++)
+    {
+        /// handling subtracting is easier with signed value
+        __int128_t diff = static_cast<__int128_t>(ldata[i]) - rdata[i] - borrow;
+
+        ldata[i] = static_cast<icell_t>(diff);
+        borrow = diff < 0 ? 1 : 0;
+    }
+
+    /// propagate borrow (move the rest)
+    for(isize_t i = rsize; i < lsize && borrow; i++)
+    {
+        __int128_t diff = static_cast<__int128_t>(ldata[i]) - borrow;
+
+        ldata[i] = static_cast<icell_t>(diff);
+        borrow = diff < 0 ? 1 : 0;
+    }
 
     this->normalize();
 }
@@ -286,6 +316,20 @@ void InfiniterArithmetic<InfiniterDerived>::add(icell_t p_value, bool p_negative
 
         return;
     }
+    ///  1 +  1 ->  (1+1)
+    /// -1 +  1 -> -(1-1)
+    ///  1 + -1 ->  (1-1)
+    /// -1 + -1 -> -(1+1)
+    ///
+    ///  2 +  1 ->  (2+1)
+    /// -2 +  1 -> -(2-1)
+    ///  2 + -1 ->  (2-1)
+    /// -2 + -1 -> -(2+1)
+    ///
+    ///  1 +  2 ->  (1+2) ->  (2+1)
+    /// -1 +  2 -> -(1-2) ->  (2-1)
+    ///  1 + -2 ->  (1-2) -> -(2-1)
+    /// -1 + -2 -> -(1+2) -> -(2+1)
 
     /// addition:
     /// this is negative
@@ -337,6 +381,20 @@ void InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_value, bool p_neg
 
         return;
     }
+    ///  1 -  1 ->  (1-1)
+    /// -1 -  1 -> -(1+1)
+    ///  1 - -1 ->  (1+1)
+    /// -1 - -1 -> -(1-1)
+    ///
+    ///  2 -  1 ->  (2-1)
+    /// -2 -  1 -> -(2+1)
+    ///  2 - -1 ->  (2+1)
+    /// -2 - -1 -> -(2-1)
+    ///
+    ///  1 -  2 ->  (1-2) -> -(2-1)
+    /// -1 -  2 -> -(1+2) -> -(2+1)
+    ///  1 - -2 ->  (1+2) ->  (2+1)
+    /// -1 - -2 -> -(1-2) ->  (2-1)
 
     /// subtraction:
     /// this is negative
@@ -634,7 +692,8 @@ InfiniterDerived InfiniterArithmetic<InfiniterDerived>::operator ++(int)
 {
     InfiniterDerived number(*this); /// static cast needed?
     this->increment();
-    return std::move(number);
+    return number; /// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
 }
 
 template<typename InfiniterDerived>
@@ -649,7 +708,8 @@ InfiniterDerived InfiniterArithmetic<InfiniterDerived>::operator --(int)
 {
     InfiniterDerived number(*this); /// static cast needed?
     this->decrement();
-    return std::move(number);
+    return number; /// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
 }
 
 
