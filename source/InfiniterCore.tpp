@@ -280,7 +280,8 @@ InfiniterDerived InfiniterCore<InfiniterDerived>::absoluteValue() const
 {
     InfiniterDerived i(*this);
     i.setPositiveSign();
-    return std::move(i);
+    return i; /// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
 }
 
 template<typename InfiniterDerived>
@@ -775,7 +776,8 @@ inline InfiniterDerived InfiniterCore<InfiniterDerived>::operator ~() const noex
 {
     InfiniterDerived number(*this);
     number.negate();
-    return std::move(number);
+    return number; /// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
 }
 
 template<typename InfiniterDerived>

@@ -38,9 +38,9 @@ inline constexpr size_t isize_bits = sizeof(isize_t) * CHAR_BIT;
 /// clzll stands for "Count Trailing Zeros Long Long"
 #define ICELL_LSB_POS(CELL) (__builtin_ctzll(CELL))
 /// clzll stands for "Count Leading Zeros Long Long"
-#define ICELL_SAFE_MSB_POS(CELL) (CELL ? ((icell_bits-1) - __builtin_clzll(CELL)) : ICELL_C(0))
+#define ICELL_MSB_SAFE_POS(CELL) (CELL ? ((icell_bits-1) - __builtin_clzll(CELL)) : ICELL_C(0))
 /// clzll stands for "Count Trailing Zeros Long Long"
-#define ICELL_SAFE_LSB_POS(CELL) (CELL ? (__builtin_ctzll(CELL)) : ICELL_C(0))
+#define ICELL_LSB_SAFE_POS(CELL) (CELL ? (__builtin_ctzll(CELL)) : ICELL_C(0))
 
 
 /// Can't be less than 1

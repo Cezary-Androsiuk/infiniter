@@ -159,21 +159,20 @@ icell_t *InfiniterBit<InfiniterDerived>::getMSBCellPtr() noexcept
 template<typename InfiniterDerived>
 isize_t InfiniterBit<InfiniterDerived>::getMSBCellPos() const noexcept
 {
-    isize_t size = this->getSize();
-    const icell_t *data = this->getData();
+    const icell_t *const data = this->getData();
+    const icell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
 
     /// iterate from most significant cell, to least significant
-    /// until non 0 cell found, then return its index
-    for(isize_t i=0; i<size; i++)
-    {
-        const isize_t pos = size -1 -i;
-        if(data[pos] != ICELL_C(0))
+    /// until non 0 cell found, then return its pos
+    do {
+        if(*(--cellPtr) != ICELL_C(0))
         {
-            return pos;
+            return cellPtr - data;
         }
     }
+    while(cellPtr != data);
 
-    /// in any case (0 or non 0 value) return least significant cell index
+    /// in any case (0 or non 0 value) return least significant cell pos
     return 0;
 }
 
@@ -198,7 +197,7 @@ icell_t InfiniterBit<InfiniterDerived>::getMSBCell(uint8_t &r_bit_pos) const noe
 
     /// in any case (0 or non 0 value) return least significant cell value
     /// but first find MSB in cell
-    r_bit_pos = ICELL_SAFE_MSB_POS(*cellPtr);
+    r_bit_pos = ICELL_MSB_SAFE_POS(*cellPtr);
 
     return *cellPtr;
 }
@@ -224,7 +223,7 @@ const icell_t *InfiniterBit<InfiniterDerived>::getMSBCellPtr(uint8_t &r_bit_pos)
 
     /// in any case (0 or non 0 value) return least significant cell value
     /// but first find MSB in cell
-    r_bit_pos = ICELL_SAFE_MSB_POS(*cellPtr);
+    r_bit_pos = ICELL_MSB_SAFE_POS(*cellPtr);
 
     return cellPtr;
 }
@@ -250,7 +249,7 @@ icell_t *InfiniterBit<InfiniterDerived>::getMSBCellPtr(uint8_t &r_bit_pos) noexc
 
     /// in any case (0 or non 0 value) return least significant cell value
     /// but first find MSB in cell
-    r_bit_pos = ICELL_SAFE_MSB_POS(*cellPtr);
+    r_bit_pos = ICELL_MSB_SAFE_POS(*cellPtr);
 
     return cellPtr;
 }
@@ -258,27 +257,25 @@ icell_t *InfiniterBit<InfiniterDerived>::getMSBCellPtr(uint8_t &r_bit_pos) noexc
 template<typename InfiniterDerived>
 isize_t InfiniterBit<InfiniterDerived>::getMSBCellPos(uint8_t &r_bit_pos) const noexcept
 {
-    isize_t size = this->getSize();
-    const icell_t *data = this->getData();
+
+    const icell_t *const data = this->getData();
+    const icell_t *cellPtr = data + this->getSize(); /// intentional out of bounds
 
     /// iterate from most significant cell, to least significant
-    /// until non 0 cell found, then return its index
-    for(isize_t i=0; i<size; i++)
-    {
-        const isize_t pos = size -1 -i;
-        if(data[pos] != ICELL_C(0))
+    /// until non 0 cell found, then return its pos
+    do {
+        if(*(--cellPtr) != ICELL_C(0))
         {
             /// find MSB in cell
-            r_bit_pos = ICELL_MSB_POS(data[pos]);
-
-            return pos;
+            r_bit_pos = ICELL_MSB_POS(*cellPtr); /// *cellPtr != 0
+            return cellPtr - data;
         }
     }
+    while(cellPtr != data);
 
-    /// in any case (0 or non 0 value) return least significant cell index
+    /// in any case (0 or non 0 value) return least significant cell pos
     /// find MSB in cell
-    r_bit_pos = ICELL_SAFE_MSB_POS(data[0]);
-
+    r_bit_pos = ICELL_MSB_SAFE_POS(*cellPtr);
     return 0;
 }
 
@@ -294,14 +291,14 @@ uint8_t InfiniterBit<InfiniterDerived>::getMSBPos() const noexcept
         if(*(--cellPtr) != ICELL_C(0))
         {
             /// find MSB in cell
-            return ICELL_MSB_POS(*cellPtr);
+            return ICELL_MSB_POS(*cellPtr); /// *cellPtr != 0
         }
     }
     while(cellPtr != data);
 
     /// in any case (0 or non 0 value) return least significant cell value
     /// find MSB in that cell
-    return ICELL_SAFE_MSB_POS(*cellPtr);
+    return ICELL_MSB_SAFE_POS(*cellPtr);
 }
 
 template<typename InfiniterDerived>
@@ -316,11 +313,11 @@ isize_t InfiniterBit<InfiniterDerived>::getMSBGlobalPos(isize_t *const overflow)
         if(*(--cellPtr) != ICELL_C(0))
         {
             /// find MSB in cell
-            isize_t msb_pos = ICELL_MSB_POS(*cellPtr);
+            isize_t msb_pos = ICELL_MSB_POS(*cellPtr); /// *cellPtr != 0
 
             /// multiply cell position, cell size and add msb bit position
             /// max value that can occur fit in 70 bits variable (int70_t could be just fine)
-            __int128_t result128 = static_cast<__int128_t>(cellPtr - data) * isize_bits + msb_pos;
+            __int128_t result128 = static_cast<__int128_t>(cellPtr - data) * icell_bits + msb_pos;
             isize_t result = static_cast<isize_t>(result128);
             if(overflow)
                 *overflow = static_cast<isize_t>(result128 >> isize_bits);
@@ -332,7 +329,7 @@ isize_t InfiniterBit<InfiniterDerived>::getMSBGlobalPos(isize_t *const overflow)
     /// in any case (0 or non 0 value) return least significant cell value
     /// find MSB in that cell
     if(overflow) *overflow = ISIZE_C(0);
-    return ICELL_SAFE_MSB_POS(*cellPtr);
+    return ICELL_MSB_SAFE_POS(*cellPtr);
 }
 
 template<typename InfiniterDerived>
@@ -347,10 +344,10 @@ InfiniterDerived InfiniterBit<InfiniterDerived>::getMSBGlobalPos() const // thro
         if(*(--cellPtr) != ICELL_C(0))
         {
             /// find MSB in cell
-            isize_t msb_pos = ICELL_MSB_POS(*cellPtr);
+            isize_t msb_pos = ICELL_MSB_POS(*cellPtr); /// *cellPtr != 0
 
             InfiniterDerived result(2, cellPtr - data); // 2 cells is max that can be emplaced, size require 70bits
-            result.multiply(isize_bits).add(msb_pos);
+            result.multiply(icell_bits).add(msb_pos);
             return result;
         }
     }
@@ -358,7 +355,9 @@ InfiniterDerived InfiniterBit<InfiniterDerived>::getMSBGlobalPos() const // thro
 
     /// in any case (0 or non 0 value) return least significant cell value
     /// find MSB in that cell
-    return std::move(InfiniterDerived(1, ICELL_SAFE_MSB_POS(*cellPtr)));
+    // return std::move(InfiniterDerived(1, ICELL_MSB_SAFE_POS(*cellPtr)));
+    return InfiniterDerived(1, ICELL_MSB_SAFE_POS(*cellPtr)); /// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
 }
 
 
@@ -373,11 +372,11 @@ template<typename InfiniterDerived>
 icell_t InfiniterBit<InfiniterDerived>::getLSBCell() const noexcept
 {
     const icell_t *cellPtr = this->getData();
-    const icell_t *const end = cellPtr + this->getSize() - 1;
+    const icell_t *const cellEnd = cellPtr + this->getSize() - 1;
 
     /// iterate from least significant cell, to most significant
     /// until non 0 cell found, then return its value
-    while(cellPtr < end)
+    while(cellPtr < cellEnd)
     {
         if(*cellPtr != ICELL_C(0))
         {
@@ -394,11 +393,11 @@ template<typename InfiniterDerived>
 const icell_t *InfiniterBit<InfiniterDerived>::getLSBCellPtr() const noexcept
 {
     const icell_t *cellPtr = this->getData();
-    const icell_t *const end = cellPtr + this->getSize() - 1;
+    const icell_t *const cellEnd = cellPtr + this->getSize() - 1;
 
     /// iterate from least significant cell, to most significant
     /// until non 0 cell found, then return its value
-    while(cellPtr < end)
+    while(cellPtr < cellEnd)
     {
         if(*cellPtr != ICELL_C(0))
         {
@@ -415,11 +414,11 @@ template<typename InfiniterDerived>
 icell_t *InfiniterBit<InfiniterDerived>::getLSBCellPtr() noexcept
 {
     icell_t *cellPtr = this->getData();
-    const icell_t *const end = cellPtr + this->getSize() - 1;
+    const icell_t *const cellEnd = cellPtr + this->getSize() - 1;
 
     /// iterate from least significant cell, to most significant
     /// until non 0 cell found, then return its value
-    while(cellPtr < end)
+    while(cellPtr < cellEnd)
     {
         if(*cellPtr != ICELL_C(0))
         {
@@ -436,7 +435,190 @@ template<typename InfiniterDerived>
 isize_t InfiniterBit<InfiniterDerived>::getLSBCellPos() const noexcept
 {
     icell_t *cellPtr = this->getData();
-    const icell_t *const end = cellPtr + this->getSize() - 1;
+    const isize_t size_m1 = this->getSize() -1; /// size_m1 is "size minus 1"
+    const icell_t *const cellEnd = cellPtr + size_m1;
+
+    /// iterate from least significant cell, to most significant
+    /// until non 0 cell found, then return its pos
+    while(cellPtr < cellEnd)
+    {
+        if(*cellPtr != ICELL_C(0))
+        {
+            return size_m1 - (cellEnd - cellPtr);
+        }
+        ++cellPtr;
+    }
+
+    /// in any case (0 or non 0 value) return most significant cell pos
+    return size_m1;
+}
+
+template<typename InfiniterDerived>
+icell_t InfiniterBit<InfiniterDerived>::getLSBCell(uint8_t &r_bit_pos) const noexcept
+{
+    const icell_t *cellPtr = this->getData();
+    const icell_t *const cellEnd = cellPtr + this->getSize() - 1;
+
+    /// iterate from least significant cell, to most significant
+    /// until non 0 cell found, then return its value
+    while(cellPtr < cellEnd)
+    {
+        if(*cellPtr != ICELL_C(0))
+        {
+            /// find LSB in that cell
+            r_bit_pos = ICELL_LSB_POS(*cellPtr); /// *cellPtr != 0
+            return *cellPtr;
+        }
+        ++cellPtr;
+    }
+
+    /// in any case (0 or non 0 value) return most significant cell value
+    /// find LSB in that cell
+    r_bit_pos = ICELL_LSB_SAFE_POS(*cellEnd); /// *cellPtr != 0
+    return *cellPtr;
+}
+
+template<typename InfiniterDerived>
+const icell_t *InfiniterBit<InfiniterDerived>::getLSBCellPtr(uint8_t &r_bit_pos) const noexcept
+{
+    const icell_t *cellPtr = this->getData();
+    const icell_t *const cellEnd = cellPtr + this->getSize() - 1;
+
+    /// iterate from least significant cell, to most significant
+    /// until non 0 cell found, then return its value
+    while(cellPtr < cellEnd)
+    {
+        if(*cellPtr != ICELL_C(0))
+        {
+            /// find LSB in that cell
+            r_bit_pos = ICELL_LSB_POS(*cellPtr); /// *cellPtr != 0
+            return cellPtr;
+        }
+        ++cellPtr;
+    }
+
+    /// in any case (0 or non 0 value) return most significant cell value
+    /// find LSB in that cell
+    r_bit_pos = ICELL_LSB_SAFE_POS(*cellEnd);
+    return cellPtr;
+}
+
+template<typename InfiniterDerived>
+icell_t *InfiniterBit<InfiniterDerived>::getLSBCellPtr(uint8_t &r_bit_pos) noexcept
+{
+    icell_t *cellPtr = this->getData();
+    const icell_t *const cellEnd = cellPtr + this->getSize() - 1;
+
+    /// iterate from least significant cell, to most significant
+    /// until non 0 cell found, then return its value
+    while(cellPtr < cellEnd)
+    {
+        if(*cellPtr != ICELL_C(0))
+        {
+            /// find LSB in that cell
+            r_bit_pos = ICELL_LSB_POS(*cellPtr); /// *cellPtr != 0
+            return cellPtr;
+        }
+        ++cellPtr;
+    }
+
+    /// in any case (0 or non 0 value) return most significant cell value
+    /// find LSB in that cell
+    r_bit_pos = ICELL_LSB_SAFE_POS(*cellEnd);
+    return cellPtr;
+}
+
+template<typename InfiniterDerived>
+isize_t InfiniterBit<InfiniterDerived>::getLSBCellPos(uint8_t &r_bit_pos) const noexcept
+{
+    icell_t *cellPtr = this->getData();
+    const isize_t size_m1 = this->getSize() -1; /// size_m1 is "size minus 1"
+    const icell_t *const cellEnd = cellPtr + size_m1;
+
+    /// iterate from least significant cell, to most significant
+    /// until non 0 cell found, then return its pos
+    while(cellPtr < cellEnd)
+    {
+        if(*cellPtr != ICELL_C(0))
+        {
+            /// find LSB in that cell
+            r_bit_pos = ICELL_LSB_POS(*cellPtr); /// *cellPtr != 0
+            return size_m1 - (cellEnd - cellPtr);
+        }
+        ++cellPtr;
+    }
+
+    /// in any case (0 or non 0 value) return most significant cell pos
+    /// find LSB in that cell
+    r_bit_pos = ICELL_LSB_SAFE_POS(*cellEnd);
+    return size_m1;
+}
+
+template<typename InfiniterDerived>
+uint8_t InfiniterBit<InfiniterDerived>::getLSBPos() const noexcept
+{
+    icell_t *cellPtr = this->getData();
+    const isize_t size_m1 = this->getSize() -1; /// size_m1 is "size minus 1"
+    const icell_t *const cellEnd = cellPtr + size_m1;
+
+    /// iterate from least significant cell, to most significant
+    /// until non 0 cell found, then return its pos
+    while(cellPtr < cellEnd)
+    {
+        if(*cellPtr != ICELL_C(0))
+        {
+            /// find LSB in that cell
+            return ICELL_LSB_POS(*cellPtr); /// *cellPtr != 0
+        }
+        ++cellPtr;
+    }
+
+    /// in any case (0 or non 0 value) return most significant cell pos
+    /// find LSB in that cell
+    return ICELL_LSB_SAFE_POS(*cellEnd);
+}
+
+template<typename InfiniterDerived>
+isize_t InfiniterBit<InfiniterDerived>::getLSBGlobalPos(isize_t *const overflow) const noexcept // handle edge case
+{
+    const icell_t *const data = this->getData();
+    const icell_t *const cellEnd = data + this->getSize();
+    const icell_t *cellPtr = data;
+
+    /// iterate from least significant cell, to most significant
+    /// until non 0 cell found, then return its value
+    while(cellPtr < cellEnd)
+    {
+        if(*cellPtr != ICELL_C(0))
+        {
+            /// find LSB in cell
+            isize_t lsb_pos = ICELL_LSB_POS(*cellPtr); /// *cellPtr != 0
+
+            /// multiply cell position, cell size and add lsb bit position
+            /// max value that can occur fit in 70 bits variable (int70_t could be just fine)
+            __int128_t result128 = static_cast<__int128_t>(cellPtr - data) * icell_bits + lsb_pos;
+            isize_t result = static_cast<isize_t>(result128);
+
+            if(overflow)
+            {
+                *overflow = static_cast<isize_t>(result128 >> isize_bits);
+            }
+            return result;
+        }
+        ++cellPtr;
+    }
+
+    /// in any case (all zeros) return safe LSB of the first cell
+    if(overflow) *overflow = ISIZE_C(0);
+    return ICELL_LSB_SAFE_POS(*data);
+}
+
+template<typename InfiniterDerived>
+InfiniterDerived InfiniterBit<InfiniterDerived>::getLSBGlobalPos() const // throws bad_alloc
+{
+    const icell_t *const data = this->getData();
+    const icell_t *const end = data + this->getSize();
+    const icell_t *cellPtr = data;
 
     /// iterate from least significant cell, to most significant
     /// until non 0 cell found, then return its value
@@ -444,56 +626,23 @@ isize_t InfiniterBit<InfiniterDerived>::getLSBCellPos() const noexcept
     {
         if(*cellPtr != ICELL_C(0))
         {
-            return cellPtr;
+            /// find LSB in cell
+            isize_t lsb_pos = ICELL_LSB_POS(*cellPtr); /// *cellPtr != 0
+
+            InfiniterDerived result(2, cellPtr - data); // 2 cells is max that can be emplaced, size require 70bits
+
+            /// POPRAWKA 1: Mnożymy przez rozmiar komórki (icell_bits), a nie rozmiar wskaźnika/indeksu!
+            result.multiply(icell_bits).add(lsb_pos);
+            return result;
         }
         ++cellPtr;
     }
 
-    /// in any case (0 or non 0 value) return most significant cell value
-    return cellPtr;
-}
-
-template<typename InfiniterDerived>
-icell_t InfiniterBit<InfiniterDerived>::getLSBCell(uint8_t &r_bit_pos) const noexcept
-{
-
-}
-
-template<typename InfiniterDerived>
-const icell_t *InfiniterBit<InfiniterDerived>::getLSBCellPtr(uint8_t &r_bit_pos) const noexcept
-{
-
-}
-
-template<typename InfiniterDerived>
-icell_t *InfiniterBit<InfiniterDerived>::getLSBCellPtr(uint8_t &r_bit_pos) noexcept
-{
-
-}
-
-template<typename InfiniterDerived>
-isize_t InfiniterBit<InfiniterDerived>::getLSBCellPos(uint8_t &r_bit_pos) const noexcept
-{
-
-}
-
-template<typename InfiniterDerived>
-uint8_t InfiniterBit<InfiniterDerived>::getLSBPos() const noexcept
-{
-
-}
-
-template<typename InfiniterDerived>
-isize_t InfiniterBit<InfiniterDerived>::getLSBGlobalPos(isize_t *const overflow) const noexcept // handle edge case
-{
-
-}
-
-template<typename InfiniterDerived>
-InfiniterDerived InfiniterBit<InfiniterDerived>::getLSBGlobalPos() const // throws bad_alloc
-{
-
-    // return std::move();
+    /// in any case (all zeros) return safe LSB of the first cell
+    /// POPRAWKA 2: Usunięte std::move
+    // return std::move(InfiniterDerived(1, ICELL_LSB_SAFE_POS(*data)));
+    return InfiniterDerived(1, ICELL_LSB_SAFE_POS(*data));/// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
 }
 
 
