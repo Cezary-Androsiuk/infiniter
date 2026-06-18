@@ -315,20 +315,20 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bo
         else
             return this->increment();  /// has normalize
     }
-    ///  1 +  1   ->    (1+1)
-    /// -1 +  1   ->   -(1-1)
-    ///  1 + -1   ->    (1-1)
     /// -1 + -1   ->   -(1+1)
+    /// -1 +  1   ->   -(1-1)
+    ///  1 +  1   ->    (1+1)
+    ///  1 + -1   ->    (1-1)
     ///
-    ///  2 +  1   ->    (2+1)
-    /// -2 +  1   ->   -(2-1)
-    ///  2 + -1   ->    (2-1)
     /// -2 + -1   ->   -(2+1)
+    /// -2 +  1   ->   -(2-1)
+    ///  2 +  1   ->    (2+1)
+    ///  2 + -1   ->    (2-1)
     ///
-    ///  1 +  2   ->    (1+2)   ->    (2+1)
-    /// -1 +  2   ->   -(1-2)   ->    (2-1)
-    ///  1 + -2   ->    (1-2)   ->   -(2-1)
     /// -1 + -2   ->   -(1+2)   ->   -(2+1)
+    /// -1 +  2   ->   -(1-2)   ->    (2-1)
+    ///  1 +  2   ->    (1+2)   ->    (2+1)
+    ///  1 + -2   ->    (1-2)   ->   -(2-1)
 
     /// addition:
     /// this is negative
@@ -342,19 +342,16 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bo
         }
         
         /// scalar is positive
-        // -2 + 1    ->   1 - 2   ->   -(2 - 1)
-        if(this->greaterMagnitude(p_right, p_negative_value))
+        if(this->smallerMagnitude(p_right, p_negative_value))
         {
-            InfiniterDerived value(p_right);
-            value.subtractMagnitude(*this).negate(); /// has normalize
-            value.setNegativeSign();
-            return this->assign(std::move(value)); /// has normalize
+            InfiniterDerived tmp_swap(p_right);
+            tmp_swap.subtractMagnitude(*this); /// has normalize
+            tmp_swap.setPositiveSign();
+            return this->assign(std::move(tmp_swap)); /// has normalize
         }
-        else
-        {
-            this->setPositiveSign();
-            return this->subtractMagnitude(p_right);  /// has normalize
-        }
+
+        this->setNegativeSign();
+        return this->subtractMagnitude(p_right);  /// has normalize
     }
     /// this is positive
     else
@@ -367,20 +364,16 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bo
         }
         
         /// scalar is negative
-        // 1 + -2   ->   1 - 2   ->   -(2 - 1)
         if(this->smallerMagnitude(p_right, p_negative_value))
         {
-            InfiniterDerived value(p_right);
-            value.subtractMagnitude(*this).negate(); /// has normalize
-            value.setNegativeSign();
-            return this->assign(std::move(value)); /// has normalize
+            InfiniterDerived tmp_swap(p_right);
+            tmp_swap.subtractMagnitude(*this); /// has normalize
+            tmp_swap.setNegativeSign();
+            return this->assign(std::move(tmp_swap)); /// has normalize
         }
-        else
-        {
 
-            this->setPositiveSign();
-            return this->subtractMagnitude(p_right);  /// has normalize
-        }
+        this->setPositiveSign();
+        return this->subtractMagnitude(p_right);  /// has normalize
     }
 
 
@@ -403,35 +396,44 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_righ
 
         return;
     }
-    ///  1 -  1   ->    (1-1)
     /// -1 -  1   ->   -(1+1)
-    ///  1 - -1   ->    (1+1)
     /// -1 - -1   ->   -(1-1)
+    ///  1 -  1   ->    (1-1)
+    ///  1 - -1   ->    (1+1)
     ///
-    ///  2 -  1   ->    (2-1)
     /// -2 -  1   ->   -(2+1)
-    ///  2 - -1   ->    (2+1)
     /// -2 - -1   ->   -(2-1)
+    ///  2 - -1   ->    (2+1)
+    ///  2 -  1   ->    (2-1)
     ///
-    ///  1 -  2   ->    (1-2)   ->   -(2-1)
     /// -1 -  2   ->   -(1+2)   ->   -(2+1)
-    ///  1 - -2   ->    (1+2)   ->    (2+1)
     /// -1 - -2   ->   -(1-2)   ->    (2-1)
+    ///  1 - -2   ->    (1+2)   ->    (2+1)
+    ///  1 -  2   ->    (1-2)   ->   -(2-1)
 
     /// subtraction:
     /// this is negative
     if(this->getSign())
     {
-        /// scalar is negative
-        if(p_negative_value)
-        {
-            this->subtractMagnitude(p_right);  /// has normalize
-        }
         /// scalar is positive
-        else
+        if(!p_negative_value)
         {
-            this->addMagnitude(p_right);  /// has normalize
+            this->setNegativeSign();
+            return this->addMagnitude(p_right);  /// has normalize
         }
+
+        /// scalar is negative
+        if(this->smallerMagnitude(p_right, p_negative_value))
+        {
+            /// swap, subtract and set positive
+            InfiniterDerived tmp_swap(p_right);
+            tmp_swap.subtractMagnitude(*this);
+            tmp_swap.setPositiveSign();
+            return this->assign(std::move(tmp_swap));
+        }
+
+        this->setNegativeSign();
+        return this->subtractMagnitude(p_right);  /// has normalize
     }
     /// this is positive
     else
@@ -439,13 +441,22 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_righ
         /// scalar is negative
         if(p_negative_value)
         {
-            this->addMagnitude(p_right);  /// has normalize
+            this->setPositiveSign();
+            return this->addMagnitude(p_right);  /// has normalize
         }
+
         /// scalar is positive
-        else
+        if(this->smallerMagnitude())
         {
-            this->subtractMagnitude(p_right);  /// has normalize
+            /// swap, add, set negative
+            InfiniterDerived tmp_swap(p_right);
+            tmp_swap.addMagnitude(*this);
+            tmp_swap.setNegativeSign();
+            return this->assign(std::move(tmp_swap));
         }
+
+        this->setPositiveSign();
+        return this->subtractMagnitude(p_right);  /// has normalize
     }
 
 }
