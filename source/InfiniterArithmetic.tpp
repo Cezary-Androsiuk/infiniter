@@ -229,9 +229,7 @@ void InfiniterArithmetic<InfiniterDerived>::addMagnitude(const InfiniterDerived 
 template<typename InfiniterDerived>
 void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(const InfiniterDerived &p_right)
 {
-    // Zakładamy, że |this| >= |p_right|.
-    // Wynik na pewno zmieści się w aktualnym buforze 'this'.
-    ///
+    /// assert |this| >= |p_right|
 
     icell_t *ldata = this->getData();
     const icell_t *rdata = p_right.getData();
@@ -248,7 +246,7 @@ void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(const InfiniterDer
         __int128_t diff = static_cast<__int128_t>(ldata[i]) - rdata[i] - borrow;
 
         ldata[i] = static_cast<icell_t>(diff);
-        borrow = diff < 0 ? 1 : 0;
+        borrow = static_cast<uint64_t>(static_cast<__uint128_t>(diff) >> 127);
     }
 
     /// propagate borrow (move the rest)
@@ -257,7 +255,7 @@ void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(const InfiniterDer
         __int128_t diff = static_cast<__int128_t>(ldata[i]) - borrow;
 
         ldata[i] = static_cast<icell_t>(diff);
-        borrow = diff < 0 ? 1 : 0;
+        borrow = static_cast<uint64_t>(static_cast<__uint128_t>(diff) >> 127);
     }
 
     this->normalize();
