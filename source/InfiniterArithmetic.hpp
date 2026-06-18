@@ -21,28 +21,38 @@ public:
     /// InfiniterBit methods
 
 protected:
-    void incrementMagnitude();
-    void decrementMagnitude();
+    InfiniterDerived &incrementMagnitude();
+    InfiniterDerived &decrementMagnitude();
 
-    void addMagnitude(icell_t p_value);
-    void subtractMagnitude(icell_t p_value);
+    InfiniterDerived &addMagnitude(icell_t p_right);
+    InfiniterDerived &subtractMagnitude(icell_t p_right);
 
-    void addMagnitude(const InfiniterDerived &p_right);
-    void subtractMagnitude(const InfiniterDerived &p_right);
+    InfiniterDerived &addMagnitude(const InfiniterDerived &p_right);
+    InfiniterDerived &subtractMagnitude(const InfiniterDerived &p_right);
 
 public:
-    void increment();
-    void decrement();
+    InfiniterDerived &increment();
+    InfiniterDerived &decrement();
 
-    void add(icell_t p_value, bool p_negative_value=false);
-    void subtract(icell_t p_value, bool p_negative_value=false);
 
-    void add(const InfiniterDerived &p_right);
-    void subtract(const InfiniterDerived &p_right);
+    
+    InfiniterDerived &add(icell_t p_right, bool p_negative_value=false);
+    InfiniterDerived &subtract(icell_t p_right, bool p_negative_value=false);
 
-    void multiply(const InfiniterDerived &p_right);
+    InfiniterDerived &add(const InfiniterDerived &p_right);
+    InfiniterDerived &subtract(const InfiniterDerived &p_right);
 
-    void divde(const InfiniterDerived &p_right);
+    InfiniterDerived plus(icell_t p_right, bool p_negative_value=false);
+    InfiniterDerived subtract(icell_t p_right, bool p_negative_value=false);
+
+    InfiniterDerived plus(const InfiniterDerived &p_right);
+    InfiniterDerived subtract(const InfiniterDerived &p_right);
+
+
+
+    InfiniterDerived &multiply(const InfiniterDerived &p_right);
+
+    InfiniterDerived &divde(const InfiniterDerived &p_right);
 
 
 public:

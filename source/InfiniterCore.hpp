@@ -59,10 +59,24 @@ public:
     InfiniterDerived absoluteValue() const;/////////////////////////////////////////////////// maybe as static with reference argument
     inline void absoluteValueAssign();
 
-    void assign(icell_t p_value, bool p_negative_value=false) noexcept;
-    void assign(const icell_t *p_array, isize_t p_size, bool p_negative_value=false);
-    void assign(const InfiniterDerived &p_source);
-    void assign(InfiniterDerived &&p_source);
+    InfiniterDerived &assign(icell_t p_value, bool p_negative_value=false) noexcept;
+    InfiniterDerived &assign(const icell_t *p_array, isize_t p_size, bool p_negative_value=false);
+    InfiniterDerived &assign(const InfiniterDerived &p_source);
+    InfiniterDerived &assign(InfiniterDerived &&p_source);
+
+    bool equalMagnitude(icell_t p_scalar, int p_sign) const noexcept;
+    bool differsMagnitude(icell_t p_scalar, int p_sign) const noexcept;
+    bool greaterMagnitude(icell_t p_scalar, int p_sign) const noexcept;
+    bool smallerMagnitude(icell_t p_scalar, int p_sign) const noexcept;
+    bool greaterEqualMagnitude(icell_t p_scalar, int p_sign) const noexcept;
+    bool smallerEqualMagnitude(icell_t p_scalar, int p_sign) const noexcept;
+
+    bool equalMagnitude(const InfiniterDerived &p_right) const noexcept;
+    bool differsMagnitude(const InfiniterDerived &p_right) const noexcept;
+    bool greaterMagnitude(const InfiniterDerived &p_right) const noexcept;
+    bool smallerMagnitude(const InfiniterDerived &p_right) const noexcept;
+    bool greaterEqualMagnitude(const InfiniterDerived &p_right) const noexcept;
+    bool smallerEqualMagnitude(const InfiniterDerived &p_right) const noexcept;
 
     bool equal(icell_t p_scalar, int p_sign) const noexcept;
     bool differs(icell_t p_scalar, int p_sign) const noexcept;

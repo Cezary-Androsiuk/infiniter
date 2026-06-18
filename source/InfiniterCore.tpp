@@ -31,6 +31,7 @@ InfiniterCore<InfiniterDerived>::InfiniterCore() noexcept
 {
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   DEFAULT\n", this);
 
+    m_data[0] = ICELL_C(0);
     m_bits.sign = false;
     m_size = ISIZE_C(1);
 }
@@ -41,6 +42,7 @@ InfiniterCore<InfiniterDerived>::InfiniterCore(isize_t p_capacity)
 {
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER 1\n", this);
 
+    m_data[0] = ICELL_C(0);
     m_bits.sign = false;
     m_size = ISIZE_C(1);
 }
@@ -50,12 +52,12 @@ InfiniterCore<InfiniterDerived>::InfiniterCore(isize_t p_capacity, icell_t p_val
     : InfiniterMemory(p_capacity) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER 2\n", this);
-
-    m_bits.sign = p_negative_value;
-    m_size = ISIZE_C(1);
-
+    
     /// assign value
     m_data[0] = p_value;
+    
+    m_bits.sign = (m_data[0] == ICELL_C(0)) ? false : p_negative_value;
+    m_size = ISIZE_C(1);
 }
 
 template<typename InfiniterDerived>
@@ -64,13 +66,17 @@ InfiniterCore<InfiniterDerived>::InfiniterCore(const icell_t *p_array, isize_t p
 {
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER 3\n", this);
 
+    icell_t is_zero = ICELL_C(0);
+
     for(isize_t i=0; i<p_size; i++)
     {
         m_data[i] = p_array[i];
+        is_zero |= m_data[i];
     }
 
-    m_bits.sign = p_negative_value;
+    m_bits.sign = is_zero ? false : p_negative_value;
     m_size = p_size;
+    this->normalize();
 }
 
 template<typename InfiniterDerived>
@@ -83,6 +89,7 @@ InfiniterCore<InfiniterDerived>::InfiniterCore(const InfiniterDerived &p_source)
 
     m_bits.sign = p_source.m_bits.sign;
     m_size = p_source.m_size;
+    this->normalize();
 }
 
 template<typename InfiniterDerived>
@@ -95,6 +102,7 @@ InfiniterCore<InfiniterDerived>::InfiniterCore(InfiniterDerived &&p_source) noex
 
     m_bits.sign = p_source.m_bits.sign;
     m_size = p_source.m_size;
+    this->normalize();
 }
 
 template<typename InfiniterDerived>
@@ -291,16 +299,18 @@ void InfiniterCore<InfiniterDerived>::absoluteValueAssign()
 }
 
 template<typename InfiniterDerived>
-void InfiniterCore<InfiniterDerived>::assign(icell_t p_value, bool p_negative_value) noexcept
+InfiniterDerived &InfiniterCore<InfiniterDerived>::assign(icell_t p_value, bool p_negative_value) noexcept
 {
     m_data[0] = p_value;
 
-    m_bits.sign = p_negative_value;
+    m_bits.sign = (m_data[0] == ICELL_C(0)) ? false : p_negative_value;
     m_size = ISIZE_C(1);
+
+    return *this;
 }
 
 template<typename InfiniterDerived>
-void InfiniterCore<InfiniterDerived>::assign(const icell_t *p_array, isize_t p_size, bool p_negative_value)
+InfiniterDerived &InfiniterCore<InfiniterDerived>::assign(const icell_t *p_array, isize_t p_size, bool p_negative_value)
 {
     /// reserve more if needed
     /// UNLIKELY to speed up operations where memory isn't realocated
@@ -316,10 +326,14 @@ void InfiniterCore<InfiniterDerived>::assign(const icell_t *p_array, isize_t p_s
 
     m_size = p_size;
     m_bits.sign = p_negative_value;
+
+    this->normalize();
+
+    return *this;
 }
 
 template<typename InfiniterDerived>
-void InfiniterCore<InfiniterDerived>::assign(const InfiniterDerived &p_source)
+InfiniterDerived &InfiniterCore<InfiniterDerived>::assign(const InfiniterDerived &p_source)
 {
     if( &p_source != this )
     {
@@ -329,11 +343,15 @@ void InfiniterCore<InfiniterDerived>::assign(const InfiniterDerived &p_source)
 
         m_bits.sign = p_source.m_bits.sign;
         m_size = p_source.m_size;
+
+        this->normalize();
     }
+
+    return *this;
 }
 
 template<typename InfiniterDerived>
-void InfiniterCore<InfiniterDerived>::assign(InfiniterDerived &&p_source)
+InfiniterDerived &InfiniterCore<InfiniterDerived>::assign(InfiniterDerived &&p_source)
 {
     if( &p_source != this )
     {
@@ -343,7 +361,11 @@ void InfiniterCore<InfiniterDerived>::assign(InfiniterDerived &&p_source)
 
         m_bits.sign = p_source.m_bits.sign;
         m_size = p_source.m_size;
+
+        this->normalize();
     }
+
+    return *this;
 }
 
 template<typename InfiniterDerived>

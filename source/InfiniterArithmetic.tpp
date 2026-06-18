@@ -72,7 +72,7 @@ InfiniterArithmetic<InfiniterDerived>::~InfiniterArithmetic() noexcept
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::incrementMagnitude()
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::incrementMagnitude()
 {
     icell_t *data = this->getData();
     icell_t size = this->getRealSize();
@@ -106,10 +106,11 @@ void InfiniterArithmetic<InfiniterDerived>::incrementMagnitude()
     (*cell_ptr)++;
 
     this->normalize();
+    return *this;
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::decrementMagnitude()
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::decrementMagnitude()
 {
     icell_t *data = this->getData();
     icell_t size = this->getRealSize();
@@ -128,15 +129,16 @@ void InfiniterArithmetic<InfiniterDerived>::decrementMagnitude()
     (*cell_ptr)--;
 
     this->normalize();
+    return *this;
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::addMagnitude(icell_t p_value)
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::addMagnitude(icell_t p_right)
 {
     icell_t *data = this->getData();
     isize_t size = this->getRealSize();
 
-    icell_t carry = p_value;
+    icell_t carry = p_right;
     for(isize_t i=0; i<size && carry; i++)
     {
         // __uint128_t sum = (__uint128_t)data[i] + carry;
@@ -152,15 +154,16 @@ void InfiniterArithmetic<InfiniterDerived>::addMagnitude(icell_t p_value)
     }
 
     this->normalize();
+    return *this;
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(icell_t p_value)
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(icell_t p_right)
 {
     icell_t *data = this->getData();
     isize_t size = this->getRealSize();
 
-    icell_t carry = p_value;
+    icell_t carry = p_right;
     for(isize_t i=0; i<size && carry; i++)
     {
         __uint128_t sum = static_cast<__uint128_t>(data[i]) + carry;
@@ -175,10 +178,11 @@ void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(icell_t p_value)
     }
 
     this->normalize();
+    return *this;
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::addMagnitude(const InfiniterDerived &p_right)
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::addMagnitude(const InfiniterDerived &p_right)
 {
     /// block to approximate result size
     {
@@ -222,12 +226,12 @@ void InfiniterArithmetic<InfiniterDerived>::addMagnitude(const InfiniterDerived 
         carry = static_cast<icell_t>(sum >> icell_bits);
     }
 
-
     this->normalize();
+    return *this;
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(const InfiniterDerived &p_right)
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(const InfiniterDerived &p_right)
 {
     /// assert |this| >= |p_right|
 
@@ -259,31 +263,31 @@ void InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(const InfiniterDer
     }
 
     this->normalize();
+    return *this;
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::increment()
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::increment()
 {
     /// handle incrementing from negative
     if(this->getSign())
     {
         /// perform operation on absolute value
-        this->decrementMagnitude();  /// has normalize
-        return;
+        return this->decrementMagnitude();  /// has normalize
     }
 
-    this->incrementMagnitude();  /// has normalize
+    return this->incrementMagnitude();  /// has normalize
+
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::decrement()
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::decrement()
 {
     /// handle decrementing from negative
     if(this->getSign())
     {
         /// perform operation on absolute value
-        this->incrementMagnitude();  /// has normalize
-        return;
+        return this->incrementMagnitude();  /// has normalize
     }
 
     /// handle decrementing to negative
@@ -291,43 +295,40 @@ void InfiniterArithmetic<InfiniterDerived>::decrement()
     /// will have one condition less
     if(this->is0())
     {
-        this->increment();
         this->setNegativeSign();
-        return;
+        return this->incrementMagnitude(); /// has normalize
     }
-
-    this->decrementMagnitude();  /// has normalize
+    
+    return this->decrementMagnitude();  /// has normalize
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::add(icell_t p_value, bool p_negative_value)
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bool p_negative_value)
 {
     /// handle edge cases
-    if(p_value == 0)
-        return;
-    if(p_value == 1)
+    if(p_right == 0)
+        return *this;
+    if(p_right == 1)
     {
         if(p_negative_value)
-            this->decrement();  /// has normalize
+            return this->decrement();  /// has normalize
         else
-            this->increment();  /// has normalize
-
-        return;
+            return this->increment();  /// has normalize
     }
-    ///  1 +  1 ->  (1+1)
-    /// -1 +  1 -> -(1-1)
-    ///  1 + -1 ->  (1-1)
-    /// -1 + -1 -> -(1+1)
+    ///  1 +  1   ->    (1+1)
+    /// -1 +  1   ->   -(1-1)
+    ///  1 + -1   ->    (1-1)
+    /// -1 + -1   ->   -(1+1)
     ///
-    ///  2 +  1 ->  (2+1)
-    /// -2 +  1 -> -(2-1)
-    ///  2 + -1 ->  (2-1)
-    /// -2 + -1 -> -(2+1)
+    ///  2 +  1   ->    (2+1)
+    /// -2 +  1   ->   -(2-1)
+    ///  2 + -1   ->    (2-1)
+    /// -2 + -1   ->   -(2+1)
     ///
-    ///  1 +  2 ->  (1+2) ->  (2+1)
-    /// -1 +  2 -> -(1-2) ->  (2-1)
-    ///  1 + -2 ->  (1-2) -> -(2-1)
-    /// -1 + -2 -> -(1+2) -> -(2+1)
+    ///  1 +  2   ->    (1+2)   ->    (2+1)
+    /// -1 +  2   ->   -(1-2)   ->    (2-1)
+    ///  1 + -2   ->    (1-2)   ->   -(2-1)
+    /// -1 + -2   ->   -(1+2)   ->   -(2+1)
 
     /// addition:
     /// this is negative
@@ -336,26 +337,49 @@ void InfiniterArithmetic<InfiniterDerived>::add(icell_t p_value, bool p_negative
         /// scalar is negative
         if(p_negative_value)
         {
-            this->addMagnitude(p_value);  /// has normalize
+            this->setNegativeSign();
+            return this->addMagnitude(p_right);  /// has normalize
         }
+        
         /// scalar is positive
+        // -2 + 1    ->   1 - 2   ->   -(2 - 1)
+        if(this->greaterMagnitude(p_right, p_negative_value))
+        {
+            InfiniterDerived value(p_right);
+            value.subtractMagnitude(*this).negate(); /// has normalize
+            value.setNegativeSign();
+            return this->assign(std::move(value)); /// has normalize
+        }
         else
         {
-            this->subtractMagnitude(p_value);  /// has normalize
+            this->setPositiveSign();
+            return this->subtractMagnitude(p_right);  /// has normalize
         }
     }
     /// this is positive
     else
     {
-        /// scalar is negative
-        if(p_negative_value)
-        {
-            this->subtractMagnitude(p_value);  /// has normalize
-        }
         /// scalar is positive
+        if(!p_negative_value)
+        {
+            this->setPositiveSign();
+            return this->addMagnitude(p_right);  /// has normalize
+        }
+        
+        /// scalar is negative
+        // 1 + -2   ->   1 - 2   ->   -(2 - 1)
+        if(this->smallerMagnitude(p_right, p_negative_value))
+        {
+            InfiniterDerived value(p_right);
+            value.subtractMagnitude(*this).negate(); /// has normalize
+            value.setNegativeSign();
+            return this->assign(std::move(value)); /// has normalize
+        }
         else
         {
-            this->addMagnitude(p_value);  /// has normalize
+
+            this->setPositiveSign();
+            return this->subtractMagnitude(p_right);  /// has normalize
         }
     }
 
@@ -363,14 +387,14 @@ void InfiniterArithmetic<InfiniterDerived>::add(icell_t p_value, bool p_negative
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_value, bool p_negative_value)
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_right, bool p_negative_value)
 {
-    if(p_value == 0)
+    if(p_right == 0)
     {
         this->normalize();
         return;
     }
-    if(p_value == 1)
+    if(p_right == 1)
     {
         if(p_negative_value)
             this->increment();  /// has normalize
@@ -379,20 +403,20 @@ void InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_value, bool p_neg
 
         return;
     }
-    ///  1 -  1 ->  (1-1)
-    /// -1 -  1 -> -(1+1)
-    ///  1 - -1 ->  (1+1)
-    /// -1 - -1 -> -(1-1)
+    ///  1 -  1   ->    (1-1)
+    /// -1 -  1   ->   -(1+1)
+    ///  1 - -1   ->    (1+1)
+    /// -1 - -1   ->   -(1-1)
     ///
-    ///  2 -  1 ->  (2-1)
-    /// -2 -  1 -> -(2+1)
-    ///  2 - -1 ->  (2+1)
-    /// -2 - -1 -> -(2-1)
+    ///  2 -  1   ->    (2-1)
+    /// -2 -  1   ->   -(2+1)
+    ///  2 - -1   ->    (2+1)
+    /// -2 - -1   ->   -(2-1)
     ///
-    ///  1 -  2 ->  (1-2) -> -(2-1)
-    /// -1 -  2 -> -(1+2) -> -(2+1)
-    ///  1 - -2 ->  (1+2) ->  (2+1)
-    /// -1 - -2 -> -(1-2) ->  (2-1)
+    ///  1 -  2   ->    (1-2)   ->   -(2-1)
+    /// -1 -  2   ->   -(1+2)   ->   -(2+1)
+    ///  1 - -2   ->    (1+2)   ->    (2+1)
+    /// -1 - -2   ->   -(1-2)   ->    (2-1)
 
     /// subtraction:
     /// this is negative
@@ -401,12 +425,12 @@ void InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_value, bool p_neg
         /// scalar is negative
         if(p_negative_value)
         {
-            this->subtractMagnitude(p_value);  /// has normalize
+            this->subtractMagnitude(p_right);  /// has normalize
         }
         /// scalar is positive
         else
         {
-            this->addMagnitude(p_value);  /// has normalize
+            this->addMagnitude(p_right);  /// has normalize
         }
     }
     /// this is positive
@@ -415,19 +439,19 @@ void InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_value, bool p_neg
         /// scalar is negative
         if(p_negative_value)
         {
-            this->addMagnitude(p_value);  /// has normalize
+            this->addMagnitude(p_right);  /// has normalize
         }
         /// scalar is positive
         else
         {
-            this->subtractMagnitude(p_value);  /// has normalize
+            this->subtractMagnitude(p_right);  /// has normalize
         }
     }
 
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::add(const InfiniterDerived &p_right)
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(const InfiniterDerived &p_right)
 {
     if(this->is0())
     {
@@ -501,7 +525,7 @@ void InfiniterArithmetic<InfiniterDerived>::add(const InfiniterDerived &p_right)
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::subtract(const InfiniterDerived &p_right)
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(const InfiniterDerived &p_right)
 {
     if(this->is0())
     {
@@ -575,7 +599,7 @@ void InfiniterArithmetic<InfiniterDerived>::subtract(const InfiniterDerived &p_r
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::multiply(const InfiniterDerived &p_right)
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::multiply(const InfiniterDerived &p_right)
 {
     /// handle signs
     /// reverse sign only if other number is negative case
@@ -632,7 +656,7 @@ void InfiniterArithmetic<InfiniterDerived>::multiply(const InfiniterDerived &p_r
 }
 
 template<typename InfiniterDerived>
-void InfiniterArithmetic<InfiniterDerived>::divde(const InfiniterDerived &p_right)
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::divde(const InfiniterDerived &p_right)
 {
     /// handle signs
     /// reverse sign only if other number is negative case
