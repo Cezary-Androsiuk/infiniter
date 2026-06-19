@@ -198,6 +198,7 @@ void InfiniterCore<InfiniterDerived>::normalize() noexcept
     this->trim();
     if(this->is0())
         this->setPositiveSign();
+
 }
 
 template<typename InfiniterDerived>
@@ -244,7 +245,12 @@ isize_t InfiniterCore<InfiniterDerived>::getRealSize() const noexcept
 template<typename InfiniterDerived>
 isize_t InfiniterCore<InfiniterDerived>::setSize(isize_t p_new_size) noexcept
 {
-    return m_size = std::min(p_new_size, m_capacity);
+    isize_t new_size = std::min(p_new_size, m_capacity);
+
+    /// clear extended memory to keep the same value (it could contain old junk)
+    std::fill_n(m_data + m_size, new_size-m_size, ICELL_C(0));
+
+    return m_size = new_size;
 }
 
 template<typename InfiniterDerived>
@@ -254,9 +260,8 @@ isize_t InfiniterCore<InfiniterDerived>::setSizeWithExtend(isize_t p_new_size)
     {
         this->reserve( REALLOC_PADDING_SIZE(p_new_size) );
     }
-
-    m_size = p_new_size;
-    return m_size;
+    
+    return this->setSize(p_new_size);
 }
 
 template<typename InfiniterDerived>
