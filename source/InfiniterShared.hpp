@@ -164,5 +164,14 @@ union BitsUS{ /// bits union struct
 
 // ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER UTILITY ^^^^^^^^^^^^^^^^^^^^^^^
 
+
+
+// ####################### INFINITER #######################
+
+/// prints what is happening - what constructors are executed
+#define I_DEBUG_EXECUTION_PRINT true
+
+// ^^^^^^^^^^^^^^^^^^^^^^^ INFINITER ^^^^^^^^^^^^^^^^^^^^^^^
+
 #define LIKELY(x)       __builtin_expect(!!(x), 1)
 #define UNLIKELY(x)     __builtin_expect(!!(x), 0)

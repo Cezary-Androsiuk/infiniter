@@ -47,17 +47,24 @@ InfiniterIO<InfiniterDerived>::InfiniterIO() noexcept
 }
 
 template<typename InfiniterDerived>
-InfiniterIO<InfiniterDerived>::InfiniterIO(isize_t p_capacity)
-    : InfiniterArithmetic<InfiniterDerived>(p_capacity)
+InfiniterIO<InfiniterDerived>::InfiniterIO(int64_t p_value)
+    : InfiniterArithmetic<InfiniterDerived>(p_value)
 {
-    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER isize_t\n", this);
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER int64_t\n", this);
 }
 
 template<typename InfiniterDerived>
-InfiniterIO<InfiniterDerived>::InfiniterIO(isize_t p_capacity, icell_t p_value, bool p_negative_value)
-    : InfiniterArithmetic<InfiniterDerived>(p_capacity, p_value, p_negative_value)
+InfiniterIO<InfiniterDerived>::InfiniterIO(int64_t p_value, isize_t p_capacity)
+    : InfiniterArithmetic<InfiniterDerived>(p_value, p_capacity)
 {
-    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER isize_t icell_t bool\n", this);
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER int64_t isize_t\n", this);
+}
+
+template<typename InfiniterDerived>
+InfiniterIO<InfiniterDerived>::InfiniterIO(icell_t p_value, isize_t p_capacity, bool p_negative_value)
+    : InfiniterArithmetic<InfiniterDerived>(p_value, p_capacity, p_negative_value)
+{
+    _io_dbgprintf("--- DEBUG IO %p | Constructed   PARAMETER icell_t isize_t bool\n", this);
 }
 
 template<typename InfiniterDerived>

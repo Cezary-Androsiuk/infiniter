@@ -9,8 +9,9 @@ class InfiniterArithmetic : public InfiniterBit<InfiniterDerived>
 public:
     inline explicit InfiniterArithmetic() noexcept;
 
-    inline explicit InfiniterArithmetic(isize_t p_capacity); /// throws bad_alloc
-    inline explicit InfiniterArithmetic(isize_t p_capacity, icell_t p_value, bool p_negative_value=false); /// throws bad_alloc
+    inline InfiniterArithmetic(int64_t p_value); /// throws bad_alloc
+    inline explicit InfiniterArithmetic(int64_t p_value, isize_t p_capacity); /// throws bad_alloc
+    inline explicit InfiniterArithmetic(icell_t p_value, isize_t p_capacity, bool p_negative_value); /// throws bad_alloc
     inline explicit InfiniterArithmetic(const icell_t *p_array, isize_t p_size, bool p_negative_value=false); /// throws bad_alloc
 
     inline InfiniterArithmetic(const InfiniterDerived &p_source); /// throws bad_alloc

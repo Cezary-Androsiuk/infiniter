@@ -11,8 +11,9 @@ class InfiniterBit : public InfiniterCore<InfiniterDerived>
 public:
     inline explicit InfiniterBit() noexcept;
 
-    inline explicit InfiniterBit(isize_t p_capacity); /// throws bad_alloc
-    inline explicit InfiniterBit(isize_t p_capacity, icell_t p_value, bool p_negative_value=false); /// throws bad_alloc
+    inline InfiniterBit(int64_t p_value); /// throws bad_alloc
+    inline explicit InfiniterBit(int64_t p_value, isize_t p_capacity); /// throws bad_alloc
+    inline explicit InfiniterBit(icell_t p_value, isize_t p_capacity, bool p_negative_value); /// throws bad_alloc
     inline explicit InfiniterBit(const icell_t *p_array, isize_t p_size, bool p_negative_value=false); /// throws bad_alloc
 
     inline InfiniterBit(const InfiniterDerived &p_source); /// throws bad_alloc

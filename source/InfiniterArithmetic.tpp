@@ -29,17 +29,24 @@ InfiniterArithmetic<InfiniterDerived>::InfiniterArithmetic() noexcept
 }
 
 template<typename InfiniterDerived>
-InfiniterArithmetic<InfiniterDerived>::InfiniterArithmetic(isize_t p_capacity)
-    : InfiniterBit<InfiniterDerived>(p_capacity)
+InfiniterArithmetic<InfiniterDerived>::InfiniterArithmetic(int64_t p_value)
+    : InfiniterBit<InfiniterDerived>(p_value)
 {
-    _ia_dbgprintf("--- DEBUG IA %p | Constructed   PARAMETER isize_t\n", this);
+    _ia_dbgprintf("--- DEBUG IA %p | Constructed   PARAMETER int64_t\n", this);
 }
 
 template<typename InfiniterDerived>
-InfiniterArithmetic<InfiniterDerived>::InfiniterArithmetic(isize_t p_capacity, icell_t p_value, bool p_negative_value)
-    : InfiniterBit<InfiniterDerived>(p_capacity, p_value, p_negative_value)
+InfiniterArithmetic<InfiniterDerived>::InfiniterArithmetic(int64_t p_value, isize_t p_capacity)
+    : InfiniterBit<InfiniterDerived>(p_value, p_capacity)
 {
-    _ia_dbgprintf("--- DEBUG IA %p | Constructed   PARAMETER isize_t icell_t bool\n", this);
+    _ia_dbgprintf("--- DEBUG IA %p | Constructed   PARAMETER int64_t isize_t\n", this);
+}
+
+template<typename InfiniterDerived>
+InfiniterArithmetic<InfiniterDerived>::InfiniterArithmetic(icell_t p_value, isize_t p_capacity, bool p_negative_value)
+    : InfiniterBit<InfiniterDerived>(p_value, p_capacity, p_negative_value)
+{
+    _ia_dbgprintf("--- DEBUG IA %p | Constructed   PARAMETER icell_t isize_t bool\n", this);
 }
 
 template<typename InfiniterDerived>
@@ -106,7 +113,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::incrementMagnitude()
     (*cell_ptr)++;
 
     this->normalize();
-    return *this;
+    return this->getRef();
 }
 
 template<typename InfiniterDerived>
@@ -129,7 +136,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::decrementMagnitude()
     (*cell_ptr)--;
 
     this->normalize();
-    return *this;
+    return this->getRef();
 }
 
 template<typename InfiniterDerived>
@@ -154,7 +161,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::addMagnitude(icell_t p_
     }
 
     this->normalize();
-    return *this;
+    return this->getRef();
 }
 
 template<typename InfiniterDerived>
@@ -178,7 +185,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(icell
     }
 
     this->normalize();
-    return *this;
+    return this->getRef();
 }
 
 template<typename InfiniterDerived>
@@ -227,7 +234,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::addMagnitude(const Infi
     }
 
     this->normalize();
-    return *this;
+    return this->getRef();
 }
 
 template<typename InfiniterDerived>
@@ -263,7 +270,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(const
     }
 
     this->normalize();
-    return *this;
+    return this->getRef();
 }
 
 template<typename InfiniterDerived>
@@ -271,7 +278,7 @@ inline InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::setSignProduct(i
 {
     ibit_t sign_product = p_left_sign ^ p_right_sign;
     this->setSign(sign_product);
-    return *this;
+    return this->getRef();
 }
 
 template<typename InfiniterDerived>
@@ -280,7 +287,7 @@ inline InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::multiplyNaiveMag
     isize_t left_size = this->getRealSize();
     isize_t right_size = p_right.getRealSize();
 
-    InfiniterDerived result
+    // InfiniterDerived result
 }
 
 template<typename InfiniterDerived>
@@ -333,7 +340,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bo
     if(p_right == 0)
     {
         this->normalize();
-        return *this;
+        return this->getRef();
     }
     if(p_right == 1)
     {
@@ -371,8 +378,8 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bo
         /// right is positive but left is smaller
         if(this->smallerMagnitude(p_right, p_negative_value))
         {
-            InfiniterDerived tmp_swap(1, p_right);
-            tmp_swap.subtractMagnitude(*this); /// has normalize
+            InfiniterDerived tmp_swap(p_right);
+            tmp_swap.subtractMagnitude(this->getCRef()); /// has normalize
             tmp_swap.setPositiveSign();
             return this->assign(std::move(tmp_swap)); /// has normalize
         }
@@ -394,8 +401,8 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bo
         /// right is negative but left is smaller
         if(this->smallerMagnitude(p_right, p_negative_value))
         {
-            InfiniterDerived tmp_swap(1, p_right);
-            tmp_swap.subtractMagnitude(*this); /// has normalize
+            InfiniterDerived tmp_swap(p_right);
+            tmp_swap.subtractMagnitude(this->getCRef()); /// has normalize
             tmp_swap.setNegativeSign();
             return this->assign(std::move(tmp_swap)); /// has normalize
         }
@@ -415,7 +422,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_righ
     if(p_right == 0)
     {
         this->normalize();
-        return *this;
+        return this->getRef();
     }
     if(p_right == 1)
     {
@@ -454,8 +461,8 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_righ
         if(this->smallerMagnitude(p_right, p_negative_value))
         {
             /// swap, subtract and set positive
-            InfiniterDerived tmp_swap(1, p_right);  /// has normalize
-            tmp_swap.subtractMagnitude(*this);  /// has normalize
+            InfiniterDerived tmp_swap(p_right);  /// has normalize
+            tmp_swap.subtractMagnitude(this->getCRef());  /// has normalize
             tmp_swap.setPositiveSign();
             return this->assign(std::move(tmp_swap));  /// has normalize
         }
@@ -478,8 +485,8 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_righ
         if(this->smallerMagnitude())
         {
             /// swap, add, set negative
-            InfiniterDerived tmp_swap(1, p_right);  /// has normalize
-            tmp_swap.addMagnitude(*this);  /// has normalize
+            InfiniterDerived tmp_swap(p_right);  /// has normalize
+            tmp_swap.addMagnitude(this->getCRef());  /// has normalize
             tmp_swap.setNegativeSign();
             return this->assign(std::move(tmp_swap));  /// has normalize
         }
@@ -542,7 +549,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(const InfiniterDeri
         if(this->smallerMagnitude(p_right))
         {
             InfiniterDerived tmp_swap(p_right);  /// has normalize
-            tmp_swap.addMagnitude(*this);  /// has normalize
+            tmp_swap.addMagnitude(this->getCRef());  /// has normalize
             tmp_swap.setPositiveSign();
             return this->assign(std::move(tmp_swap));  /// has normalize
         }
@@ -565,7 +572,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(const InfiniterDeri
         if(this->smallerMagnitude(p_right))
         {
             InfiniterDerived tmp_swap(p_right);  /// has normalize
-            tmp_swap.subtractMagnitude(*this);  /// has normalize
+            tmp_swap.subtractMagnitude(this->getCRef());  /// has normalize
             tmp_swap.setNegativeSign();
             return this->assign(std::move(tmp_swap));  /// has normalize
         }
@@ -627,7 +634,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(const Infinite
         if(this->smallerMagnitude(p_right))
         {
             InfiniterDerived tmp_swap(p_right);  /// has normalize
-            tmp_swap.subtractMagnitude(*this);  /// has normalize
+            tmp_swap.subtractMagnitude(this->getCRef());  /// has normalize
             tmp_swap.setPositiveSign();
             return this->assign(std::move(tmp_swap));  /// has normalize
         }
@@ -651,7 +658,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(const Infinite
         if(this->smallerMagnitude(p_right))
         {
             InfiniterDerived tmp_swap(p_right);  /// has normalize
-            tmp_swap.addMagnitude(*this);  /// has normalize
+            tmp_swap.addMagnitude(this->getCRef());  /// has normalize
             tmp_swap.setNegativeSign();
             return this->assign(std::move(tmp_swap));  /// has normalize
         }
@@ -687,7 +694,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::multiply(const Infinite
         if(value == 0)
         {
             this->reset();    /// has normalize
-            return *this;
+            return this->getRef();
         }
         if(value == 1)
         {
@@ -710,12 +717,12 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::multiply(const Infinite
         if(p_right.is0())
         {
             this->reset();
-            return *this;
+            return this->getRef();
         }
         if(p_right.is1())
         {
             this->normalize();
-            return *this;
+            return this->getRef();
         }
         if(p_right.is2())
         {
@@ -786,14 +793,13 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::divde(const InfiniterDe
 template<typename InfiniterDerived>
 InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::operator ++()
 {
-    this->increment();
-    return static_cast<InfiniterDerived&>(*this);
+    return this->increment();
 }
 
 template<typename InfiniterDerived>
 InfiniterDerived InfiniterArithmetic<InfiniterDerived>::operator ++(int)
 {
-    InfiniterDerived number(*this); /// static cast needed?
+    InfiniterDerived number(this->getCRef()); /// static cast needed?
     this->increment();
     return number; /// copy elision aka RVO (Return Value Optimization)
     /// using move is "pessimising move" and after C++17 copy elision is guaranteed
@@ -802,14 +808,13 @@ InfiniterDerived InfiniterArithmetic<InfiniterDerived>::operator ++(int)
 template<typename InfiniterDerived>
 InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::operator --()
 {
-    this->increment();
-    return static_cast<InfiniterDerived&>(*this);
+    return this->decrement();
 }
 
 template<typename InfiniterDerived>
 InfiniterDerived InfiniterArithmetic<InfiniterDerived>::operator --(int)
 {
-    InfiniterDerived number(*this); /// static cast needed?
+    InfiniterDerived number(this->getCRef()); /// static cast needed?
     this->decrement();
     return number; /// copy elision aka RVO (Return Value Optimization)
     /// using move is "pessimising move" and after C++17 copy elision is guaranteed

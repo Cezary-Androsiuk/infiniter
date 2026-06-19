@@ -12,8 +12,9 @@ class InfiniterUtility : public InfiniterIO<InfiniterDerived>
 public:
     inline explicit InfiniterUtility() noexcept;
 
-    inline explicit InfiniterUtility(isize_t p_capacity); /// throws bad_alloc
-    inline explicit InfiniterUtility(isize_t p_capacity, icell_t p_value, bool p_negative_value=false); /// throws bad_alloc
+    inline InfiniterUtility(int64_t p_value); /// throws bad_alloc
+    inline explicit InfiniterUtility(int64_t p_value, isize_t p_capacity); /// throws bad_alloc
+    inline explicit InfiniterUtility(icell_t p_value, isize_t p_capacity, bool p_negative_value); /// throws bad_alloc
     inline explicit InfiniterUtility(const icell_t *p_array, isize_t p_size, bool p_negative_value=false); /// throws bad_alloc
 
     inline explicit InfiniterUtility(const std::string &p_number, int p_base=10, bool p_negative_value=false); /// throws bad_alloc /// InfiniterException::InvalidStringFormat

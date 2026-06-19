@@ -11,9 +11,9 @@ class InfiniterCore : private InfiniterMemory
 public:
     inline explicit InfiniterCore() noexcept;
 
-    inline explicit InfiniterCore(isize_t p_capacity); /// throws bad_alloc
-
-    inline explicit InfiniterCore(isize_t p_capacity, icell_t p_value, bool p_negative_value=false); /// throws bad_alloc
+    inline InfiniterCore(int64_t p_value); /// throws bad_alloc
+    inline explicit InfiniterCore(int64_t p_value, isize_t p_capacity); /// throws bad_alloc
+    inline explicit InfiniterCore(icell_t p_value, isize_t p_capacity, bool p_negative_value); /// throws bad_alloc
     inline explicit InfiniterCore(const icell_t *p_array, isize_t p_size, bool p_negative_value=false); /// throws bad_alloc
 
     inline InfiniterCore(const InfiniterDerived &p_source); /// throws bad_alloc
@@ -24,6 +24,10 @@ public:
     void reset() noexcept;
 
 protected:
+    inline InfiniterDerived &getRef() noexcept;
+    inline const InfiniterDerived &getCRef() const noexcept;
+    inline InfiniterDerived getCopy() const;
+
     void clear() noexcept;
     void clearReserved() noexcept;
 

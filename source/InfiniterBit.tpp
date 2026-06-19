@@ -32,17 +32,24 @@ InfiniterBit<InfiniterDerived>::InfiniterBit() noexcept
 }
 
 template<typename InfiniterDerived>
-InfiniterBit<InfiniterDerived>::InfiniterBit(isize_t p_capacity)
-    : InfiniterCore<InfiniterDerived>(p_capacity)
+InfiniterBit<InfiniterDerived>::InfiniterBit(int64_t p_value)
+    : InfiniterCore<InfiniterDerived>(p_value)
 {
-    _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER isize_t\n", this);
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER int64_t\n", this);
 }
 
 template<typename InfiniterDerived>
-InfiniterBit<InfiniterDerived>::InfiniterBit(isize_t p_capacity, icell_t p_value, bool p_negative_value)
-    : InfiniterCore<InfiniterDerived>(p_capacity, p_value, p_negative_value)
+InfiniterBit<InfiniterDerived>::InfiniterBit(int64_t p_value, isize_t p_capacity)
+    : InfiniterCore<InfiniterDerived>(p_value, p_capacity)
 {
-    _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER isize_t icell_t bool\n", this);
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER int64_t isize_t\n", this);
+}
+
+template<typename InfiniterDerived>
+InfiniterBit<InfiniterDerived>::InfiniterBit(icell_t p_value, isize_t p_capacity, bool p_negative_value)
+    : InfiniterCore<InfiniterDerived>(p_value, p_capacity, p_negative_value)
+{
+    _ib_dbgprintf("--- DEBUG IB %p | Constructed   PARAMETER icell_t isize_t bool\n", this);
 }
 
 template<typename InfiniterDerived>
@@ -725,7 +732,7 @@ InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftLSB(ibit_t p_lsb)
     /// overflow possible if that MSB is 1
 
     this->normalize();
-    return *this;
+    return this->getRef();
 }
 
 template<typename InfiniterDerived>
@@ -748,7 +755,7 @@ InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftMSB(ibit_t p_msb)
     /// old LSB is out at this point
 
     this->normalize();
-    return *this;
+    return this->getRef();
 }
 
 template<typename InfiniterDerived>
@@ -784,7 +791,7 @@ InfiniterDerived &InfiniterBit<InfiniterDerived>::pushMSB(ibit_t p_msb)
     if(!p_msb)
     {
         this->normalize();
-        return *this;
+        return this->getRef();
     }
 
     icell_t *data = this->getData();
@@ -799,7 +806,7 @@ InfiniterDerived &InfiniterBit<InfiniterDerived>::pushMSB(ibit_t p_msb)
         data[size-1] = ICELL_C(1);
 
         this->normalize();
-        return *this;
+        return this->getRef();
     }
 
     icell_t *msb_cell = getMSBCellPtr();
@@ -814,7 +821,7 @@ InfiniterDerived &InfiniterBit<InfiniterDerived>::pushMSB(ibit_t p_msb)
     *msb_cell |= (ICELL_C(1) << next_bit_index);
 
     this->normalize();
-    return *this;
+    return this->getRef();
 }
 
 

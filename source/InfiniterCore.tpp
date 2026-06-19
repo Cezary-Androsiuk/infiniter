@@ -5,8 +5,6 @@
 #include "InfiniterShared.hpp"
 #include "InfiniterException.hpp"
 
-#include "Infiniter.hpp"
-
 #include <utility> // std::move
 
 /// _ic_dbgprintf("--- DEBUG IC %p | Constructed   DEFAULT\n", this);
@@ -37,23 +35,48 @@ InfiniterCore<InfiniterDerived>::InfiniterCore() noexcept
 }
 
 template<typename InfiniterDerived>
-InfiniterCore<InfiniterDerived>::InfiniterCore(isize_t p_capacity)
-    : InfiniterMemory(p_capacity) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
+InfiniterCore<InfiniterDerived>::InfiniterCore(int64_t p_value)
+    : InfiniterMemory() /// capacity has to be equal or greater than 1
 {
-    _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER 1\n", this);
+    /// value only covers first cell, purpose of this is to initialize instance with 1 or other scalar values
+    _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER int64_t\n", this);
 
-    m_data[0] = ICELL_C(0);
-    m_bits.sign = false;
+    /// Bit Twiddling Hack (Absolute Value)
+    int64_t mask = p_value >> 63;
+    icell_t value = (p_value ^ mask) - mask;
+
+    /// assign value
+    m_data[0] = value;
+
+    m_bits.sign = mask;
     m_size = ISIZE_C(1);
 }
 
 template<typename InfiniterDerived>
-InfiniterCore<InfiniterDerived>::InfiniterCore(isize_t p_capacity, icell_t p_value, bool p_negative_value)
+InfiniterCore<InfiniterDerived>::InfiniterCore(int64_t p_value, isize_t p_capacity)
+    : InfiniterMemory(p_capacity) /// capacity has to be equal or greater than 1
+{
+    /// value only covers first cell, purpose of this is to initialize instance with 1 or other scalar values
+    _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER int64_t isize_t\n", this);
+
+    /// Bit Twiddling Hack (Absolute Value)
+    int64_t mask = p_value >> 63;
+    icell_t value = (p_value ^ mask) - mask;
+
+    /// assign value
+    m_data[0] = value;
+
+    m_bits.sign = mask;
+    m_size = ISIZE_C(1);
+}
+
+template<typename InfiniterDerived>
+InfiniterCore<InfiniterDerived>::InfiniterCore(icell_t p_value, isize_t p_capacity, bool p_negative_value)
     : InfiniterMemory(p_capacity) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
     /// value only covers first cell, purpose of this is to initialize instance with 1 or other scalar values
     ///
-    _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER 2\n", this);
+    _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER icell_t isize_t bool\n", this);
     
     /// assign value
     m_data[0] = p_value;
@@ -66,7 +89,7 @@ template<typename InfiniterDerived>
 InfiniterCore<InfiniterDerived>::InfiniterCore(const icell_t *p_array, isize_t p_size, bool p_negative_value)
     : InfiniterMemory(p_size) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
-    _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER 3\n", this);
+    _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER icell_t* isize_t bool\n", this);
 
     icell_t is_zero = ICELL_C(0);
 
@@ -121,6 +144,24 @@ void InfiniterCore<InfiniterDerived>::reset() noexcept
     InfiniterMemory::reset(); /// makes m_capacity == SBO_CAPACITY
     m_bits.sign = false;
     m_size = ISIZE_C(1);
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived &InfiniterCore<InfiniterDerived>::getRef() noexcept
+{
+    return static_cast<InfiniterDerived &>(*this);
+}
+
+template<typename InfiniterDerived>
+inline const InfiniterDerived &InfiniterCore<InfiniterDerived>::getCRef() const noexcept
+{
+    return static_cast<const InfiniterDerived &>(*this);
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterCore<InfiniterDerived>::getCopy() const
+{
+    return InfiniterDerived(static_cast<const InfiniterDerived &>(*this));
 }
 
 template<typename InfiniterDerived>
@@ -313,7 +354,7 @@ InfiniterDerived &InfiniterCore<InfiniterDerived>::assign(icell_t p_value, bool 
     m_bits.sign = (m_data[0] == ICELL_C(0)) ? false : p_negative_value;
     m_size = ISIZE_C(1);
 
-    return *this;
+    return this->getRef();
 }
 
 template<typename InfiniterDerived>
@@ -336,7 +377,7 @@ InfiniterDerived &InfiniterCore<InfiniterDerived>::assign(const icell_t *p_array
 
     this->normalize();
 
-    return *this;
+    return this->getRef();
 }
 
 template<typename InfiniterDerived>
@@ -354,7 +395,7 @@ InfiniterDerived &InfiniterCore<InfiniterDerived>::assign(const InfiniterDerived
         this->normalize();
     }
 
-    return *this;
+    return this->getRef();
 }
 
 template<typename InfiniterDerived>
@@ -372,8 +413,82 @@ InfiniterDerived &InfiniterCore<InfiniterDerived>::assign(InfiniterDerived &&p_s
         this->normalize();
     }
 
-    return *this;
+    return this->getRef();
 }
+
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::equalMagnitude(icell_t p_scalar, int p_sign) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::differsMagnitude(icell_t p_scalar, int p_sign) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::greaterMagnitude(icell_t p_scalar, int p_sign) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::smallerMagnitude(icell_t p_scalar, int p_sign) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::greaterEqualMagnitude(icell_t p_scalar, int p_sign) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::smallerEqualMagnitude(icell_t p_scalar, int p_sign) const noexcept
+{
+
+}
+
+
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::equalMagnitude(const InfiniterDerived &p_right) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::differsMagnitude(const InfiniterDerived &p_right) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::greaterMagnitude(const InfiniterDerived &p_right) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::smallerMagnitude(const InfiniterDerived &p_right) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::greaterEqualMagnitude(const InfiniterDerived &p_right) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+inline bool InfiniterCore<InfiniterDerived>::smallerEqualMagnitude(const InfiniterDerived &p_right) const noexcept
+{
+
+}
+
 
 template<typename InfiniterDerived>
 inline bool InfiniterCore<InfiniterDerived>::equal(icell_t p_scalar, int p_sign) const noexcept
