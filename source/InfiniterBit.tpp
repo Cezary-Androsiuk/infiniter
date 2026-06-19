@@ -707,7 +707,7 @@ void InfiniterBit<InfiniterDerived>::toggleBitUnsafe(uint64_t p_cell_index, uint
 }
 
 template<typename InfiniterDerived>
-void InfiniterBit<InfiniterDerived>::shiftLSB(ibit_t p_lsb)
+InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftLSB(ibit_t p_lsb)
 {
     icell_t lsb_mask = !!p_lsb; /// change 010010...100101 to 000...001
 
@@ -723,10 +723,13 @@ void InfiniterBit<InfiniterDerived>::shiftLSB(ibit_t p_lsb)
 
     /// old MSB is out at this point
     /// overflow possible if that MSB is 1
+
+    this->normalize();
+    return *this;
 }
 
 template<typename InfiniterDerived>
-void InfiniterBit<InfiniterDerived>::shiftMSB(ibit_t p_msb)
+InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftMSB(ibit_t p_msb)
 {
     icell_t msb_mask = !!p_msb; /// change 010010...100101 to 00...01
 
@@ -743,22 +746,25 @@ void InfiniterBit<InfiniterDerived>::shiftMSB(ibit_t p_msb)
     }
 
     /// old LSB is out at this point
+
+    this->normalize();
+    return *this;
 }
 
 template<typename InfiniterDerived>
-void InfiniterBit<InfiniterDerived>::shiftLeft()
+InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftLeft()
 {
-    this->shiftLSB(IBIT_0);
+    return this->shiftLSB(IBIT_0);
 }
 
 template<typename InfiniterDerived>
-void InfiniterBit<InfiniterDerived>::shiftRight()
+InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftRight()
 {
-    this->shiftMSB(IBIT_0);
+    return this->shiftMSB(IBIT_0);
 }
 
 template<typename InfiniterDerived>
-void InfiniterBit<InfiniterDerived>::pushLSB(ibit_t p_lsb)
+InfiniterDerived &InfiniterBit<InfiniterDerived>::pushLSB(ibit_t p_lsb)
 {
     /// check for possible overflow before shifting left
     const isize_t size = this->getSize();
@@ -768,15 +774,18 @@ void InfiniterBit<InfiniterDerived>::pushLSB(ibit_t p_lsb)
         this->setSizeWithExtend(size +1);
     }
 
-    this->shiftLSB(p_lsb);
+    return this->shiftLSB(p_lsb);
 }
 
 template<typename InfiniterDerived>
-void InfiniterBit<InfiniterDerived>::pushMSB(ibit_t p_msb)
+InfiniterDerived &InfiniterBit<InfiniterDerived>::pushMSB(ibit_t p_msb)
 {
     /// well... adding 0 at the front won't do much
     if(!p_msb)
-        return;
+    {
+        this->normalize();
+        return *this;
+    }
 
     icell_t *data = this->getData();
     isize_t size = this->getSize();
@@ -788,7 +797,9 @@ void InfiniterBit<InfiniterDerived>::pushMSB(ibit_t p_msb)
         data = this->getData();
 
         data[size-1] = ICELL_C(1);
-        return;
+
+        this->normalize();
+        return *this;
     }
 
     icell_t *msb_cell = getMSBCellPtr();
@@ -801,6 +812,9 @@ void InfiniterBit<InfiniterDerived>::pushMSB(ibit_t p_msb)
 
     int next_bit_index = 64 - __builtin_clzll(*msb_cell);
     *msb_cell |= (ICELL_C(1) << next_bit_index);
+
+    this->normalize();
+    return *this;
 }
 
 

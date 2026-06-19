@@ -94,14 +94,14 @@ public:
     inline void toggleBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept;
 
 
-    void shiftLSB(ibit_t p_lsb=IBIT_FALSE); // Least Significant Bit (<<)
-    void shiftMSB(ibit_t p_msb=IBIT_FALSE); // Most Significant Bit (>>)
+    InfiniterDerived &shiftLSB(ibit_t p_lsb=IBIT_FALSE); // Least Significant Bit (<<)
+    InfiniterDerived &shiftMSB(ibit_t p_msb=IBIT_FALSE); // Most Significant Bit (>>)
 
-    inline void shiftLeft();
-    inline void shiftRight();
+    inline InfiniterDerived &shiftLeft();
+    inline InfiniterDerived &shiftRight();
 
-    void pushLSB(ibit_t p_lsb);
-    void pushMSB(ibit_t p_msb);
+    InfiniterDerived &pushLSB(ibit_t p_lsb);
+    InfiniterDerived &pushMSB(ibit_t p_msb);
 
 
 
