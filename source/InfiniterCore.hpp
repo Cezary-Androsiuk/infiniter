@@ -12,7 +12,7 @@ public:
     inline explicit InfiniterCore() noexcept;
 
     inline explicit InfiniterCore(isize_t p_capacity); /// throws bad_alloc
-    /// value only covers first cell, purpose of this is to initialize instance with 1 or other scalar values
+
     inline explicit InfiniterCore(isize_t p_capacity, icell_t p_value, bool p_negative_value=false); /// throws bad_alloc
     inline explicit InfiniterCore(const icell_t *p_array, isize_t p_size, bool p_negative_value=false); /// throws bad_alloc
 

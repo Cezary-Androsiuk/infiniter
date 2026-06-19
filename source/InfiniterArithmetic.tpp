@@ -267,6 +267,29 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(const
 }
 
 template<typename InfiniterDerived>
+inline InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::setSignProduct(ibit_t p_left_sign, ibit_t p_right_sign)
+{
+    ibit_t sign_product = p_left_sign ^ p_right_sign;
+    this->setSign(sign_product);
+    return *this;
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::multiplyNaiveMagnitude(const InfiniterDerived &p_right)
+{
+    isize_t left_size = this->getRealSize();
+    isize_t right_size = p_right.getRealSize();
+
+    InfiniterDerived result
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::multiplyMagnitude(const InfiniterDerived &p_right)
+{
+
+}
+
+template<typename InfiniterDerived>
 InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::increment()
 {
     /// handle incrementing from negative
@@ -306,6 +329,7 @@ template<typename InfiniterDerived>
 InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bool p_negative_value)
 {
     /// handle edge cases
+    /// pre addition conditions
     if(p_right == 0)
     {
         this->normalize();
@@ -347,7 +371,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bo
         /// right is positive but left is smaller
         if(this->smallerMagnitude(p_right, p_negative_value))
         {
-            InfiniterDerived tmp_swap(p_right);
+            InfiniterDerived tmp_swap(1, p_right);
             tmp_swap.subtractMagnitude(*this); /// has normalize
             tmp_swap.setPositiveSign();
             return this->assign(std::move(tmp_swap)); /// has normalize
@@ -370,7 +394,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bo
         /// right is negative but left is smaller
         if(this->smallerMagnitude(p_right, p_negative_value))
         {
-            InfiniterDerived tmp_swap(p_right);
+            InfiniterDerived tmp_swap(1, p_right);
             tmp_swap.subtractMagnitude(*this); /// has normalize
             tmp_swap.setNegativeSign();
             return this->assign(std::move(tmp_swap)); /// has normalize
@@ -387,6 +411,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bo
 template<typename InfiniterDerived>
 InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_right, bool p_negative_value)
 {
+    /// pre subtraction conditions
     if(p_right == 0)
     {
         this->normalize();
@@ -429,10 +454,10 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_righ
         if(this->smallerMagnitude(p_right, p_negative_value))
         {
             /// swap, subtract and set positive
-            InfiniterDerived tmp_swap(p_right);
-            tmp_swap.subtractMagnitude(*this);
+            InfiniterDerived tmp_swap(1, p_right);  /// has normalize
+            tmp_swap.subtractMagnitude(*this);  /// has normalize
             tmp_swap.setPositiveSign();
-            return this->assign(std::move(tmp_swap));
+            return this->assign(std::move(tmp_swap));  /// has normalize
         }
 
         /// right is negative
@@ -453,17 +478,16 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_righ
         if(this->smallerMagnitude())
         {
             /// swap, add, set negative
-            InfiniterDerived tmp_swap(p_right);
-            tmp_swap.addMagnitude(*this);
+            InfiniterDerived tmp_swap(1, p_right);  /// has normalize
+            tmp_swap.addMagnitude(*this);  /// has normalize
             tmp_swap.setNegativeSign();
-            return this->assign(std::move(tmp_swap));
+            return this->assign(std::move(tmp_swap));  /// has normalize
         }
 
         /// right is positive
         this->setPositiveSign();
         return this->subtractMagnitude(p_right);  /// has normalize
     }
-
 }
 
 template<typename InfiniterDerived>
@@ -476,20 +500,8 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(const InfiniterDeri
         bool sign = this->getSign();
         icell_t value = this->getData()[0];
 
-        if(value == 0)
-        {
-            return this->assign(p_right);  /// has normalize
-        }
-
-        if(value == 1)
-        {
-            if(sign)
-                return this->assign(p_right).decrement();  /// has normalize
-            else
-                return this->assign(p_right).increment();  /// has normalize
-        }
-
-        return this->assign(p_right).add(value, sign); /// has normalize
+        return this->assign(p_right)    /// has normalize
+            .add(value, sign);          /// has normalize
     }
 
     if(p_right.getRealSize() == 1)
@@ -497,20 +509,6 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(const InfiniterDeri
         /// just scalar
         bool sign = p_right.getSign();
         icell_t value = p_right.getData()[0];
-
-        if(value == 0)
-        {
-            this->normalize();
-            return *this;
-        }
-
-        if(value == 1)
-        {
-            if(sign)
-                return this->decrement();  /// has normalize
-            else
-                return this->increment();  /// has normalize
-        }
 
         return this->add(value, sign); /// has normalize
     }
@@ -588,41 +586,14 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(const Infinite
         bool sign = this->getSign();
         icell_t value = this->getData()[0];
 
-        if(value == 0)
-        {
-            return this->assign(p_right);  /// has normalize
-        }
-
-        if(value == 1)
-        {
-            this->assign(p_right);
-            if(sign)
-                return this->increment();  /// has normalize
-            else
-                return this->decrement();  /// has normalize
-        }
-
-        return this->assign(p_right).subtract(value, sign); /// has normalize
+        return this->assign(p_right)    /// has normalize
+            .subtract(value, sign);     /// has normalize
     }
     if(p_right.getRealSize() == 1)
     {
         /// just scalar
         bool sign = p_right.getSign();
         icell_t value = p_right.getData()[0];
-
-        if(value == 0)
-        {
-            this->normalize();
-            return;
-        }
-
-        if(value == 1)
-        {
-            if(sign)
-                return this->increment();  /// has normalize
-            else
-                return this->decrement();  /// has normalize
-        }
 
         return this->subtract(value, sign); /// has normalize
     }
@@ -642,89 +613,125 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(const Infinite
     ///  1 -  2   ->    (1-2)   ->   -(2-1)
 
     /// subtraction:
-    /// this is negative
+    /// left is negative
     if(this->getSign())
     {
-        /// scalar is negative
-        if(p_right.getSign())
+        /// right is positive
+        if(!p_right.getSign())
         {
-            this->subtractMagnitude(p_right);  /// has normalize
+            this->setNegativeSign();
+            return this->addMagnitude(p_right);  /// has normalize
         }
-        /// scalar is positive but left is smaller
-        else
+
+        /// right is negative but left is smaller
+        if(this->smallerMagnitude(p_right))
         {
-            this->addMagnitude(p_right);  /// has normalize
+            InfiniterDerived tmp_swap(p_right);  /// has normalize
+            tmp_swap.subtractMagnitude(*this);  /// has normalize
+            tmp_swap.setPositiveSign();
+            return this->assign(std::move(tmp_swap));  /// has normalize
         }
+
+        /// right is negative
+        this->setNegativeSign();
+        return this->subtractMagnitude(p_right);  /// has normalize
+
     }
-    /// this is positive
+    /// left is positive
     else
     {
-        /// scalar is negative
+        /// right is negative
         if(p_right.getSign())
         {
-            this->addMagnitude(p_right);  /// has normalize
+            this->setPositiveSign();
+            return this->addMagnitude(p_right);  /// has normalize
         }
-        /// scalar is positive
-        else
+
+        /// right is positive but left is smaller
+        if(this->smallerMagnitude(p_right))
         {
-            this->subtractMagnitude(p_right);  /// has normalize
+            InfiniterDerived tmp_swap(p_right);  /// has normalize
+            tmp_swap.addMagnitude(*this);  /// has normalize
+            tmp_swap.setNegativeSign();
+            return this->assign(std::move(tmp_swap));  /// has normalize
         }
+
+        /// right is positive
+        this->setPositiveSign();
+        return this->subtractMagnitude(p_right);  /// has normalize
     }
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::multiplyNaive(const InfiniterDerived &p_right)
+{
+
+    isize_t left_size = this->getRealSize();
+    isize_t right_size = p_right.getRealSize();
+
 }
 
 template<typename InfiniterDerived>
 InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::multiply(const InfiniterDerived &p_right)
 {
-    /// handle signs
-    /// reverse sign only if other number is negative case
-    if(p_right.getSign())
-        this->negate();
+    /// pre multiplication conditions
+    isize_t left_size = this->getRealSize();
+    isize_t right_size = p_right.getRealSize();
 
-    if(p_right.getRealSize() == 1)
+    if(left_size == 1)
     {
+        bool sign = this->getSign();
+        icell_t value = this->getData()[0];
+
+        /// handle edge cases this
+        if(value == 0)
+        {
+            this->reset();    /// has normalize
+            return *this;
+        }
+        if(value == 1)
+        {
+            return this->assign(p_right)   /// has normalize
+                .setSignProduct(this->getSign(), p_right.getSign());
+        }
+        if(value == 2)
+        {
+            return this->assign(p_right)    /// has normalize
+                .pushLSB(IBIT_0);           /// has normalize
+        }
+    }
+
+    if(right_size == 1)
+    {
+        bool sign = this->getSign();
+        icell_t value = this->getData()[0];
+
         /// handle edge cases p_right
         if(p_right.is0())
         {
             this->reset();
-            return;
+            return *this;
         }
         if(p_right.is1())
         {
             this->normalize();
-            return;
+            return *this;
         }
         if(p_right.is2())
         {
-            this->pushLSB(IBIT_0);
-            this->normalize();
-            return;
-        }
-    }
-    if(this->getRealSize() == 1)
-    {
-        /// handle edge cases this
-        if(this->is0())
-        {
-            this->reset();
-            return;
-        }
-        if(this->is1())
-        {
-            this->assign(p_right);
-            this->normalize();
-            return;
-        }
-        if(this->is2())
-        {
-            this->assign(p_right);
-            this->pushLSB(IBIT_0);
-            this->normalize();
-            return;
+            return this->pushLSB(IBIT_0);   /// has normalize
         }
     }
 
 
-    /// multiplication:
+    /// multiplication naive:
+
+
+
+    /// handle signs
+    /// reverse sign only if other number is negative
+    if(p_right.getSign())
+        this->negate();
 
 
 }

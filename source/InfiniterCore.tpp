@@ -51,6 +51,8 @@ template<typename InfiniterDerived>
 InfiniterCore<InfiniterDerived>::InfiniterCore(isize_t p_capacity, icell_t p_value, bool p_negative_value)
     : InfiniterMemory(p_capacity) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
+    /// value only covers first cell, purpose of this is to initialize instance with 1 or other scalar values
+    ///
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER 2\n", this);
     
     /// assign value
@@ -247,7 +249,7 @@ isize_t InfiniterCore<InfiniterDerived>::setSize(isize_t p_new_size) noexcept
 {
     isize_t new_size = std::min(p_new_size, m_capacity);
 
-    /// clear extended memory to keep the same value (it could contain old junk)
+    /// clear extended memory to keep the same value (it could contain old junk after trimming size)
     std::fill_n(m_data + m_size, new_size-m_size, ICELL_C(0));
 
     return m_size = new_size;

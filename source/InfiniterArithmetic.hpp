@@ -30,10 +30,13 @@ protected:
     InfiniterDerived &addMagnitude(const InfiniterDerived &p_right);
     InfiniterDerived &subtractMagnitude(const InfiniterDerived &p_right);
 
+    InfiniterDerived &setSignProduct(ibit_t p_left_sign, ibit_t p_right_sign);
+    InfiniterDerived &multiplyNaiveMagnitude(const InfiniterDerived &p_right);
+    InfiniterDerived &multiplyMagnitude(const InfiniterDerived &p_right);
+
 public:
     InfiniterDerived &increment();
     InfiniterDerived &decrement();
-
 
     
     InfiniterDerived &add(icell_t p_right, bool p_negative_value=false);
@@ -43,13 +46,13 @@ public:
     InfiniterDerived &subtract(const InfiniterDerived &p_right);
 
     InfiniterDerived plus(icell_t p_right, bool p_negative_value=false);
-    InfiniterDerived subtract(icell_t p_right, bool p_negative_value=false);
+    InfiniterDerived minus(icell_t p_right, bool p_negative_value=false);
 
     InfiniterDerived plus(const InfiniterDerived &p_right);
-    InfiniterDerived subtract(const InfiniterDerived &p_right);
+    InfiniterDerived minus(const InfiniterDerived &p_right);
 
 
-
+    InfiniterDerived &multiplyNaive(const InfiniterDerived &p_right);
     InfiniterDerived &multiply(const InfiniterDerived &p_right);
 
     InfiniterDerived &divde(const InfiniterDerived &p_right);
