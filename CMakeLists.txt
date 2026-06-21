@@ -66,7 +66,8 @@ add_executable(RunInfiniterTests
     source/InfiniterException.cpp
 
     # tests files
-    tests/test_infiniter_memory.cpp
+    tests/InfiniterTestMemory.cpp
+    tests/InfiniterTestCore.cpp
 )
 
 target_include_directories(RunInfiniterTests PRIVATE source)

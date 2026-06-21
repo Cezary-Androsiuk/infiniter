@@ -488,7 +488,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_righ
         }
 
         /// right is positive but left is smaller
-        if(this->smallerMagnitude())
+        if(this->smallerMagnitude(p_right))
         {
             /// swap, add, set negative
             InfiniterDerived tmp_swap(p_right);  /// has normalize
@@ -774,7 +774,7 @@ inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::multiplyNaive(con
     isize_t result_size = left_size + right_size;
     bool result_sign = p_left.getSign() ^ p_right.getSign();
 
-    InfiniterDerived result(0, result_size, result_sign);
+    InfiniterDerived result(ICELL_C(0), result_size, result_sign);
     result.setSize(result_size);
 
     const icell_t *left_data = p_left.getData();
@@ -815,7 +815,7 @@ inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::multiply(const In
     /// for smaller numbers is faster
     if(max_size <= 32)
     {
-        return IA::multiplyNaiveMagnitude(p_left, p_right);   /// has normalize
+        return IA::multiplyNaive(p_left, p_right);   /// has normalize
     }
 
     /// karatsuba
@@ -827,14 +827,17 @@ inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::multiply(const In
     IA::split(p_left, left_lhalf, left_rhalf, half_size);
     IA::split(p_right, right_lhalf, right_rhalf, half_size);
 
-    InfiniterDerived result_part_2 = IA::multiplyMagnitude(left_lhalf, right_lhalf);
-    InfiniterDerived result_part_0 = IA::multiplyMagnitude(left_rhalf, right_rhalf);
+    InfiniterDerived result_part_2 = IA::multiply(left_lhalf, right_lhalf);
+    InfiniterDerived result_part_0 = IA::multiply(left_rhalf, right_rhalf);
 
     /// use .add() and .subtract() on the original object to prevent copying objects
     /// (llh + lrh) * (rlh + rrh) - rp2 - rp0
-    InfiniterDerived result_part_1 = IA::multiplyMagnitude(
+    InfiniterDerived result_part_1 = IA::multiply(
                                          left_lhalf.add(left_rhalf),
-                                         right_lhalf.add(right_rhalf)).subtract(result_part_2).subtract(result_part_0);
+                                         right_lhalf.add(right_rhalf)
+                                         )
+                                         .subtract(result_part_2)
+                                         .subtract(result_part_0);
 
     /// again use use .shiftLeft() and .add() on the original object to prevent copying objects
     /// (rp2 * 2^(2 * hs)) + (rp1 * 2^hs) + rp0

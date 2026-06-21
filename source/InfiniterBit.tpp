@@ -815,6 +815,33 @@ InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftRight()
 }
 
 template<typename InfiniterDerived>
+inline InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftCellsLeft(isize_t p_cells)
+{
+    isize_t size = this->getRealSize();
+
+    isize_t new_size = this->setSizeWithExtend(size + p_cells);
+    icell_t *data = this->getData();
+
+    /// iterate only over old size (require p_cells size padding)
+    /// shift cells like:
+    /// 0000 0000 1010 1111 0000
+    /// 1010 1111 0000 0000 0000
+    for(isize_t i=0; i<size; i++)
+    {
+        isize_t i_rev = new_size - i - 1;
+        data[i_rev] = data[i_rev - p_cells];
+    }
+
+    return this->getRef();
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftCellsRight(isize_t p_cells)
+{
+
+}
+
+template<typename InfiniterDerived>
 InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftLeft(isize_t p_operations)
 {
     if(p_operations == 0)

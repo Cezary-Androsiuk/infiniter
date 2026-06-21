@@ -97,9 +97,8 @@ union BitsUS{ /// bits union struct
 /// Little Endian aproach
 
 
-/// allows to enable highlited syntax  in tpp files
-#define INFINITER_TPP_INCLUDED false
-
+/// if not ensured, object after std::move will be corrupted and need to be deleted, but it is few operation faster
+#define I_ENSURE_NEW_OBJECT_AFTER_MOVE true
 
 
 // ####################### INFINITER MEMORY #######################
@@ -107,9 +106,6 @@ union BitsUS{ /// bits union struct
 /// Infiniter variable should be set to 0 after allocation? or leave it without overwriting old data
 /// after allocation memory will be set to 0 if enabled, if disabled memory can have trash in it
 #define IM_CLEAR_ALLOCATED_MEMORY true
-
-/// if not ensured, object after std::move will be corrupted and need to be deleted, but it is few operation faster
-#define IM_ENSURE_NEW_OBJECT_AFTER_MOVE true
 
 /// prints what is happening - what constructors are executed
 #define IM_DEBUG_EXECUTION_PRINT false

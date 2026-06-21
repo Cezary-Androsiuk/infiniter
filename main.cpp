@@ -506,8 +506,40 @@ int main(int argc, char *argv[])
     infiniter1.add(infiniter2);
     printf("\n");
 
+    printf("\n");
     infiniter1.print(10);
     printf("\n");
+    printf("\n");
+
+
+    Infiniter infiniter3("12345");
+    printf("\n");
+    infiniter3.print(10);
+    printf("\n");
+    infiniter3.print(2);
+    printf("\n");
+    printf("\n");
+
+
+    infiniter1.print(10);
+    printf("\n");
+
+    Infiniter infiniter4 = Infiniter::multiply(infiniter1, infiniter3);
+    printf("\n");
+    printf("\n");
+    infiniter4.print(10);
+    printf("\n");
+    infiniter4.print(2);
+    printf("\n");
+
+    Infiniter infiniter5 = Infiniter::multiply(infiniter3, infiniter1);
+    printf("\n");
+    printf("\n");
+    infiniter5.print(10);
+    printf("\n");
+    infiniter5.print(2);
+    printf("\n");
+
 
     // InfiniterIO icp;
     // icp.dbgPrint(); printf("\n");

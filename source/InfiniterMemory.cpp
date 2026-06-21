@@ -109,7 +109,7 @@ InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source) noexcept
         p_source.m_data = nullptr;
     }
 
-#if IM_ENSURE_NEW_OBJECT_AFTER_MOVE
+#if I_ENSURE_NEW_OBJECT_AFTER_MOVE
     /// reset source by hand (to prevent memory deallocation)
     p_source.m_data = p_source.m_sbo_buffer;
     p_source.m_capacity = SBO_CAPACITY;
@@ -118,7 +118,7 @@ InfiniterMemory::InfiniterMemory(InfiniterMemory &&p_source) noexcept
 #if IM_CLEAR_ALLOCATED_MEMORY
     std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, ICELL_C(0));
 #endif // IM_CLEAR_ALLOCATED_MEMORY
-#endif // IM_ENSURE_NEW_OBJECT_AFTER_MOVE
+#endif // I_ENSURE_NEW_OBJECT_AFTER_MOVE
 }
 
 InfiniterMemory::~InfiniterMemory() noexcept
@@ -356,7 +356,7 @@ void InfiniterMemory::assign(InfiniterMemory &&p_source)
             p_source.m_data = nullptr;
         }
 
-#if IM_ENSURE_NEW_OBJECT_AFTER_MOVE
+#if I_ENSURE_NEW_OBJECT_AFTER_MOVE
         /// reset source by hand (to prevent memory deallocation)
         p_source.m_data = p_source.m_sbo_buffer;
         p_source.m_capacity = SBO_CAPACITY;
@@ -365,7 +365,7 @@ void InfiniterMemory::assign(InfiniterMemory &&p_source)
 #if IM_CLEAR_ALLOCATED_MEMORY
         std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, ICELL_C(0));
 #endif // IM_CLEAR_ALLOCATED_MEMORY
-#endif // IM_ENSURE_NEW_OBJECT_AFTER_MOVE
+#endif // I_ENSURE_NEW_OBJECT_AFTER_MOVE
     }
 }
 
@@ -437,7 +437,7 @@ InfiniterMemory &InfiniterMemory::operator =(InfiniterMemory &&p_source)
             p_source.m_data = nullptr;
         }
 
-#if IM_ENSURE_NEW_OBJECT_AFTER_MOVE
+#if I_ENSURE_NEW_OBJECT_AFTER_MOVE
         /// reset source by hand (to prevent memory deallocation)
         p_source.m_data = p_source.m_sbo_buffer;
         p_source.m_capacity = SBO_CAPACITY;
@@ -446,7 +446,7 @@ InfiniterMemory &InfiniterMemory::operator =(InfiniterMemory &&p_source)
 #if IM_CLEAR_ALLOCATED_MEMORY
         std::fill_n(p_source.m_sbo_buffer, SBO_CAPACITY, ICELL_C(0));
 #endif // IM_CLEAR_ALLOCATED_MEMORY
-#endif // IM_ENSURE_NEW_OBJECT_AFTER_MOVE
+#endif // I_ENSURE_NEW_OBJECT_AFTER_MOVE
     }
 
     return *this;

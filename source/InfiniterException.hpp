@@ -10,6 +10,11 @@ namespace InfiniterException{
         virtual ~Exception() noexcept;
     };
 
+    class InvalidSize : public Exception { public:
+        explicit InvalidSize(uint64_t p_input)
+            : Exception("Invalid Size: " + std::to_string(p_input)) {}
+    };
+
     class OutOfRange : public Exception { public:
         explicit OutOfRange(uint64_t p_got, uint64_t p_min, uint64_t p_max)
             : Exception("Out of Range: Got value " + std::to_string(p_got) +
@@ -30,7 +35,7 @@ namespace InfiniterException{
     class InvalidBase : public Exception { public:
         explicit InvalidBase(uint8_t p_base, uint8_t p_min_base, uint8_t p_max_base)
             : Exception(
-                  "Invalid base " + std::to_string(p_base) +
+                  "Invalid base: " + std::to_string(p_base) +
                   ", must be between " + std::to_string(p_min_base) +
                   " and " + std::to_string(p_min_base)) {}
     };

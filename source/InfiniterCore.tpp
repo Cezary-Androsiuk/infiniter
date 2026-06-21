@@ -75,9 +75,8 @@ InfiniterCore<InfiniterDerived>::InfiniterCore(icell_t p_value, isize_t p_capaci
     : InfiniterMemory(p_capacity) /// ensures that final capacity will be grater or equal to SBO_CAPACITY
 {
     /// value only covers first cell, purpose of this is to initialize instance with 1 or other scalar values
-    ///
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER icell_t isize_t bool\n", this);
-    
+
     /// assign value
     m_data[0] = p_value;
     
@@ -91,15 +90,17 @@ InfiniterCore<InfiniterDerived>::InfiniterCore(const icell_t *p_array, isize_t p
 {
     _ic_dbgprintf("--- DEBUG IC %p | Constructed   PARAMETER icell_t* isize_t bool\n", this);
 
-    icell_t is_zero = ICELL_C(0);
+    if(p_size < ICELL_C(1))
+    {
+        throw InfiniterException::InvalidSize(p_size);
+    }
 
     for(isize_t i=0; i<p_size; i++)
     {
         m_data[i] = p_array[i];
-        is_zero |= m_data[i];
     }
 
-    m_bits.sign = is_zero ? false : p_negative_value;
+    m_bits.sign = p_negative_value;
     m_size = p_size;
     this->normalize();
 }
@@ -219,20 +220,16 @@ void InfiniterCore<InfiniterDerived>::optimize()
 template<typename InfiniterDerived>
 void InfiniterCore<InfiniterDerived>::trim() noexcept
 {
-    /// iterate from back
-    for(isize_t i=0; i<m_size; i++)
-    {
-        const isize_t i_rev = m_size - 1 - i;
+    isize_t new_size = m_size;
 
-        /// on first non 0 cell stop and reduce m_size by i
-        if(m_data[i_rev] != ICELL_C(0))
-        {
-            if(i)
-            {
-                this->setSize(m_size-i);
-            }
-            return;
-        }
+    while (new_size > 1 && m_data[new_size - 1] == ICELL_C(0))
+    {
+        new_size--;
+    }
+
+    if(new_size < m_size)
+    {
+        this->setSize(new_size);
     }
 }
 
@@ -241,8 +238,10 @@ InfiniterDerived &InfiniterCore<InfiniterDerived>::normalize() noexcept
 {
     this->trim();
     if(this->is0())
+    {
         this->setPositiveSign();
-
+    }
+    return this->getRef();
 }
 
 template<typename InfiniterDerived>
@@ -279,10 +278,12 @@ template<typename InfiniterDerived>
 isize_t InfiniterCore<InfiniterDerived>::getRealSize() const noexcept
 {
     isize_t real_size = m_size;
+
     while (real_size > 1 && m_data[real_size - 1] == ICELL_C(0))
     {
         real_size--;
     }
+
     return real_size;
 }
 
@@ -292,10 +293,18 @@ isize_t InfiniterCore<InfiniterDerived>::setSize(isize_t p_new_size) noexcept
     /// returns what size was set
     /// if p_new_size > m_capacity, then size will be set to m_capacity
 
+    if(p_new_size < ICELL_C(1))
+    {
+        return m_size;
+    }
+
     isize_t new_size = std::min(p_new_size, m_capacity);
 
     /// clear extended memory to keep the same value (it could contain old junk after trimming size)
-    std::fill_n(m_data + m_size, new_size-m_size, ICELL_C(0));
+    if(new_size > m_size)
+    {
+        std::fill_n(m_data + m_size, new_size-m_size, ICELL_C(0));
+    }
 
     return m_size = new_size;
 }
@@ -417,6 +426,12 @@ InfiniterDerived &InfiniterCore<InfiniterDerived>::assign(InfiniterDerived &&p_s
         m_size = p_source.m_size;
 
         this->normalize();
+
+        printf("Wartosc przed przypisaniem: %llu\n", (unsigned long long)p_source.m_size);
+        fflush(stdout);
+        p_source.m_size = ISIZE_C(1);
+        printf("Wartosc po przypisaniu: %llu\n", (unsigned long long)p_source.m_size);
+        fflush(stdout);
     }
 
     return this->getRef();
@@ -877,14 +892,18 @@ bool InfiniterCore<InfiniterDerived>::greater(const InfiniterDerived &p_right) c
 
     /// handle signs
     if(m_bits.sign != p_right.m_bits.sign)
-        return m_bits.sign;
+        return !m_bits.sign;
+
+    bool is_negative = m_bits.sign;
 
     /// handle different sizes
     isize_t left_size = this->getRealSize();
     isize_t right_size = p_right.getRealSize();
 
-    if(left_size > right_size)
-        return true;
+    if(left_size != right_size)
+    {
+        return is_negative ? (left_size < right_size) : (left_size > right_size);
+    }
 
     /// handle data - iterate from MSB
     const icell_t *right_data = p_right.m_data;
@@ -893,7 +912,9 @@ bool InfiniterCore<InfiniterDerived>::greater(const InfiniterDerived &p_right) c
         isize_t i_rev = left_size - 1 - i;
         if(m_data[i_rev] != right_data[i_rev])
         {
-            return m_data[i_rev] > right_data[i_rev];
+            return is_negative ?
+                (m_data[i_rev] < right_data[i_rev]) :
+                (m_data[i_rev] > right_data[i_rev]);
         }
     }
 
@@ -908,14 +929,18 @@ bool InfiniterCore<InfiniterDerived>::smaller(const InfiniterDerived &p_right) c
 
     /// handle signs
     if(m_bits.sign != p_right.m_bits.sign)
-        return !m_bits.sign;
+        return m_bits.sign;
+
+    bool is_negative = m_bits.sign;
 
     /// handle different sizes
     isize_t left_size = this->getRealSize();
     isize_t right_size = p_right.getRealSize();
 
-    if(left_size < right_size)
-        return true;
+    if(left_size != right_size)
+    {
+        return is_negative ? (left_size > right_size) : (left_size < right_size);
+    }
 
     /// handle data - iterate from MSB
     const icell_t *right_data = p_right.m_data;
@@ -924,7 +949,9 @@ bool InfiniterCore<InfiniterDerived>::smaller(const InfiniterDerived &p_right) c
         isize_t i_rev = left_size - 1 - i;
         if(m_data[i_rev] != right_data[i_rev])
         {
-            return m_data[i_rev] < right_data[i_rev];
+            return is_negative ?
+                       (m_data[i_rev] > right_data[i_rev]) :
+                       (m_data[i_rev] < right_data[i_rev]);
         }
     }
 
@@ -939,14 +966,18 @@ bool InfiniterCore<InfiniterDerived>::greaterEqual(const InfiniterDerived &p_rig
 
     /// handle signs
     if(m_bits.sign != p_right.m_bits.sign)
-        return m_bits.sign;
+        return !m_bits.sign;
+
+    bool is_negative = m_bits.sign;
 
     /// handle different sizes
     isize_t left_size = this->getRealSize();
     isize_t right_size = p_right.getRealSize();
 
-    if(left_size > right_size)
-        return true;
+    if(left_size != right_size)
+    {
+        return is_negative ? (left_size < right_size) : (left_size > right_size);
+    }
 
     /// handle data - iterate from MSB
     const icell_t *right_data = p_right.m_data;
@@ -955,7 +986,9 @@ bool InfiniterCore<InfiniterDerived>::greaterEqual(const InfiniterDerived &p_rig
         isize_t i_rev = left_size - 1 - i;
         if(m_data[i_rev] != right_data[i_rev])
         {
-            return m_data[i_rev] > right_data[i_rev];
+            return is_negative ?
+                       (m_data[i_rev] < right_data[i_rev]) :
+                       (m_data[i_rev] > right_data[i_rev]);
         }
     }
 
@@ -970,14 +1003,18 @@ bool InfiniterCore<InfiniterDerived>::smallerEqual(const InfiniterDerived &p_rig
 
     /// handle signs
     if(m_bits.sign != p_right.m_bits.sign)
-        return !m_bits.sign;
+        return m_bits.sign;
+
+    bool is_negative = m_bits.sign;
 
     /// handle different sizes
     isize_t left_size = this->getRealSize();
     isize_t right_size = p_right.getRealSize();
 
-    if(left_size < right_size)
-        return true;
+    if(left_size != right_size)
+    {
+        return is_negative ? (left_size > right_size) : (left_size < right_size);
+    }
 
     /// handle data - iterate from MSB
     const icell_t *right_data = p_right.m_data;
@@ -986,7 +1023,9 @@ bool InfiniterCore<InfiniterDerived>::smallerEqual(const InfiniterDerived &p_rig
         isize_t i_rev = left_size - 1 - i;
         if(m_data[i_rev] != right_data[i_rev])
         {
-            return m_data[i_rev] < right_data[i_rev];
+            return is_negative ?
+                       (m_data[i_rev] > right_data[i_rev]) :
+                       (m_data[i_rev] < right_data[i_rev]);
         }
     }
 
@@ -1015,37 +1054,37 @@ bool InfiniterCore<InfiniterDerived>::is0() const noexcept
 template<typename InfiniterDerived>
 bool InfiniterCore<InfiniterDerived>::is1() const noexcept
 {
-    return this->equal(1, 0);
+    return this->equalMagnitude(1);
 }
 
 template<typename InfiniterDerived>
 bool InfiniterCore<InfiniterDerived>::is2() const noexcept
 {
-    return this->equal(2, 0);
+    return this->equalMagnitude(2);
 }
 
 template<typename InfiniterDerived>
 bool InfiniterCore<InfiniterDerived>::isPositive1() const noexcept
 {
-    return this->equal(1, 1);
+    return this->equal(1, IBIT_FALSE);
 }
 
 template<typename InfiniterDerived>
 bool InfiniterCore<InfiniterDerived>::isNegative1() const noexcept
 {
-    return this->equal(1, -1);
+    return this->equal(1, IBIT_TRUE);
 }
 
 template<typename InfiniterDerived>
 bool InfiniterCore<InfiniterDerived>::isPositive2() const noexcept
 {
-    return this->equal(2, 1);
+    return this->equal(2, IBIT_FALSE);
 }
 
 template<typename InfiniterDerived>
 bool InfiniterCore<InfiniterDerived>::isNegative2() const noexcept
 {
-    return this->equal(2, -1);
+    return this->equal(2, IBIT_TRUE);
 }
 
 template<typename InfiniterDerived>
@@ -1053,7 +1092,7 @@ bool InfiniterCore<InfiniterDerived>::toBool() const noexcept
 {
     /// check LSB - most common case
     if(m_data[0] != ICELL_C(0))
-        return false;
+        return true;
 
     const isize_t size = m_size - 1; /// -1 excluded from loop
     /// iterate from MSB to LSB+1
@@ -1112,6 +1151,7 @@ void InfiniterCore<InfiniterDerived>::dbg_print_data() const
         printf("%016llx ", m_data[m_size - ISIZE_C(1) - i]);
     }
     printf("\n");
+    fflush(stdout);
 }
 
 template<typename InfiniterDerived>
@@ -1125,6 +1165,7 @@ void InfiniterCore<InfiniterDerived>::dbg_print_memory() const
         printf("%016llx ", m_data[m_capacity - ISIZE_C(1) - i]);
     }
     printf("\n");
+    fflush(stdout);
 }
 #endif // IC_ENABLE_DB_PRINT_METHOD
 
