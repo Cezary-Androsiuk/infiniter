@@ -3,9 +3,22 @@
 #include "InfiniterShared.hpp"
 #include "InfiniterBit.hpp"
 
+struct InfiniterDivisionResult
+{
+
+};
+
 template<typename InfiniterDerived>
 class InfiniterArithmetic : public InfiniterBit<InfiniterDerived>
 {
+public:
+    struct InfiniterDivisionResult
+    {
+        InfiniterDerived result;
+        InfiniterDerived remainder;
+    };
+
+protected:
     using IA = InfiniterArithmetic<InfiniterDerived>;
 
 public:
@@ -42,28 +55,59 @@ public:
     InfiniterDerived &increment();
     InfiniterDerived &decrement();
 
+
     
     InfiniterDerived &add(icell_t p_right, bool p_negative_value=false);
-    InfiniterDerived &subtract(icell_t p_right, bool p_negative_value=false);
-
     InfiniterDerived &add(const InfiniterDerived &p_right);
+
+    InfiniterDerived plus(icell_t p_right, bool p_negative_value=false) const;
+    InfiniterDerived plus(const InfiniterDerived &p_right) const;
+
+    static InfiniterDerived add(icell_t p_left, icell_t p_right,
+                                bool p_left_negative=false,
+                                bool p_right_negative=false);
+    static InfiniterDerived add(const InfiniterDerived &p_left,
+                                const InfiniterDerived &p_right);
+
+
+
+    InfiniterDerived &subtract(icell_t p_right, bool p_negative_value=false);
     InfiniterDerived &subtract(const InfiniterDerived &p_right);
 
-    InfiniterDerived plus(icell_t p_right, bool p_negative_value=false);
-    InfiniterDerived minus(icell_t p_right, bool p_negative_value=false);
+    InfiniterDerived minus(icell_t p_right, bool p_negative_value=false) const;
+    InfiniterDerived minus(const InfiniterDerived &p_right) const;
 
-    InfiniterDerived plus(const InfiniterDerived &p_right);
-    InfiniterDerived minus(const InfiniterDerived &p_right);
+    static InfiniterDerived subtract(icell_t p_left, icell_t p_right,
+                                     bool p_left_negative=false,
+                                     bool p_right_negative=false);
+    static InfiniterDerived subtract(const InfiniterDerived &p_left,
+                                     const InfiniterDerived &p_right);
+
 
 
     InfiniterDerived &multiplyNaive(const InfiniterDerived &p_right);
     InfiniterDerived &multiply(const InfiniterDerived &p_right);
+
+    InfiniterDerived timesNaive(const InfiniterDerived &p_right) const;
+    InfiniterDerived times(const InfiniterDerived &p_right) const;
+
     static InfiniterDerived multiplyNaive(const InfiniterDerived &p_left,
                                           const InfiniterDerived &p_right);
     static InfiniterDerived multiply(const InfiniterDerived &p_left,
                                      const InfiniterDerived &p_right);
 
+
+
     InfiniterDerived &divde(const InfiniterDerived &p_right);
+    InfiniterDivisionResult divdeRem(const InfiniterDerived &p_right);
+
+    InfiniterDerived over(const InfiniterDerived &p_right) const;
+    InfiniterDivisionResult overRem(const InfiniterDerived &p_right);
+
+    static InfiniterDerived divde(const InfiniterDerived &p_left,
+                                  const InfiniterDerived &p_right);
+    InfiniterDivisionResult divdeRem(const InfiniterDerived &p_left,
+                                    const InfiniterDerived &p_right);
 
 
 public:

@@ -338,6 +338,8 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::decrement()
     return this->decrementMagnitude();  /// has normalize
 }
 
+
+
 template<typename InfiniterDerived>
 InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bool p_negative_value)
 {
@@ -422,88 +424,6 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bo
 }
 
 template<typename InfiniterDerived>
-InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_right, bool p_negative_value)
-{
-    /// pre subtraction conditions
-    if(p_right == 0)
-    {
-        this->normalize();
-        return this->getRef();
-    }
-    if(p_right == 1)
-    {
-        if(p_negative_value)
-            return this->increment();  /// has normalize
-        else
-            return this->decrement();  /// has normalize
-    }
-    /// -1 -  1   ->   -(1+1)
-    /// -1 - -1   ->   -(1-1)
-    ///  1 -  1   ->    (1-1)
-    ///  1 - -1   ->    (1+1)
-    ///
-    /// -2 -  1   ->   -(2+1)
-    /// -2 - -1   ->   -(2-1)
-    ///  2 - -1   ->    (2+1)
-    ///  2 -  1   ->    (2-1)
-    ///
-    /// -1 -  2   ->   -(1+2)
-    /// -1 - -2   ->   -(1-2)   ->    (2-1)
-    ///  1 - -2   ->    (1+2)
-    ///  1 -  2   ->    (1-2)   ->   -(2-1)
-
-    /// subtraction:
-    /// left is negative
-    if(this->getSign())
-    {
-        /// right is positive
-        if(!p_negative_value)
-        {
-            this->setNegativeSign();
-            return this->addMagnitude(p_right);  /// has normalize
-        }
-
-        /// right is negative but left is smaller
-        if(this->smallerMagnitude(p_right))
-        {
-            /// swap, subtract and set positive
-            InfiniterDerived tmp_swap(p_right);  /// has normalize
-            tmp_swap.subtractMagnitude(this->getCRef());  /// has normalize
-            tmp_swap.setPositiveSign();
-            return this->assign(std::move(tmp_swap));  /// has normalize
-        }
-
-        /// right is negative
-        this->setNegativeSign();
-        return this->subtractMagnitude(p_right);  /// has normalize
-    }
-    /// left is positive
-    else
-    {
-        /// right is negative
-        if(p_negative_value)
-        {
-            this->setPositiveSign();
-            return this->addMagnitude(p_right);  /// has normalize
-        }
-
-        /// right is positive but left is smaller
-        if(this->smallerMagnitude(p_right))
-        {
-            /// swap, add, set negative
-            InfiniterDerived tmp_swap(p_right);  /// has normalize
-            tmp_swap.addMagnitude(this->getCRef());  /// has normalize
-            tmp_swap.setNegativeSign();
-            return this->assign(std::move(tmp_swap));  /// has normalize
-        }
-
-        /// right is positive
-        this->setPositiveSign();
-        return this->subtractMagnitude(p_right);  /// has normalize
-    }
-}
-
-template<typename InfiniterDerived>
 InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(const InfiniterDerived &p_right)
 {
     /// pre addition conditions
@@ -584,6 +504,124 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(const InfiniterDeri
         }
 
         /// right is negative
+        this->setPositiveSign();
+        return this->subtractMagnitude(p_right);  /// has normalize
+    }
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::plus(icell_t p_right, bool p_negative_value) const
+{
+    InfiniterDerived result(this->getCRef());
+    result.add(p_right, p_negative_value);
+    return result; /// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::plus(const InfiniterDerived &p_right) const
+{
+    InfiniterDerived result(this->getCRef());
+    result.add(p_right);
+    return result; /// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::add(icell_t p_left, icell_t p_right, bool p_left_negative, bool p_right_negative)
+{
+    InfiniterDerived result(p_left, 1, p_left_negative);
+    result.add(p_right, p_right_negative);
+    return result; /// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::add(const InfiniterDerived &p_left, const InfiniterDerived &p_right)
+{
+    return p_left.plus(p_right); /// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
+}
+
+
+
+template<typename InfiniterDerived>
+InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_right, bool p_negative_value)
+{
+    /// pre subtraction conditions
+    if(p_right == 0)
+    {
+        this->normalize();
+        return this->getRef();
+    }
+    if(p_right == 1)
+    {
+        if(p_negative_value)
+            return this->increment();  /// has normalize
+        else
+            return this->decrement();  /// has normalize
+    }
+    /// -1 -  1   ->   -(1+1)
+    /// -1 - -1   ->   -(1-1)
+    ///  1 -  1   ->    (1-1)
+    ///  1 - -1   ->    (1+1)
+    ///
+    /// -2 -  1   ->   -(2+1)
+    /// -2 - -1   ->   -(2-1)
+    ///  2 - -1   ->    (2+1)
+    ///  2 -  1   ->    (2-1)
+    ///
+    /// -1 -  2   ->   -(1+2)
+    /// -1 - -2   ->   -(1-2)   ->    (2-1)
+    ///  1 - -2   ->    (1+2)
+    ///  1 -  2   ->    (1-2)   ->   -(2-1)
+
+    /// subtraction:
+    /// left is negative
+    if(this->getSign())
+    {
+        /// right is positive
+        if(!p_negative_value)
+        {
+            this->setNegativeSign();
+            return this->addMagnitude(p_right);  /// has normalize
+        }
+
+        /// right is negative but left is smaller
+        if(this->smallerMagnitude(p_right))
+        {
+            /// swap, subtract and set positive
+            InfiniterDerived tmp_swap(p_right);  /// has normalize
+            tmp_swap.subtractMagnitude(this->getCRef());  /// has normalize
+            tmp_swap.setPositiveSign();
+            return this->assign(std::move(tmp_swap));  /// has normalize
+        }
+
+        /// right is negative
+        this->setNegativeSign();
+        return this->subtractMagnitude(p_right);  /// has normalize
+    }
+    /// left is positive
+    else
+    {
+        /// right is negative
+        if(p_negative_value)
+        {
+            this->setPositiveSign();
+            return this->addMagnitude(p_right);  /// has normalize
+        }
+
+        /// right is positive but left is smaller
+        if(this->smallerMagnitude(p_right))
+        {
+            /// swap, add, set negative
+            InfiniterDerived tmp_swap(p_right);  /// has normalize
+            tmp_swap.addMagnitude(this->getCRef());  /// has normalize
+            tmp_swap.setNegativeSign();
+            return this->assign(std::move(tmp_swap));  /// has normalize
+        }
+
+        /// right is positive
         this->setPositiveSign();
         return this->subtractMagnitude(p_right);  /// has normalize
     }
@@ -676,33 +714,67 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(const Infinite
 }
 
 template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::minus(icell_t p_right, bool p_negative_value) const
+{
+    InfiniterDerived result(this->getCRef());
+    result.subtract(p_right, p_negative_value);
+    return result; /// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::minus(const InfiniterDerived &p_right) const
+{
+    InfiniterDerived result(this->getCRef());
+    result.subtract(p_right);
+    return result; /// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_left, icell_t p_right, bool p_left_negative, bool p_right_negative)
+{
+    InfiniterDerived result(p_left, 1, p_left_negative);
+    result.subtract(p_right, p_right_negative);
+    return result; /// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::subtract(const InfiniterDerived &p_left, const InfiniterDerived &p_right)
+{
+    return p_left.minus(p_right); /// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
+}
+
+
+
+template<typename InfiniterDerived>
 inline InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::multiplyNaive(const InfiniterDerived &p_right)
 {
-
-    isize_t left_size = this->getRealSize();
-    isize_t right_size = p_right.getRealSize();
-
+    // return *this = IA::multiplyNaive(this->getCRef(), p_right));
+    return this->assign(IA::multiplyNaive(this->getCRef(), p_right)); /// move is already active here
 }
 
 template<typename InfiniterDerived>
 InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::multiply(const InfiniterDerived &p_right)
 {
+    // return *this = IA::multiply(this->getCRef(), p_right));
+    return this->assign(IA::multiply(this->getCRef(), p_right)); /// move is already active here
+}
 
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::timesNaive(const InfiniterDerived &p_right) const
+{
+    return IA::multiplyNaive(this->getCRef(), p_right);/// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
+}
 
-    // /// handle signs
-    // /// reverse sign only if other number is negative
-    // if(p_right.getSign())
-    //     this->negate();
-
-    // /// multiplication naive:
-    // if(left_size <= 32 && right_size <= 32)
-    // {
-    //     return this->multiplyNaiveMagnitude(p_right)   /// has normalize
-    //         .setSignProduct(this->getSign(), p_right.getSign());
-    // }
-
-    // /// multiplication:
-
+template<typename InfiniterDerived>
+InfiniterDerived InfiniterArithmetic<InfiniterDerived>::times(const InfiniterDerived &p_right) const
+{
+    return IA::multiply(this->getCRef(), p_right);/// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
 }
 
 template<typename InfiniterDerived>
@@ -802,7 +874,8 @@ inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::multiplyNaive(con
     }
 
     result.normalize();
-    return std::move(result);
+    return result; /// copy elision aka RVO (Return Value Optimization)
+    /// using move is "pessimising move" and after C++17 copy elision is guaranteed
 }
 
 template<typename InfiniterDerived>
@@ -845,6 +918,8 @@ inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::multiply(const In
         .add(result_part_1.shiftLeft(half_size))
         .add(result_part_0);
 }
+
+
 
 template<typename InfiniterDerived>
 InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::divde(const InfiniterDerived &p_right)
@@ -889,8 +964,94 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::divde(const InfiniterDe
 
     /// comparison optimization
     // if()
+    // 1. Obsługa błędu krytycznego
+    if (y.blocks.empty() || (y.blocks.size() == 1 && y.blocks[0] == 0)) {
+        throw std::domain_error("Division by zero");
+    }
+
+    DivModResult result;
+    result.quotient.blocks.assign(x.blocks.size(), 0);
+    result.remainder.blocks = {0};
+
+    // 2. Optymalizacja: Jeśli |X| < |Y|, wynik to 0, a reszta to X.
+    if (abs_compare(x, y) < 0) {
+        result.quotient.blocks = {0};
+        result.remainder = x;
+        return result;
+    }
+
+    // 3. Główna pętla dzielenia bitowego.
+    // Iterujemy od najbardziej znaczącego bitu dzielnej (X) w dół do zera.
+    // Metoda total_bits() powinna zwracać pozycję najwyższego ustawionego bitu.
+    int max_bit = x.total_bits() - 1;
+
+    for (int i = max_bit; i >= 0; --i) {
+        // A) Przesuń resztę o 1 bit w lewo (mnożenie przez 2)
+        result.remainder.shift_left_by_one();
+
+        // B) Pobierz i-ty bit z X i wstaw na najmłodszą pozycję reszty
+        if (x.test_bit(i)) {
+            result.remainder.set_bit(0, 1);
+        }
+
+        // C) Sprawdź, czy reszta jest większa lub równa dzielnikowi (na modułach)
+        if (abs_compare(result.remainder, y) >= 0) {
+            // Odejmowanie wartości bezwzględnych
+            result.remainder = abs_subtract(result.remainder, y);
+
+            // Ustawiamy i-ty bit w ilorazie na 1
+            result.quotient.set_bit(i, 1);
+        }
+    }
+
+    // 4. Czyszczenie wiodących zer w ilorazie
+    result.quotient.trim_leading_zeros();
+    result.remainder.trim_leading_zeros();
+
+    // 5. Ustalanie znaków
+    // Iloraz ma znak ujemny tylko wtedy, gdy operandy miały różne znaki.
+    result.quotient.is_negative = (x.is_negative != y.is_negative) && !result.quotient.is_zero();
+
+    // Znak reszty w matematyce zależy od konwencji. W C++ (od C++11)
+    // operator % dla typów wbudowanych zachowuje znak dzielnej (X).
+    result.remainder.is_negative = x.is_negative && !result.remainder.is_zero();
+
+    return result;
 
     /// division:
+}
+
+template<typename InfiniterDerived>
+inline typename InfiniterArithmetic<InfiniterDerived>::InfiniterDivisionResult
+InfiniterArithmetic<InfiniterDerived>::divdeRem(const InfiniterDerived &p_right)
+{
+
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::over(const InfiniterDerived &p_right) const
+{
+
+}
+
+template<typename InfiniterDerived>
+inline typename InfiniterArithmetic<InfiniterDerived>::InfiniterDivisionResult
+InfiniterArithmetic<InfiniterDerived>::overRem(const InfiniterDerived &p_right)
+{
+
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::divde(const InfiniterDerived &p_left, const InfiniterDerived &p_right)
+{
+
+}
+
+template<typename InfiniterDerived>
+inline typename InfiniterArithmetic<InfiniterDerived>::InfiniterDivisionResult
+InfiniterArithmetic<InfiniterDerived>::divdeRem(const InfiniterDerived &p_left, const InfiniterDerived &p_right)
+{
+
 }
 
 template<typename InfiniterDerived>
