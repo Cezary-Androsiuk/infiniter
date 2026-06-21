@@ -21,13 +21,13 @@ public:
 
     inline ~InfiniterCore() noexcept;
 
-    void reset() noexcept;
-
-protected:
     inline InfiniterDerived &getRef() noexcept;
     inline const InfiniterDerived &getCRef() const noexcept;
     inline InfiniterDerived getCopy() const;
 
+    InfiniterDerived &reset() noexcept;
+
+protected:
     void clear() noexcept;
     void clearReserved() noexcept;
 
@@ -39,8 +39,8 @@ public:
     inline void shrink();
     inline void optimize();
 
-    void trim() noexcept; // reduce size to trim not used zero-cells in front of the number
-    inline void normalize() noexcept;
+    void trim() noexcept; /// reduce size to trim not used zero-cells in front of the number
+    inline InfiniterDerived &normalize() noexcept;
 
     inline icell_t *getData() noexcept;
     inline const icell_t *getData() const noexcept;
@@ -50,30 +50,29 @@ public:
     inline ibit_t getSign() const noexcept;
     isize_t getRealSize() const noexcept;
 
-    /// returns what size was set
-    /// if p_new_size > m_capacity, then size will be set to m_capacity
     inline isize_t setSize(isize_t p_new_size) noexcept;
     isize_t setSizeWithExtend(isize_t p_new_size);
 
-    inline void setSign(bool p_new_sign) noexcept;
-    inline void setPositiveSign() noexcept;
-    inline void setNegativeSign() noexcept;
-    inline void negate() noexcept;
+    inline InfiniterDerived &setSign(bool p_new_sign) noexcept;
+    inline InfiniterDerived &setPositiveSign() noexcept;
+    inline InfiniterDerived &setNegativeSign() noexcept;
+    inline InfiniterDerived &negate() noexcept;
 
-    InfiniterDerived absoluteValue() const;/////////////////////////////////////////////////// maybe as static with reference argument
-    inline void absoluteValueAssign();
+    inline InfiniterDerived &abs();
+    static InfiniterDerived abs(const InfiniterDerived &p_value);
 
     InfiniterDerived &assign(icell_t p_value, bool p_negative_value=false) noexcept;
     InfiniterDerived &assign(const icell_t *p_array, isize_t p_size, bool p_negative_value=false);
     InfiniterDerived &assign(const InfiniterDerived &p_source);
     InfiniterDerived &assign(InfiniterDerived &&p_source);
 
-    bool equalMagnitude(icell_t p_scalar, int p_sign) const noexcept;
-    bool differsMagnitude(icell_t p_scalar, int p_sign) const noexcept;
-    bool greaterMagnitude(icell_t p_scalar, int p_sign) const noexcept;
-    bool smallerMagnitude(icell_t p_scalar, int p_sign) const noexcept;
-    bool greaterEqualMagnitude(icell_t p_scalar, int p_sign) const noexcept;
-    bool smallerEqualMagnitude(icell_t p_scalar, int p_sign) const noexcept;
+protected:
+    bool equalMagnitude(icell_t p_scalar) const noexcept;
+    bool differsMagnitude(icell_t p_scalar) const noexcept;
+    bool greaterMagnitude(icell_t p_scalar) const noexcept;
+    bool smallerMagnitude(icell_t p_scalar) const noexcept;
+    bool greaterEqualMagnitude(icell_t p_scalar) const noexcept;
+    bool smallerEqualMagnitude(icell_t p_scalar) const noexcept;
 
     bool equalMagnitude(const InfiniterDerived &p_right) const noexcept;
     bool differsMagnitude(const InfiniterDerived &p_right) const noexcept;
@@ -82,12 +81,13 @@ public:
     bool greaterEqualMagnitude(const InfiniterDerived &p_right) const noexcept;
     bool smallerEqualMagnitude(const InfiniterDerived &p_right) const noexcept;
 
-    bool equal(icell_t p_scalar, int p_sign) const noexcept;
-    bool differs(icell_t p_scalar, int p_sign) const noexcept;
-    bool greater(icell_t p_scalar, int p_sign) const noexcept;
-    bool smaller(icell_t p_scalar, int p_sign) const noexcept;
-    bool greaterEqual(icell_t p_scalar, int p_sign) const noexcept;
-    bool smallerEqual(icell_t p_scalar, int p_sign) const noexcept;
+public:
+    bool equal(icell_t p_scalar, bool p_sign) const noexcept;
+    bool differs(icell_t p_scalar, bool p_sign) const noexcept;
+    bool greater(icell_t p_scalar, bool p_sign) const noexcept;
+    bool smaller(icell_t p_scalar, bool p_sign) const noexcept;
+    bool greaterEqual(icell_t p_scalar, bool p_sign) const noexcept;
+    bool smallerEqual(icell_t p_scalar, bool p_sign) const noexcept;
 
     bool equal(const InfiniterDerived &p_right) const noexcept;
     bool differs(const InfiniterDerived &p_right) const noexcept;
@@ -128,18 +128,26 @@ public:
 public:
 
     /// Operators
-    InfiniterDerived &operator = (const InfiniterDerived &p_source);
-    InfiniterDerived &operator = (InfiniterDerived &&p_source);
+    InfiniterDerived &operator = (isval_t p_scalar);
+    InfiniterDerived &operator = (const InfiniterDerived &p_right);
+    InfiniterDerived &operator = (InfiniterDerived &&p_right);
 
     inline explicit operator bool () const noexcept;
-    inline InfiniterDerived operator ~ () const noexcept;
+    inline InfiniterDerived operator - () const noexcept;
 
-    inline bool operator == (const InfiniterDerived &p_source) const noexcept;
-    inline bool operator != (const InfiniterDerived &p_source) const noexcept;
-    inline bool operator > (const InfiniterDerived &p_source) const noexcept;
-    inline bool operator < (const InfiniterDerived &p_source) const noexcept;
-    inline bool operator >= (const InfiniterDerived &p_source) const noexcept;
-    inline bool operator <= (const InfiniterDerived &p_source) const noexcept;
+    inline bool operator == (isval_t p_scalar) const noexcept;
+    inline bool operator != (isval_t p_scalar) const noexcept;
+    inline bool operator > (isval_t p_scalar) const noexcept;
+    inline bool operator < (isval_t p_scalar) const noexcept;
+    inline bool operator >= (isval_t p_scalar) const noexcept;
+    inline bool operator <= (isval_t p_scalar) const noexcept;
+
+    inline bool operator == (const InfiniterDerived &p_right) const noexcept;
+    inline bool operator != (const InfiniterDerived &p_right) const noexcept;
+    inline bool operator > (const InfiniterDerived &p_right) const noexcept;
+    inline bool operator < (const InfiniterDerived &p_right) const noexcept;
+    inline bool operator >= (const InfiniterDerived &p_right) const noexcept;
+    inline bool operator <= (const InfiniterDerived &p_right) const noexcept;
 
     inline icell_t& operator [] (isize_t p_cell_index);
     inline const icell_t& operator [] (isize_t p_cell_index) const;
@@ -151,3 +159,4 @@ private:
 };
 
 #include "InfiniterCore.tpp"
+

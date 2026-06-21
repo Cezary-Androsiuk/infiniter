@@ -287,6 +287,18 @@ isize_t InfiniterBit<InfiniterDerived>::getMSBCellPos(uint8_t &r_bit_pos) const 
 }
 
 template<typename InfiniterDerived>
+inline const icell_t *InfiniterBit<InfiniterDerived>::getMSBCellPtr(isize_t &r_pos) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+inline icell_t *InfiniterBit<InfiniterDerived>::getMSBCellPtr(isize_t &r_pos) noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
 uint8_t InfiniterBit<InfiniterDerived>::getMSBPos() const noexcept
 {
     const icell_t *const data = this->getData();
@@ -562,6 +574,18 @@ isize_t InfiniterBit<InfiniterDerived>::getLSBCellPos(uint8_t &r_bit_pos) const 
 }
 
 template<typename InfiniterDerived>
+inline const icell_t *InfiniterBit<InfiniterDerived>::getLSBCellPtr(isize_t &r_pos) const noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
+inline icell_t *InfiniterBit<InfiniterDerived>::getLSBCellPtr(isize_t &r_pos) noexcept
+{
+
+}
+
+template<typename InfiniterDerived>
 uint8_t InfiniterBit<InfiniterDerived>::getLSBPos() const noexcept
 {
     icell_t *cellPtr = this->getData();
@@ -653,6 +677,26 @@ InfiniterDerived InfiniterBit<InfiniterDerived>::getLSBGlobalPos() const // thro
 }
 
 
+
+template<typename InfiniterDerived>
+inline InfiniterDerived &InfiniterBit<InfiniterDerived>::invert()
+{
+    icell_t *data = this->getData();
+    icell_t *data_ptr = data + this->getSize();
+
+    while(data != data_ptr--)
+    {
+        *data_ptr = ~(*data_ptr);
+    }
+
+    return this->getRef();
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterBit<InfiniterDerived>::invert(const InfiniterDerived &p_value)
+{
+    return p_value.getCopy().invert();
+}
 
 
 
@@ -771,6 +815,42 @@ InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftRight()
 }
 
 template<typename InfiniterDerived>
+InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftLeft(isize_t p_operations)
+{
+    if(p_operations == 0)
+    {
+        return this->getRef();
+    }
+
+    /// well, this could be written with SHLCell and some math
+    /// for now it has to be enough
+    for(isize_t i=0; i<p_operations-1; i++)
+    {
+        this->shiftLeft();
+    }
+
+    return this->shiftLeft();
+}
+
+template<typename InfiniterDerived>
+InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftRight(isize_t p_operations)
+{
+    if(p_operations == 0)
+    {
+        return this->getRef();
+    }
+
+    /// well, this could be written with SHRCell and some math
+    /// for now it has to be enough
+    for(isize_t i=0; i<p_operations-1; i++)
+    {
+        this->shiftRight();
+    }
+
+    return this->shiftRight();
+}
+
+template<typename InfiniterDerived>
 InfiniterDerived &InfiniterBit<InfiniterDerived>::pushLSB(ibit_t p_lsb)
 {
     /// check for possible overflow before shifting left
@@ -822,6 +902,12 @@ InfiniterDerived &InfiniterBit<InfiniterDerived>::pushMSB(ibit_t p_msb)
 
     this->normalize();
     return this->getRef();
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterBit<InfiniterDerived>::operator ~() const noexcept
+{
+    return this->getCopy().invert();
 }
 
 

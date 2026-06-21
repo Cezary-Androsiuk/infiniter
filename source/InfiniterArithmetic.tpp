@@ -173,7 +173,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(icell
     icell_t carry = p_right;
     for(isize_t i=0; i<size && carry; i++)
     {
-        __uint128_t sum = static_cast<__uint128_t>(data[i]) + carry;
+        icell2_t sum = static_cast<icell2_t>(data[i]) + carry;
         data[i] = static_cast<icell_t>(sum);
         carry = static_cast<icell_t>(sum >> icell_bits);
     }
@@ -218,7 +218,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::addMagnitude(const Infi
     /// add common part
     for(isize_t i=0; i<rsize; i++)
     {
-        __uint128_t sum = static_cast<__uint128_t>(ldata[i]) + rdata[i] + carry;
+        icell2_t sum = static_cast<icell2_t>(ldata[i]) + rdata[i] + carry;
 
         ldata[i] = static_cast<icell_t>(sum);
         carry = static_cast<icell_t>(sum >> icell_bits);
@@ -227,7 +227,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::addMagnitude(const Infi
     /// move the rest (with carry)
     for(isize_t i=rsize; i<lsize && carry; i++)
     {
-        __uint128_t sum = static_cast<__uint128_t>(ldata[i]) + carry;
+        icell2_t sum = static_cast<icell2_t>(ldata[i]) + carry;
 
         ldata[i] = static_cast<icell_t>(sum);
         carry = static_cast<icell_t>(sum >> icell_bits);
@@ -254,19 +254,19 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtractMagnitude(const
     for(isize_t i = 0; i < rsize; i++)
     {
         /// handling subtracting is easier with signed value
-        __int128_t diff = static_cast<__int128_t>(ldata[i]) - rdata[i] - borrow;
+        icell2s_t diff = static_cast<icell2s_t>(ldata[i]) - rdata[i] - borrow;
 
         ldata[i] = static_cast<icell_t>(diff);
-        borrow = static_cast<uint64_t>(static_cast<__uint128_t>(diff) >> 127);
+        borrow = static_cast<icell_t>(static_cast<icell2_t>(diff) >> (icell_bits*2 -1));
     }
 
     /// propagate borrow (move the rest)
     for(isize_t i = rsize; i < lsize && borrow; i++)
     {
-        __int128_t diff = static_cast<__int128_t>(ldata[i]) - borrow;
+        icell2s_t diff = static_cast<icell2s_t>(ldata[i]) - borrow;
 
         ldata[i] = static_cast<icell_t>(diff);
-        borrow = static_cast<uint64_t>(static_cast<__uint128_t>(diff) >> 127);
+        borrow = static_cast<icell_t>(static_cast<icell2_t>(diff) >> (icell_bits*2 -1));
     }
 
     this->normalize();
@@ -282,18 +282,24 @@ inline InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::setSignProduct(i
 }
 
 template<typename InfiniterDerived>
-inline InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::multiplyNaiveMagnitude(const InfiniterDerived &p_right)
+inline void InfiniterArithmetic<InfiniterDerived>::split(
+    const InfiniterDerived &p_input,
+    InfiniterDerived &p_out_left, InfiniterDerived &p_out_right,
+    isize_t p_half_size)
 {
-    isize_t left_size = this->getRealSize();
-    isize_t right_size = p_right.getRealSize();
+    const isize_t input_size = p_input.getSize();
 
-    // InfiniterDerived result
-}
+    if(input_size <= p_half_size)
+    {
+        p_out_left.assign(0);
+        p_out_right.assign(p_input);
+        return;
+    }
 
-template<typename InfiniterDerived>
-inline InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::multiplyMagnitude(const InfiniterDerived &p_right)
-{
+    const icell_t *input_data = p_input.getData();
 
+    p_out_left.assign(input_data, p_half_size);
+    p_out_right.assign(input_data + p_half_size, input_size - p_half_size);
 }
 
 template<typename InfiniterDerived>
@@ -376,7 +382,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bo
         }
         
         /// right is positive but left is smaller
-        if(this->smallerMagnitude(p_right, p_negative_value))
+        if(this->smallerMagnitude(p_right))
         {
             InfiniterDerived tmp_swap(p_right);
             tmp_swap.subtractMagnitude(this->getCRef()); /// has normalize
@@ -399,7 +405,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::add(icell_t p_right, bo
         }
         
         /// right is negative but left is smaller
-        if(this->smallerMagnitude(p_right, p_negative_value))
+        if(this->smallerMagnitude(p_right))
         {
             InfiniterDerived tmp_swap(p_right);
             tmp_swap.subtractMagnitude(this->getCRef()); /// has normalize
@@ -458,7 +464,7 @@ InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::subtract(icell_t p_righ
         }
 
         /// right is negative but left is smaller
-        if(this->smallerMagnitude(p_right, p_negative_value))
+        if(this->smallerMagnitude(p_right))
         {
             /// swap, subtract and set positive
             InfiniterDerived tmp_swap(p_right);  /// has normalize
@@ -681,66 +687,160 @@ inline InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::multiplyNaive(co
 template<typename InfiniterDerived>
 InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::multiply(const InfiniterDerived &p_right)
 {
+
+
+    // /// handle signs
+    // /// reverse sign only if other number is negative
+    // if(p_right.getSign())
+    //     this->negate();
+
+    // /// multiplication naive:
+    // if(left_size <= 32 && right_size <= 32)
+    // {
+    //     return this->multiplyNaiveMagnitude(p_right)   /// has normalize
+    //         .setSignProduct(this->getSign(), p_right.getSign());
+    // }
+
+    // /// multiplication:
+
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::multiplyNaive(const InfiniterDerived &p_left,
+                                                                             const InfiniterDerived &p_right)
+{
     /// pre multiplication conditions
-    isize_t left_size = this->getRealSize();
+    isize_t left_size = p_left.getRealSize();
     isize_t right_size = p_right.getRealSize();
 
     if(left_size == 1)
     {
-        bool sign = this->getSign();
-        icell_t value = this->getData()[0];
+        bool sign = p_left.getSign();
+        icell_t value = p_left.getData()[0];
 
-        /// handle edge cases this
+        /// handle edge cases p_left
         if(value == 0)
         {
-            this->reset();    /// has normalize
-            return this->getRef();
+            return InfiniterDerived();
         }
         if(value == 1)
         {
-            return this->assign(p_right)   /// has normalize
-                .setSignProduct(this->getSign(), p_right.getSign());
+            const icell_t *data = p_right.getData();
+            const isize_t size = p_right.getSize();
+            const bool sign = p_left.getSign() ^ p_right.getSign();
+
+            return InfiniterDerived(data, size, sign);   /// has normalize
         }
         if(value == 2)
         {
-            return this->assign(p_right)    /// has normalize
-                .pushLSB(IBIT_0);           /// has normalize
+            const icell_t *data = p_right.getData();
+            const isize_t size = p_right.getSize();
+            const bool sign = p_left.getSign() ^ p_right.getSign();
+
+            return InfiniterDerived(data, size, sign)   /// has normalize
+                .shiftLeft();                           /// has normalize
         }
     }
 
     if(right_size == 1)
     {
-        bool sign = this->getSign();
-        icell_t value = this->getData()[0];
+        bool sign = p_right.getSign();
+        icell_t value = p_right.getData()[0];
 
         /// handle edge cases p_right
         if(p_right.is0())
         {
-            this->reset();
-            return this->getRef();
+            return InfiniterDerived();
         }
         if(p_right.is1())
         {
-            this->normalize();
-            return this->getRef();
+            const icell_t *data = p_left.getData();
+            const isize_t size = p_left.getSize();
+            const bool sign = p_left.getSign() ^ p_right.getSign();
+
+            return InfiniterDerived(data, size, sign);   /// has normalize
         }
         if(p_right.is2())
         {
-            return this->pushLSB(IBIT_0);   /// has normalize
+            const icell_t *data = p_left.getData();
+            const isize_t size = p_left.getSize();
+            const bool sign = p_left.getSign() ^ p_right.getSign();
+
+            return InfiniterDerived(data, size, sign)   /// has normalize
+                .shiftLeft();                           /// has normalize
         }
     }
 
+    isize_t result_size = left_size + right_size;
+    bool result_sign = p_left.getSign() ^ p_right.getSign();
 
-    /// multiplication naive:
+    InfiniterDerived result(0, result_size, result_sign);
+    result.setSize(result_size);
 
+    const icell_t *left_data = p_left.getData();
+    const icell_t *right_data = p_right.getData();
+    icell_t *result_data = result.getData();
 
+    for(isize_t j=0; j<left_size; j++)
+    {
+        icell_t carry = 0;
 
-    /// handle signs
-    /// reverse sign only if other number is negative
-    if(p_right.getSign())
-        this->negate();
+        for(isize_t i=0; i<right_size; i++)
+        {
+            icell2_t raw_result = static_cast<icell2_t>(left_data[j]) * right_data[i] +
+                                     result_data[j + i] + carry;
 
+            result_data[j + i] = static_cast<icell_t>(raw_result);
 
+            carry = static_cast<icell_t>(raw_result >> icell_bits);
+        }
+
+        if(carry > ICELL_C(0))
+        {
+            result_data[j + right_size] += carry;
+        }
+    }
+
+    result.normalize();
+    return std::move(result);
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::multiply(const InfiniterDerived &p_left,
+                                                                        const InfiniterDerived &p_right)
+{
+    isize_t max_size = std::max(p_left.getRealSize(), p_right.getRealSize());
+
+    /// multiplication naive
+    /// for smaller numbers is faster
+    if(max_size <= 32)
+    {
+        return IA::multiplyNaiveMagnitude(p_left, p_right);   /// has normalize
+    }
+
+    /// karatsuba
+    isize_t half_size = max_size / 2;
+
+    InfiniterDerived left_lhalf, left_rhalf;  /// left  left half | left  right half
+    InfiniterDerived right_lhalf, right_rhalf;  /// right left half | right right half
+
+    IA::split(p_left, left_lhalf, left_rhalf, half_size);
+    IA::split(p_right, right_lhalf, right_rhalf, half_size);
+
+    InfiniterDerived result_part_2 = IA::multiplyMagnitude(left_lhalf, right_lhalf);
+    InfiniterDerived result_part_0 = IA::multiplyMagnitude(left_rhalf, right_rhalf);
+
+    /// use .add() and .subtract() on the original object to prevent copying objects
+    /// (llh + lrh) * (rlh + rrh) - rp2 - rp0
+    InfiniterDerived result_part_1 = IA::multiplyMagnitude(
+                                         left_lhalf.add(left_rhalf),
+                                         right_lhalf.add(right_rhalf)).subtract(result_part_2).subtract(result_part_0);
+
+    /// again use use .shiftLeft() and .add() on the original object to prevent copying objects
+    /// (rp2 * 2^(2 * hs)) + (rp1 * 2^hs) + rp0
+    return result_part_2.shiftLeft(2*half_size)
+        .add(result_part_1.shiftLeft(half_size))
+        .add(result_part_0);
 }
 
 template<typename InfiniterDerived>

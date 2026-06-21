@@ -47,6 +47,11 @@ public:
     /// Returns position of cell with MSB and get MSB position in cell
     isize_t getMSBCellPos(uint8_t &r_bit_pos) const noexcept;
 
+    /// Returns const pointer to cell with MSB and position of cell
+    const icell_t *getMSBCellPtr(isize_t &r_pos) const noexcept;
+    /// Returns pointer to cell with MSB and position of cell
+    icell_t *getMSBCellPtr(isize_t &r_pos) noexcept;
+
     /// Returns MSB position in cell
     uint8_t getMSBPos() const noexcept;/////////////////////////////////////////////////// done here
     /// Returns MSB global position in cell  (could fail for large numbers)
@@ -74,6 +79,11 @@ public:
     /// Returns position of cell with LSB and get LSB position in cell
     isize_t getLSBCellPos(uint8_t &r_bit_pos) const noexcept;
 
+    /// Returns const pointer to cell with LSB and position of cell
+    const icell_t *getLSBCellPtr(isize_t &r_pos) const noexcept;
+    /// Returns pointer to cell with LSB and position of cell
+    icell_t *getLSBCellPtr(isize_t &r_pos) noexcept;
+
     /// Returns LSB position in cell
     uint8_t getLSBPos() const noexcept;
     /// Returns LSB global position in cell  (could fail for large numbers)
@@ -81,6 +91,9 @@ public:
     /// Returns LSB global position in cell
     InfiniterDerived getLSBGlobalPos() const; // throws bad_alloc
 
+
+    InfiniterDerived &invert();
+    static InfiniterDerived invert(const InfiniterDerived &p_value);
 
 
     inline ibit_t getBit(isize_t p_cell_index, uint8_t p_pos); // throws out_of_range
@@ -101,10 +114,17 @@ public:
     inline InfiniterDerived &shiftLeft();
     inline InfiniterDerived &shiftRight();
 
+    inline InfiniterDerived &shiftLeft(isize_t p_operations);
+    inline InfiniterDerived &shiftRight(isize_t p_operations);
+
     InfiniterDerived &pushLSB(ibit_t p_lsb);
     InfiniterDerived &pushMSB(ibit_t p_msb);
 
 
+public:
+
+    /// Operators
+    inline InfiniterDerived operator ~ () const noexcept;
 
 
 };

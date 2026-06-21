@@ -279,7 +279,7 @@ void InfiniterMemory::shrink(isize_t p_target_capacity)
     if(UNLIKELY( p_target_capacity >= m_capacity ))
         return;
 
-    if(p_target_capacity == SBO_CAPACITY)
+    if(p_target_capacity <= SBO_CAPACITY)
     {
         /// shrink to match SBO
 

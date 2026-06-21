@@ -6,6 +6,8 @@
 template<typename InfiniterDerived>
 class InfiniterArithmetic : public InfiniterBit<InfiniterDerived>
 {
+    using IA = InfiniterArithmetic<InfiniterDerived>;
+
 public:
     inline explicit InfiniterArithmetic() noexcept;
 
@@ -32,8 +34,9 @@ protected:
     InfiniterDerived &subtractMagnitude(const InfiniterDerived &p_right);
 
     InfiniterDerived &setSignProduct(ibit_t p_left_sign, ibit_t p_right_sign);
-    InfiniterDerived &multiplyNaiveMagnitude(const InfiniterDerived &p_right);
-    InfiniterDerived &multiplyMagnitude(const InfiniterDerived &p_right);
+    static void split(const InfiniterDerived &p_input,
+                      InfiniterDerived &p_out_left, InfiniterDerived &p_out_right,
+                      isize_t p_half_size);
 
 public:
     InfiniterDerived &increment();
@@ -55,6 +58,10 @@ public:
 
     InfiniterDerived &multiplyNaive(const InfiniterDerived &p_right);
     InfiniterDerived &multiply(const InfiniterDerived &p_right);
+    static InfiniterDerived multiplyNaive(const InfiniterDerived &p_left,
+                                          const InfiniterDerived &p_right);
+    static InfiniterDerived multiply(const InfiniterDerived &p_left,
+                                     const InfiniterDerived &p_right);
 
     InfiniterDerived &divde(const InfiniterDerived &p_right);
 

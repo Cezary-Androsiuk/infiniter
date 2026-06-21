@@ -17,6 +17,14 @@ typedef uint64_t    icell_t;    /// cell capacity
 typedef uint64_t    isize_t;    /// size capacity
 typedef uint8_t     ibit_t;     /// bit capacity
 
+
+/// following declarations are strictly related with icell_t (has to be equal size as icell_t but signed)
+typedef int64_t     isval_t;   /// sign value
+
+/// following declarations are strictly related with icell_t (has to be 2 times icell_t)
+typedef __uint128_t icell2_t;   /// two cell capacity
+typedef __int128_t  icell2s_t;  /// near two cell capacity (with sign)
+
 #define IBIT_1 UINT8_C(1)
 #define IBIT_0 UINT8_C(0)
 #define IBIT_TRUE IBIT_1
@@ -31,6 +39,7 @@ typedef uint8_t     ibit_t;     /// bit capacity
 
 inline constexpr size_t icell_bits = sizeof(icell_t) * CHAR_BIT;
 inline constexpr size_t isize_bits = sizeof(isize_t) * CHAR_BIT;
+inline constexpr size_t isval_bits = sizeof(isval_t) * CHAR_BIT;
 
 /// WARNING: providing 0 value will couse undefined behaviour
 /// clzll stands for "Count Leading Zeros Long Long"
@@ -96,7 +105,7 @@ union BitsUS{ /// bits union struct
 // ####################### INFINITER MEMORY #######################
 
 /// Infiniter variable should be set to 0 after allocation? or leave it without overwriting old data
-/// after allocation memory will be set to 0 if enabled, if disabled memory can have trash in in
+/// after allocation memory will be set to 0 if enabled, if disabled memory can have trash in it
 #define IM_CLEAR_ALLOCATED_MEMORY true
 
 /// if not ensured, object after std::move will be corrupted and need to be deleted, but it is few operation faster
