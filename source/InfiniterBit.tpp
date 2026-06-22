@@ -815,21 +815,33 @@ InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftRight()
 }
 
 template<typename InfiniterDerived>
-inline InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftCellsLeft(isize_t p_cells)
+inline InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftCellsLeft(isize_t p_shift, icell_t p_fill)
 {
     isize_t size = this->getRealSize();
 
-    isize_t new_size = this->setSizeWithExtend(size + p_cells);
-    icell_t *data = this->getData();
+    /// if p_fill = 2
+    /// Extend required cells
+    /// From:           1010 1111 1000
+    /// To:   0000 0000 1010 1111 1000
+    size = this->setSizeWithExtend(size + p_shift);
+    icell_t *data = this->getData(); /// get data after extend (possible allocation)
 
-    /// iterate only over old size (require p_cells size padding)
-    /// shift cells like:
-    /// 0000 0000 1010 1111 0000
-    /// 1010 1111 0000 0000 0000
-    for(isize_t i=0; i<size; i++)
+    /// iterate only over old size (require p_shift size padding)
+    /// Shift data with offset
+    /// From: 0000 0000 1010 1111 1000
+    /// To:   1010 1111 1000 1111 1000
+    for(isize_t i=0; i<size - p_shift; i++)
+    {
+        const isize_t i_rev = size -i -1;
+        data[i_rev] = data[]
+    }
+    /// Clear offset
+    /// From: 0000 0000 1010 1111 1000
+    /// To:   1010 1111 1000 0000 0000
+    for(isize_t i=0; i<new_size - p_shift; i++)
     {
         isize_t i_rev = new_size - i - 1;
-        data[i_rev] = data[i_rev - p_cells];
+        data[i_rev] = data[i_rev - p_shift];
     }
 
     return this->getRef();

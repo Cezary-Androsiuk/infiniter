@@ -114,7 +114,7 @@ public:
     inline InfiniterDerived &shiftLeft();
     inline InfiniterDerived &shiftRight();
 
-    InfiniterDerived &shiftCellsLeft(isize_t p_cells);
+    InfiniterDerived &shiftCellsLeft(isize_t p_cells, icell_t p_fill = ICELL_C(0));
     InfiniterDerived &shiftCellsRight(isize_t p_cells);
 
     inline InfiniterDerived &shiftLeft(isize_t p_operations);
