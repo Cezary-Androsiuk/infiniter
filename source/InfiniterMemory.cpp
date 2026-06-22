@@ -43,8 +43,9 @@ InfiniterMemory::InfiniterMemory(isize_t p_capacity)
 
     _im_dbgprintf("--- DEBUG IM %p | Constructed   PARAMETER isize_t\n", this);
 
-    /// often when this constructor will be called, user wants more that SBO size
-    if(LIKELY( p_capacity > SBO_CAPACITY ))
+    /// might be often called while creating object with size=1
+    /// so I removed LIKELY macro
+    if(p_capacity > SBO_CAPACITY)
     {
         IM_CAP_LIMIT(p_capacity);
 

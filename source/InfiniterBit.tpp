@@ -757,196 +757,322 @@ void InfiniterBit<InfiniterDerived>::toggleBitUnsafe(uint64_t p_cell_index, uint
     this->getData()[p_cell_index] ^= (ICELL_C(1) << p_pos);
 }
 
-template<typename InfiniterDerived>
-InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftLSB(ibit_t p_lsb)
-{
-    icell_t lsb_mask = !!p_lsb; /// change 010010...100101 to 000...001
+// template<typename InfiniterDerived>
+// InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftLSB(ibit_t p_lsb)
+// {
+//     icell_t lsb_mask = !!p_lsb; /// change 010010...100101 to 000...001
 
-    icell_t *data = this->getData();
-    icell_t nextLSB;
+//     icell_t *data = this->getData();
+//     icell_t nextLSB;
 
-    for(isize_t i=0; i<this->getSize(); i++)
-    {
-        nextLSB = !!(data[i] & M100);
-        data[i] = (data[i] << 1) | lsb_mask; /// shift left and set lsb_mask
-        lsb_mask = nextLSB;
-    }
+//     for(isize_t i=0; i<this->getSize(); i++)
+//     {
+//         nextLSB = !!(data[i] & M100);
+//         data[i] = (data[i] << 1) | lsb_mask; /// shift left and set lsb_mask
+//         lsb_mask = nextLSB;
+//     }
 
-    /// old MSB is out at this point
-    /// overflow possible if that MSB is 1
+//     /// old MSB is out at this point
+//     /// overflow possible if that MSB is 1
 
-    this->normalize();
-    return this->getRef();
-}
+//     this->normalize();
+//     return this->getRef();
+// }
 
-template<typename InfiniterDerived>
-InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftMSB(ibit_t p_msb)
-{
-    icell_t msb_mask = !!p_msb; /// change 010010...100101 to 00...01
+// template<typename InfiniterDerived>
+// InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftMSB(ibit_t p_msb)
+// {
+//     icell_t msb_mask = !!p_msb; /// change 010010...100101 to 00...01
 
-    msb_mask <<= 63; /// change 000...001 to 100...000
+//     msb_mask <<= 63; /// change 000...001 to 100...000
 
-    icell_t *data = this->getData();
-    icell_t nextMSB;
+//     icell_t *data = this->getData();
+//     icell_t nextMSB;
 
-    for(isize_t i=this->getSize(); i>0; i--)
-    {
-        nextMSB = (data[i-1] & M001) << 63;
-        data[i-1] = (data[i-1] >> 1) | msb_mask; /// shift right and set msb
-        msb_mask = nextMSB;
-    }
+//     for(isize_t i=this->getSize(); i>0; i--)
+//     {
+//         nextMSB = (data[i-1] & M001) << 63;
+//         data[i-1] = (data[i-1] >> 1) | msb_mask; /// shift right and set msb
+//         msb_mask = nextMSB;
+//     }
 
-    /// old LSB is out at this point
+//     /// old LSB is out at this point
 
-    this->normalize();
-    return this->getRef();
-}
+//     this->normalize();
+//     return this->getRef();
+// }
 
-template<typename InfiniterDerived>
-InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftLeft()
-{
-    return this->shiftLSB(IBIT_0);
-}
+// template<typename InfiniterDerived>
+// InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftLeft()
+// {
+//     return this->shiftLSB(IBIT_0);
+// }
 
-template<typename InfiniterDerived>
-InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftRight()
-{
-    return this->shiftMSB(IBIT_0);
-}
+// template<typename InfiniterDerived>
+// InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftRight()
+// {
+//     return this->shiftMSB(IBIT_0);
+// }
+
+// template<typename InfiniterDerived>
+// InfiniterDerived &InfiniterBit<InfiniterDerived>::pushLSB(ibit_t p_lsb)
+// {
+//     /// check for possible overflow before shifting left
+//     const isize_t size = this->getSize();
+//     if(this->getData()[size-1] & M100)
+//     {
+//         // MSB is 1 and memory need to be expanded
+//         this->setSizeWithExtend(size +1);
+//     }
+
+//     return this->shiftLSB(p_lsb);
+// }
+
+// template<typename InfiniterDerived>
+// InfiniterDerived &InfiniterBit<InfiniterDerived>::pushMSB(ibit_t p_msb)
+// {
+//     /// well... adding 0 at the front won't do much
+//     if(!p_msb)
+//     {
+//         this->normalize();
+//         return this->getRef();
+//     }
+
+//     icell_t *data = this->getData();
+//     isize_t size = this->getSize();
+
+//     /// extend if right now msb is at the left egde
+//     if(data[size-1] & M100)
+//     {
+//         size = this->setSizeWithExtend(size +1);
+//         data = this->getData();
+
+//         data[size-1] = ICELL_C(1);
+
+//         this->normalize();
+//         return this->getRef();
+//     }
+
+//     icell_t *msb_cell = getMSBCellPtr();
+//     /// if msb is at the edge use next cell
+//     /// but that means number has leading zero cells
+//     if(UNLIKELY(*msb_cell & M100))
+//     {
+//         msb_cell++;
+//     }
+
+//     int next_bit_index = 64 - __builtin_clzll(*msb_cell);
+//     *msb_cell |= (ICELL_C(1) << next_bit_index);
+
+//     this->normalize();
+//     return this->getRef();
+// }
 
 template<typename InfiniterDerived>
 inline InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftCellsLeft(isize_t p_shift, icell_t p_fill)
 {
+    if(p_shift == 0)
+    {
+        return this->getRef();
+    }
+
     isize_t size = this->getRealSize();
 
     /// if p_fill = 2
     /// Extend required cells
+    /// INDEX:   4    3    2    1    0
     /// From:           1010 1111 1000
     /// To:   0000 0000 1010 1111 1000
     size = this->setSizeWithExtend(size + p_shift);
     icell_t *data = this->getData(); /// get data after extend (possible allocation)
 
-    /// iterate only over old size (require p_shift size padding)
+    /// Move content left (require p_shift size padding)
     /// Shift data with offset
+    /// INDEX:   4    3    2    1    0
     /// From: 0000 0000 1010 1111 1000
     /// To:   1010 1111 1000 1111 1000
     for(isize_t i=0; i<size - p_shift; i++)
     {
         const isize_t i_rev = size -i -1;
-        data[i_rev] = data[]
-    }
-    /// Clear offset
-    /// From: 0000 0000 1010 1111 1000
-    /// To:   1010 1111 1000 0000 0000
-    for(isize_t i=0; i<new_size - p_shift; i++)
-    {
-        isize_t i_rev = new_size - i - 1;
         data[i_rev] = data[i_rev - p_shift];
     }
 
+    /// Clear offset using p_fill (by default ICELL_C(0))
+    /// INDEX:   4    3    2    1    0
+    /// From: 0000 0000 1010 1111 1000
+    /// To:   1010 1111 1000 0000 0000
+    for(isize_t i=0; i<p_shift; i++)
+    {
+        data[i] = p_fill;
+    }
+
     return this->getRef();
 }
 
 template<typename InfiniterDerived>
-inline InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftCellsRight(isize_t p_cells)
+inline InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftCellsRight(isize_t p_shift, icell_t p_fill) noexcept
 {
-
-}
-
-template<typename InfiniterDerived>
-InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftLeft(isize_t p_operations)
-{
-    if(p_operations == 0)
+    if(p_shift == 0)
     {
         return this->getRef();
     }
 
-    /// well, this could be written with SHLCell and some math
-    /// for now it has to be enough
-    for(isize_t i=0; i<p_operations-1; i++)
-    {
-        this->shiftLeft();
-    }
-
-    return this->shiftLeft();
-}
-
-template<typename InfiniterDerived>
-InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftRight(isize_t p_operations)
-{
-    if(p_operations == 0)
-    {
-        return this->getRef();
-    }
-
-    /// well, this could be written with SHRCell and some math
-    /// for now it has to be enough
-    for(isize_t i=0; i<p_operations-1; i++)
-    {
-        this->shiftRight();
-    }
-
-    return this->shiftRight();
-}
-
-template<typename InfiniterDerived>
-InfiniterDerived &InfiniterBit<InfiniterDerived>::pushLSB(ibit_t p_lsb)
-{
-    /// check for possible overflow before shifting left
-    const isize_t size = this->getSize();
-    if(this->getData()[size-1] & M100)
-    {
-        // MSB is 1 and memory need to be expanded
-        this->setSizeWithExtend(size +1);
-    }
-
-    return this->shiftLSB(p_lsb);
-}
-
-template<typename InfiniterDerived>
-InfiniterDerived &InfiniterBit<InfiniterDerived>::pushMSB(ibit_t p_msb)
-{
-    /// well... adding 0 at the front won't do much
-    if(!p_msb)
-    {
-        this->normalize();
-        return this->getRef();
-    }
-
+    isize_t size = this->getRealSize();
     icell_t *data = this->getData();
-    isize_t size = this->getSize();
 
-    /// extend if right now msb is at the left egde
-    if(data[size-1] & M100)
+    /// if p_fill = 2
+    /// Move content right (require p_shift size padding)
+    /// Shift data with offset
+    /// INDEX:   4    3    2    1    0
+    /// From: 0100 1001 1010 1111 1000
+    /// To:   0100 1001 0100 1001 1010
+    for(isize_t i=0; i<size - p_shift; i++)
+    {
+        data[i] = data[i + p_shift];
+    }
+
+    /// Clear offset using p_fill (by default ICELL_C(0))
+    /// Shift data with offset
+    /// INDEX:   4    3    2    1    0
+    /// From: 0100 1001 1010 1111 1000
+    /// To:   0000 0000 0100 1001 1010
+    for(isize_t i=0; i<p_shift; i++)
+    {
+        data[size -i -1] = 0;
+    }
+
+    /// Normalize
+    /// INDEX:   4    3    2    1    0
+    /// From: 0000 0000 0100 1001 1010
+    /// To:             0100 1001 1010
+    return this->normalize();
+}
+
+template<typename InfiniterDerived>
+InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftLeft(isize_t p_bit_shift, ibit_t p_fill)
+{
+    if(p_bit_shift == 0)
+    {
+        return this->getRef();
+    }
+
+    p_fill = !!p_fill;
+
+    isize_t cell_shift = p_bit_shift / icell_bits;
+    if(cell_shift)
+    {
+        this->shiftCellsLeft(cell_shift, p_fill ? ~ICELL_C(0) : ICELL_C(0));
+    }
+
+    p_bit_shift %= icell_bits;
+
+    /// p_bit_shift was even (in cells)
+    if(!p_bit_shift)
+        return this->getRef();
+
+    isize_t size = this->getRealSize();
+    icell_t *data = this->getData();
+
+    /// check if another cell is needed
+    /// mostly it will be just m_size+1 because shiftCellsLeft will reserve memory with padding
+    if(data[size-1] >> (icell_bits - p_bit_shift))
     {
         size = this->setSizeWithExtend(size +1);
+        /// require data refresh - possible memory realocation
         data = this->getData();
+    }
 
-        data[size-1] = ICELL_C(1);
 
-        this->normalize();
+    /// fill carry with bits that are given (branchless)
+    // icell_t bits_carry = p_fill ? ((ICELL_C(1) << p_bit_shift) -1) : 0;
+    icell_t bits_carry = 0 - static_cast<icell_t>(p_fill != IBIT_0);
+    bits_carry = ((ICELL_C(1) << p_bit_shift) -1) & bits_carry;
+
+    for(isize_t i=0; i<size; i++)
+    {
+        icell_t new_bits_carry = data[i] >> (icell_bits - p_bit_shift);
+        data[i] <<= p_bit_shift;
+        data[i] |= bits_carry;
+        bits_carry = new_bits_carry;
+    }
+
+    return this->normalize();
+}
+
+template<typename InfiniterDerived>
+InfiniterDerived &InfiniterBit<InfiniterDerived>::shiftRight(isize_t p_bit_shift) noexcept
+{
+    if(p_bit_shift == 0)
+    {
         return this->getRef();
     }
 
-    icell_t *msb_cell = getMSBCellPtr();
-    /// if msb is at the edge use next cell
-    /// but that means number has leading zero cells
-    if(UNLIKELY(*msb_cell & M100))
+    const ibit_t p_fill = ICELL_C(0);
+    // p_fill = !!p_fill;
+
+    isize_t cell_shift = p_bit_shift / icell_bits;
+    if(cell_shift)
     {
-        msb_cell++;
+        this->shiftCellsRight(cell_shift, p_fill ? ~ICELL_C(0) : ICELL_C(0));
     }
 
-    int next_bit_index = 64 - __builtin_clzll(*msb_cell);
-    *msb_cell |= (ICELL_C(1) << next_bit_index);
+    p_bit_shift %= icell_bits;
 
-    this->normalize();
-    return this->getRef();
+    /// p_bit_shift was even (in cells)
+    if(!p_bit_shift)
+        return this->getRef();
+
+    isize_t size = this->getRealSize();
+    icell_t *data = this->getData();
+
+    /// fill carry with bits that are given (branchless)
+    /// but for now only 0
+    icell_t bits_carry = 0;
+
+    for(isize_t i=0; i<size; i++)
+    {
+        isize_t i_rev = size -i -1;
+        icell_t new_bits_carry = data[i_rev] << (icell_bits - p_bit_shift);
+        data[i_rev] >>= p_bit_shift;
+        data[i_rev] |= bits_carry;
+        bits_carry = new_bits_carry;
+    }
+
+    return this->normalize();
 }
 
 template<typename InfiniterDerived>
 inline InfiniterDerived InfiniterBit<InfiniterDerived>::operator ~() const noexcept
 {
     return this->getCopy().invert();
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterBit<InfiniterDerived>::operator <<(isize_t p_shift) const
+{
+    InfiniterDerived result(this->getCRef());
+    result.shiftLeft(p_shift);
+    return result;
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived InfiniterBit<InfiniterDerived>::operator >>(isize_t p_shift) const
+{
+    InfiniterDerived result(this->getCRef());
+    result.shiftRight(p_shift);
+    return result;
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived &InfiniterBit<InfiniterDerived>::operator <<=(isize_t p_shift) const
+{
+    return this->shiftLeft(p_shift);
+}
+
+template<typename InfiniterDerived>
+inline InfiniterDerived &InfiniterBit<InfiniterDerived>::operator >>=(isize_t p_shift) const noexcept
+{
+    return this->shiftRight(p_shift);
 }
 
 

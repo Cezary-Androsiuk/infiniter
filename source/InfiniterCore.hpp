@@ -4,6 +4,7 @@
 #include "InfiniterMemory.hpp"
 
 #include <cstdint>
+// #include <initializer_list>
 
 template<typename InfiniterDerived>
 class InfiniterCore : private InfiniterMemory
@@ -15,6 +16,7 @@ public:
     inline explicit InfiniterCore(int64_t p_value, isize_t p_capacity); /// throws bad_alloc
     inline explicit InfiniterCore(icell_t p_value, isize_t p_capacity, bool p_negative_value); /// throws bad_alloc
     inline explicit InfiniterCore(const icell_t *p_array, isize_t p_size, bool p_negative_value=false); /// throws bad_alloc
+    // inline explicit InfiniterCore(std::initializer_list<icell_t> p_array, bool p_negative_value=false); /// throws bad_alloc
 
     inline InfiniterCore(const InfiniterDerived &p_source); /// throws bad_alloc
     inline InfiniterCore(InfiniterDerived &&p_source) noexcept;
@@ -63,6 +65,7 @@ public:
 
     InfiniterDerived &assign(icell_t p_value, bool p_negative_value=false) noexcept;
     InfiniterDerived &assign(const icell_t *p_array, isize_t p_size, bool p_negative_value=false);
+    // InfiniterDerived &assign(std::initializer_list<icell_t> p_array, bool p_negative_value=false);
     InfiniterDerived &assign(const InfiniterDerived &p_source);
     InfiniterDerived &assign(InfiniterDerived &&p_source);
 

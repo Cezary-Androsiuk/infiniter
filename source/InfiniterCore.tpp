@@ -295,6 +295,8 @@ isize_t InfiniterCore<InfiniterDerived>::setSize(isize_t p_new_size) noexcept
 
     if(p_new_size < ICELL_C(1))
     {
+        /// sad i can't add exception cause of its reused by normalize and trim
+        /// its much faster without exception :(
         return m_size;
     }
 

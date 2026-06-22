@@ -540,6 +540,23 @@ int main(int argc, char *argv[])
     infiniter5.print(2);
     printf("\n");
 
+    const icell_t i5_arr[] = {1,2,3,4,5,6,7,0,0};
+    infiniter5.assign(i5_arr, sizeof(i5_arr)/sizeof(icell_t), false);
+    // infiniter5.print(2);
+    infiniter5.dbg_print_data();
+    printf("\n");
+    infiniter5.setSizeWithExtend(sizeof(i5_arr)/sizeof(icell_t));
+    // infiniter5.print(2);
+    infiniter5.dbg_print_data();
+    printf("\n");
+    infiniter5.shiftCellsLeft(1, ~ICELL_C(0));
+    // infiniter5.print(2);
+    infiniter5.dbg_print_data();
+    printf("\n");
+    infiniter5.shiftCellsLeft(3, ICELL_C(0));
+    // infiniter5.print(2);
+    infiniter5.dbg_print_data();
+    printf("\n");
 
     // InfiniterIO icp;
     // icp.dbgPrint(); printf("\n");

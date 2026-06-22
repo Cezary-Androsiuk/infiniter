@@ -108,26 +108,32 @@ public:
     inline void toggleBitUnsafe(uint64_t p_cell_index, uint8_t p_pos) noexcept;
 
 
-    InfiniterDerived &shiftLSB(ibit_t p_lsb=IBIT_FALSE); // Least Significant Bit (<<)
-    InfiniterDerived &shiftMSB(ibit_t p_msb=IBIT_FALSE); // Most Significant Bit (>>)
+    // InfiniterDerived &shiftLSB(ibit_t p_lsb=IBIT_0); // Least Significant Bit (<<)
+    // InfiniterDerived &shiftMSB(ibit_t p_msb=IBIT_0); // Most Significant Bit (>>)
 
-    inline InfiniterDerived &shiftLeft();
-    inline InfiniterDerived &shiftRight();
+    // inline InfiniterDerived &shiftLeft();
+    // inline InfiniterDerived &shiftRight();
 
-    InfiniterDerived &shiftCellsLeft(isize_t p_cells, icell_t p_fill = ICELL_C(0));
-    InfiniterDerived &shiftCellsRight(isize_t p_cells);
+    // InfiniterDerived &pushLSB(ibit_t p_lsb);
+    // InfiniterDerived &pushMSB(ibit_t p_msb);
 
-    inline InfiniterDerived &shiftLeft(isize_t p_operations);
-    inline InfiniterDerived &shiftRight(isize_t p_operations);
 
-    InfiniterDerived &pushLSB(ibit_t p_lsb);
-    InfiniterDerived &pushMSB(ibit_t p_msb);
+    InfiniterDerived &shiftCellsLeft(isize_t p_shift, icell_t p_fill = ICELL_C(0));
+    InfiniterDerived &shiftCellsRight(isize_t p_shift, icell_t p_fill = ICELL_C(0)) noexcept;
+
+    inline InfiniterDerived &shiftLeft(isize_t p_bit_shift = ISIZE_C(1), ibit_t p_fill = IBIT_0);
+    inline InfiniterDerived &shiftRight(isize_t p_bit_shift = ISIZE_C(1)) noexcept; //, ibit_t p_fill = IBIT_0
+
 
 
 public:
 
     /// Operators
     inline InfiniterDerived operator ~ () const noexcept;
+    inline InfiniterDerived operator << (isize_t p_shift) const;
+    inline InfiniterDerived operator >> (isize_t p_shift) const;
+    inline InfiniterDerived &operator <<= (isize_t p_shift) const;
+    inline InfiniterDerived &operator >>= (isize_t p_shift) const noexcept;
 
 
 };

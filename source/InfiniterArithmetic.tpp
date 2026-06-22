@@ -924,101 +924,7 @@ inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::multiply(const In
 template<typename InfiniterDerived>
 InfiniterDerived &InfiniterArithmetic<InfiniterDerived>::divde(const InfiniterDerived &p_right)
 {
-    /// handle signs
-    /// reverse sign only if other number is negative case
-    if(p_right.getSign())
-        this->negate();
 
-    if(p_right.is0())
-    {
-        /// zero division exception
-    }
-
-    if(this->is0())
-    {
-        this->reset();
-        return;
-    }
-
-    if(p_right.isPositive1())
-    {
-        this->trim();
-        return;
-    }
-    if(p_right.isNegative1())
-    {
-        this->negate();
-        return;
-    }
-    if(p_right.isPositive2())
-    {
-        this->shiftMSB(IBIT_0);
-        return;
-    }
-    if(p_right.isNegative2())
-    {
-        this->shiftMSB(IBIT_0);
-        this->negate();
-        return;
-    }
-
-    /// comparison optimization
-    // if()
-    // 1. Obsługa błędu krytycznego
-    if (y.blocks.empty() || (y.blocks.size() == 1 && y.blocks[0] == 0)) {
-        throw std::domain_error("Division by zero");
-    }
-
-    DivModResult result;
-    result.quotient.blocks.assign(x.blocks.size(), 0);
-    result.remainder.blocks = {0};
-
-    // 2. Optymalizacja: Jeśli |X| < |Y|, wynik to 0, a reszta to X.
-    if (abs_compare(x, y) < 0) {
-        result.quotient.blocks = {0};
-        result.remainder = x;
-        return result;
-    }
-
-    // 3. Główna pętla dzielenia bitowego.
-    // Iterujemy od najbardziej znaczącego bitu dzielnej (X) w dół do zera.
-    // Metoda total_bits() powinna zwracać pozycję najwyższego ustawionego bitu.
-    int max_bit = x.total_bits() - 1;
-
-    for (int i = max_bit; i >= 0; --i) {
-        // A) Przesuń resztę o 1 bit w lewo (mnożenie przez 2)
-        result.remainder.shift_left_by_one();
-
-        // B) Pobierz i-ty bit z X i wstaw na najmłodszą pozycję reszty
-        if (x.test_bit(i)) {
-            result.remainder.set_bit(0, 1);
-        }
-
-        // C) Sprawdź, czy reszta jest większa lub równa dzielnikowi (na modułach)
-        if (abs_compare(result.remainder, y) >= 0) {
-            // Odejmowanie wartości bezwzględnych
-            result.remainder = abs_subtract(result.remainder, y);
-
-            // Ustawiamy i-ty bit w ilorazie na 1
-            result.quotient.set_bit(i, 1);
-        }
-    }
-
-    // 4. Czyszczenie wiodących zer w ilorazie
-    result.quotient.trim_leading_zeros();
-    result.remainder.trim_leading_zeros();
-
-    // 5. Ustalanie znaków
-    // Iloraz ma znak ujemny tylko wtedy, gdy operandy miały różne znaki.
-    result.quotient.is_negative = (x.is_negative != y.is_negative) && !result.quotient.is_zero();
-
-    // Znak reszty w matematyce zależy od konwencji. W C++ (od C++11)
-    // operator % dla typów wbudowanych zachowuje znak dzielnej (X).
-    result.remainder.is_negative = x.is_negative && !result.remainder.is_zero();
-
-    return result;
-
-    /// division:
 }
 
 template<typename InfiniterDerived>
@@ -1044,7 +950,117 @@ InfiniterArithmetic<InfiniterDerived>::overRem(const InfiniterDerived &p_right)
 template<typename InfiniterDerived>
 inline InfiniterDerived InfiniterArithmetic<InfiniterDerived>::divde(const InfiniterDerived &p_left, const InfiniterDerived &p_right)
 {
+    isize_t left_size = p_left.getRealSize();
+    isize_t right_size = p_right.getRealSize();
 
+    if(right_size == 1)
+    {
+        bool sign = p_right.getSign();
+        icell_t value = p_right.getData()[0];
+
+        if(value == 0)
+        {
+            throw InfiniterException::ZeroDivision();
+        }
+
+        /// standard division
+        if(left_size == 1)
+        {
+            InfiniterDerived result(
+                p_left.getData()[0] / value, 1,
+                p_left.getSign() ^ sign);
+            return result;
+        }
+
+        /// handle easy cases like:
+        /// 000...001
+        /// 000...010
+        /// ...
+        /// 100...000
+        bool right_is_pow_2 = value && !(value & (value -1));
+        if(right_is_pow_2)
+        {
+            InfiniterDerived tmp_left(p_left);
+            return tmp_left.shiftRight(ICELL_LSB_POS(value));
+        }
+
+    }
+
+    /// x / x+y    where y > 0, is always 0
+    if(left_size < right_size) // or full comparison
+    {
+        return InfiniterDerived();
+    }
+
+    bool sign = p_left.getSign() ^ p_right.getSign();
+    InfiniterDerived result(0, left_size, sign);
+
+    /// comparison optimization
+    for(isize_t i=0; i<left_size; i++)
+    {
+        isize_t i_rev = left_size -i -1;
+
+        result.shiftLeft(1);
+
+
+    }
+
+    // if()
+    // // 1. Obsługa błędu krytycznego
+    // if (y.blocks.empty() || (y.blocks.size() == 1 && y.blocks[0] == 0)) {
+    //     throw std::domain_error("Division by zero");
+    // }
+
+    // DivModResult result;
+    // result.quotient.blocks.assign(x.blocks.size(), 0);
+    // result.remainder.blocks = {0};
+
+    // // 2. Optymalizacja: Jeśli |X| < |Y|, wynik to 0, a reszta to X.
+    // if (abs_compare(x, y) < 0) {
+    //     result.quotient.blocks = {0};
+    //     result.remainder = x;
+    //     return result;
+    // }
+
+    // // 3. Główna pętla dzielenia bitowego.
+    // // Iterujemy od najbardziej znaczącego bitu dzielnej (X) w dół do zera.
+    // // Metoda total_bits() powinna zwracać pozycję najwyższego ustawionego bitu.
+    // int max_bit = x.total_bits() - 1;
+
+    // for (int i = max_bit; i >= 0; --i) {
+    //     // A) Przesuń resztę o 1 bit w lewo (mnożenie przez 2)
+    //     result.remainder.shift_left_by_one();
+
+    //     // B) Pobierz i-ty bit z X i wstaw na najmłodszą pozycję reszty
+    //     if (x.test_bit(i)) {
+    //         result.remainder.set_bit(0, 1);
+    //     }
+
+    //     // C) Sprawdź, czy reszta jest większa lub równa dzielnikowi (na modułach)
+    //     if (abs_compare(result.remainder, y) >= 0) {
+    //         // Odejmowanie wartości bezwzględnych
+    //         result.remainder = abs_subtract(result.remainder, y);
+
+    //         // Ustawiamy i-ty bit w ilorazie na 1
+    //         result.quotient.set_bit(i, 1);
+    //     }
+    // }
+
+    // // 4. Czyszczenie wiodących zer w ilorazie
+    // result.quotient.trim_leading_zeros();
+    // result.remainder.trim_leading_zeros();
+
+    // // 5. Ustalanie znaków
+    // // Iloraz ma znak ujemny tylko wtedy, gdy operandy miały różne znaki.
+    // result.quotient.is_negative = (x.is_negative != y.is_negative) && !result.quotient.is_zero();
+
+    // // Znak reszty w matematyce zależy od konwencji. W C++ (od C++11)
+    // // operator % dla typów wbudowanych zachowuje znak dzielnej (X).
+    // result.remainder.is_negative = x.is_negative && !result.remainder.is_zero();
+
+    // return result;
+
+    /// division:
 }
 
 template<typename InfiniterDerived>

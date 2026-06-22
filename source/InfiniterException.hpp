@@ -35,9 +35,14 @@ namespace InfiniterException{
     class InvalidBase : public Exception { public:
         explicit InvalidBase(uint8_t p_base, uint8_t p_min_base, uint8_t p_max_base)
             : Exception(
-                  "Invalid base: " + std::to_string(p_base) +
+                  "Invalid Base: " + std::to_string(p_base) +
                   ", must be between " + std::to_string(p_min_base) +
                   " and " + std::to_string(p_min_base)) {}
+    };
+
+    class ZeroDivision : public Exception { public:
+        explicit ZeroDivision()
+            : Exception("Zero Division!") {}
     };
 
     class InputContainerCapacityExceeded : public Exception { public:
